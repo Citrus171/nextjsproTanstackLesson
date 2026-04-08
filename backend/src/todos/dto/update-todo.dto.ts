@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class UpdateTodoDto {
   @ApiPropertyOptional({ example: 'タイトル更新', description: 'Todoのタイトル' })
@@ -16,4 +16,11 @@ export class UpdateTodoDto {
   @IsBoolean()
   @IsOptional()
   completed?: boolean;
+
+  @ApiPropertyOptional({ example: 1, description: '優先度 1-3' })
+  @IsNumber()
+  @Min(1)
+  @Max(3)
+  @IsOptional()
+  priority?: number;
 }

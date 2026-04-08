@@ -26,6 +26,7 @@ export class TodosService {
     const todo = this.todoRepository.create({
       title: dto.title,
       description: dto.description,
+      priority: dto.priority,
       completed: false,
     });
     return this.todoRepository.save(todo);

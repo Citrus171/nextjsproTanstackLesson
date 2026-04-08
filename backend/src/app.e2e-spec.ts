@@ -9,10 +9,15 @@ async function createTestApp(): Promise<INestApplication> {
   const module: TestingModule = await Test.createTestingModule({
     imports: [
       TypeOrmModule.forRoot({
-        type: 'better-sqlite3',
-        database: ':memory:',
+        type: 'mysql',
+        host: process.env.DB_HOST ?? 'localhost',
+        port: 3306,
+        username: process.env.DB_USER ?? 'root',
+        password: process.env.DB_PASSWORD ?? 'password',
+        database: process.env.DB_TEST_NAME ?? 'todo_test',
         entities: [TodoEntity],
         synchronize: true,
+        dropSchema: true,
       }),
       TodosModule,
     ],

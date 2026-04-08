@@ -20,6 +20,10 @@ export class TodoEntity {
   @ApiPropertyOptional({ example: 'Swaggerの設定から始める', description: '詳細説明' })
   description?: string;
 
+  @Column({ nullable: true })
+  @ApiPropertyOptional({ example: 1, description: '優先度 1-3' })
+  priority?: number;
+
   @Column({ default: false })
   @ApiProperty({ example: false, description: '完了フラグ' })
   completed: boolean;
