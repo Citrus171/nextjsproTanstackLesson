@@ -4,6 +4,9 @@ memo/
 # Claude Code 設定（ローカルパスを含むため除外）
 .claude/
 
+# Playwright MCP（自動生成）
+.playwright-mcp/
+
 # 依存関係
 node_modules/
 backend/node_modules/
