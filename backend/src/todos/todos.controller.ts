@@ -23,7 +23,7 @@ export class TodosController {
   @Get()
   @ApiOperation({ summary: 'Todo一覧取得' })
   @ApiResponse({ status: 200, description: 'Todo一覧', type: [TodoEntity] })
-  findAll(): TodoEntity[] {
+  findAll(): Promise<TodoEntity[]> {
     return this.todosService.findAll();
   }
 
@@ -31,14 +31,14 @@ export class TodosController {
   @ApiOperation({ summary: 'Todo1件取得' })
   @ApiResponse({ status: 200, description: 'Todo詳細', type: TodoEntity })
   @ApiResponse({ status: 404, description: '見つからない' })
-  findOne(@Param('id', ParseIntPipe) id: number): TodoEntity {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<TodoEntity> {
     return this.todosService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Todo作成' })
   @ApiResponse({ status: 201, description: '作成成功', type: TodoEntity })
-  create(@Body() createTodoDto: CreateTodoDto): TodoEntity {
+  create(@Body() createTodoDto: CreateTodoDto): Promise<TodoEntity> {
     return this.todosService.create(createTodoDto);
   }
 
@@ -48,7 +48,7 @@ export class TodosController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTodoDto: UpdateTodoDto,
-  ): TodoEntity {
+  ): Promise<TodoEntity> {
     return this.todosService.update(id, updateTodoDto);
   }
 
@@ -56,7 +56,7 @@ export class TodosController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Todo削除' })
   @ApiResponse({ status: 204, description: '削除成功' })
-  remove(@Param('id', ParseIntPipe) id: number): void {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.todosService.remove(id);
   }
 }

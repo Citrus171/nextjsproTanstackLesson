@@ -8,7 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "codegen": "openapi-ts"
+    "codegen": "openapi-ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "type-coverage": "npx type-coverage --at-least 95 --strict --project tsconfig.app.json --ignore-files \"src/api/generated/**\" --ignore-files \"src/test/**\" --ignore-files \"src/main.tsx\""
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.13.1",
@@ -19,16 +23,23 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@hey-api/openapi-ts": "^0.95.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.3",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "jsdom": "^29.0.2",
+    "msw": "^2.13.1",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",
-    "vite": "^8.0.4"
+    "vite": "^8.0.4",
+    "vitest": "^4.1.3"
   }
 }

@@ -36,6 +36,10 @@ export type CreateTodoDto = {
      * 詳細説明
      */
     description?: string;
+    /**
+     * 優先度 1-3
+     */
+    priority?: number;
 };
 
 export type UpdateTodoDto = {

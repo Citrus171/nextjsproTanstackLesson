@@ -210,6 +210,11 @@
             "type": "string",
             "example": "Swaggerの設定から始める",
             "description": "詳細説明"
+          },
+          "priority": {
+            "type": "number",
+            "example": 1,
+            "description": "優先度 1-3"
           }
         },
         "required": [

@@ -1,0 +1,55 @@
+### ① whitelist の効果確認（余分なフィールドが除去されるか）
+POST http://localhost:3000/todos
+Content-Type: application/json
+
+{
+  "title": "テスト",
+  "description": "説明",
+  "hacker": "悪意のあるフィールド"
+}
+
+###
+
+### ② @IsNotEmpty() の効果確認（空文字を弾くか）
+POST http://localhost:3000/todos
+Content-Type: application/json
+
+{
+  "title": ""
+}
+
+###
+
+### ③ バリデーション正常系
+POST http://localhost:3000/todos
+Content-Type: application/json
+
+{
+  "title": "正常なTodo",
+  "description": "説明文"
+}
+
+###
+
+### ④ Todo一覧取得
+GET http://localhost:3000/todos
+
+###
+
+### ⑤ Todo1件取得（id=1）
+GET http://localhost:3000/todos/1
+
+###
+
+### ⑥ Todo更新（完了フラグをtrueに）
+PATCH http://localhost:3000/todos/1
+Content-Type: application/json
+
+{
+  "completed": true
+}
+
+###
+
+### ⑦ Todo削除
+DELETE http://localhost:3000/todos/1
