@@ -1,34 +1,37 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
-@Entity('todos')
+@Entity("todos")
 export class TodoEntity {
   @PrimaryGeneratedColumn()
-  @ApiProperty({ example: 1, description: 'ID' })
-  id: number;
+  @ApiProperty({ example: 1, description: "ID" })
+  id!: number;
 
   @Column()
-  @ApiProperty({ example: 'NestJSを学ぶ', description: 'タイトル' })
-  title: string;
+  @ApiProperty({ example: "NestJSを学ぶ", description: "タイトルABC" })
+  title!: string;
 
   @Column({ nullable: true })
-  @ApiPropertyOptional({ example: 'Swaggerの設定から始める', description: '詳細説明' })
+  @ApiPropertyOptional({
+    example: "Swaggerの設定から始める",
+    description: "詳細説明BBC",
+  })
   description?: string;
 
   @Column({ nullable: true })
-  @ApiPropertyOptional({ example: 1, description: '優先度 1-3' })
+  @ApiPropertyOptional({ example: 1, description: "優先度 1-3" })
   priority?: number;
 
   @Column({ default: false })
-  @ApiProperty({ example: false, description: '完了フラグ' })
-  completed: boolean;
+  @ApiProperty({ example: false, description: "完了フラグ" })
+  completed!: boolean;
 
   @CreateDateColumn()
-  @ApiProperty({ example: '2024-01-01T00:00:00.000Z', description: '作成日時' })
-  createdAt: Date;
+  @ApiProperty({ example: "2024-01-01T00:00:00.000Z", description: "作成日時" })
+  createdAt!: Date;
 }
