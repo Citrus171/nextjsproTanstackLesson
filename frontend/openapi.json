@@ -1,0 +1,241 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/todos": {
+      "get": {
+        "operationId": "TodosController_findAll",
+        "summary": "Todo一覧取得",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Todo一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TodoEntity"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "todos"
+        ]
+      },
+      "post": {
+        "operationId": "TodosController_create",
+        "summary": "Todo作成",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTodoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "todos"
+        ]
+      }
+    },
+    "/todos/{id}": {
+      "get": {
+        "operationId": "TodosController_findOne",
+        "summary": "Todo1件取得",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Todo詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "見つからない"
+          }
+        },
+        "tags": [
+          "todos"
+        ]
+      },
+      "patch": {
+        "operationId": "TodosController_update",
+        "summary": "Todo更新",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTodoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodoEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "todos"
+        ]
+      },
+      "delete": {
+        "operationId": "TodosController_remove",
+        "summary": "Todo削除",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "削除成功"
+          }
+        },
+        "tags": [
+          "todos"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Todo API",
+    "description": "NestJS + Swagger 学習用 Todo API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "TodoEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "ID"
+          },
+          "title": {
+            "type": "string",
+            "example": "NestJSを学ぶ",
+            "description": "タイトル"
+          },
+          "description": {
+            "type": "string",
+            "example": "Swaggerの設定から始める",
+            "description": "詳細説明"
+          },
+          "completed": {
+            "type": "boolean",
+            "example": false,
+            "description": "完了フラグ"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z",
+            "description": "作成日時"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "completed",
+          "createdAt"
+        ]
+      },
+      "CreateTodoDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "NestJSを学ぶ",
+            "description": "Todoのタイトル"
+          },
+          "description": {
+            "type": "string",
+            "example": "Swaggerの設定から始める",
+            "description": "詳細説明"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "UpdateTodoDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "タイトル更新",
+            "description": "Todoのタイトル"
+          },
+          "description": {
+            "type": "string",
+            "example": "詳細更新",
+            "description": "詳細説明"
+          },
+          "completed": {
+            "type": "boolean",
+            "example": true,
+            "description": "完了フラグ"
+          }
+        }
+      }
+    }
+  }
+}
