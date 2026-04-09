@@ -5,6 +5,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "repl": "nest start --entryFile repl",
     "export:openapi": "ts-node -e \"require('./src/export-openapi')\" && echo 'openapi.json exported'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
