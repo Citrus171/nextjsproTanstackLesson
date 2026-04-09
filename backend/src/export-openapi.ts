@@ -16,6 +16,7 @@ async function exportOpenApi() {
     .setTitle('Todo API')
     .setDescription('NestJS + Swagger 学習用 Todo API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

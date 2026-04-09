@@ -1,9 +1,17 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ExecutionContext, INestApplication, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import request from 'supertest';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { TodoEntity } from './todos/entities/todo.entity';
 import { TodosModule } from './todos/todos.module';
+
+class MockJwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(_ctx: ExecutionContext): boolean {
+    return true;
+  }
+}
 
 async function createTestApp(): Promise<INestApplication> {
   const module: TestingModule = await Test.createTestingModule({
@@ -21,7 +29,10 @@ async function createTestApp(): Promise<INestApplication> {
       }),
       TodosModule,
     ],
-  }).compile();
+  })
+    .overrideGuard(JwtAuthGuard)
+    .useClass(MockJwtAuthGuard)
+    .compile();
 
   const app = module.createNestApplication();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));

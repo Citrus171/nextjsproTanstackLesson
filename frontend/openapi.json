@@ -23,6 +23,11 @@
         },
         "tags": [
           "todos"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "post": {
@@ -53,6 +58,11 @@
         },
         "tags": [
           "todos"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -87,6 +97,11 @@
         },
         "tags": [
           "todos"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "patch": {
@@ -126,6 +141,11 @@
         },
         "tags": [
           "todos"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "delete": {
@@ -148,6 +168,73 @@
         },
         "tags": [
           "todos"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
         ]
       }
     }
@@ -161,6 +248,13 @@
   "tags": [],
   "servers": [],
   "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
     "schemas": {
       "TodoEntity": {
         "type": "object",
@@ -173,12 +267,17 @@
           "title": {
             "type": "string",
             "example": "NestJSを学ぶ",
-            "description": "タイトル"
+            "description": "タイトルABC"
           },
           "description": {
             "type": "string",
             "example": "Swaggerの設定から始める",
-            "description": "詳細説明"
+            "description": "詳細説明BBC"
+          },
+          "priority": {
+            "type": "number",
+            "example": 1,
+            "description": "優先度 1-3"
           },
           "completed": {
             "type": "boolean",
@@ -186,6 +285,7 @@
             "description": "完了フラグ"
           },
           "createdAt": {
+            "format": "date-time",
             "type": "string",
             "example": "2024-01-01T00:00:00.000Z",
             "description": "作成日時"
@@ -238,6 +338,11 @@
             "type": "boolean",
             "example": true,
             "description": "完了フラグ"
+          },
+          "priority": {
+            "type": "number",
+            "example": 1,
+            "description": "優先度 1-3"
           }
         }
       }

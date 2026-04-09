@@ -87,7 +87,7 @@ describe('TodosService', () => {
   // ── create ───────────────────────────────────────────────
   describe('create', () => {
     it('新しいTodoを作成して保存する', async () => {
-      const dto = { title: '新Todo', description: '説明' };
+      const dto = { title: '新Todo', description: '説明', priority: 2 };
       const entity = makeTodo({ title: dto.title, description: dto.description });
       repo.create.mockReturnValue(entity);
       repo.save.mockResolvedValue(entity);
@@ -97,6 +97,7 @@ describe('TodosService', () => {
       expect(repo.create).toHaveBeenCalledWith({
         title: dto.title,
         description: dto.description,
+        priority: dto.priority,
         completed: false,
       });
       expect(repo.save).toHaveBeenCalledWith(entity);
@@ -114,6 +115,7 @@ describe('TodosService', () => {
       expect(repo.create).toHaveBeenCalledWith({
         title: 'タイトルのみ',
         description: undefined,
+        priority: undefined,
         completed: false,
       });
     });

@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { type Options, todosControllerCreate, todosControllerFindAll, todosControllerFindOne, todosControllerRemove, todosControllerUpdate } from '../sdk.gen';
-import type { TodosControllerCreateData, TodosControllerCreateResponse, TodosControllerFindAllData, TodosControllerFindAllResponse, TodosControllerFindOneData, TodosControllerFindOneResponse, TodosControllerRemoveData, TodosControllerRemoveResponse, TodosControllerUpdateData, TodosControllerUpdateResponse } from '../types.gen';
+import { authControllerLogin, authControllerRegister, type Options, todosControllerCreate, todosControllerFindAll, todosControllerFindOne, todosControllerRemove, todosControllerUpdate } from '../sdk.gen';
+import type { AuthControllerLoginData, AuthControllerRegisterData, TodosControllerCreateData, TodosControllerCreateResponse, TodosControllerFindAllData, TodosControllerFindAllResponse, TodosControllerFindOneData, TodosControllerFindOneResponse, TodosControllerRemoveData, TodosControllerRemoveResponse, TodosControllerUpdateData, TodosControllerUpdateResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -116,6 +116,34 @@ export const todosControllerUpdateMutation = (options?: Partial<Options<TodosCon
     const mutationOptions: UseMutationOptions<TodosControllerUpdateResponse, DefaultError, Options<TodosControllerUpdateData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await todosControllerUpdate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const authControllerRegisterMutation = (options?: Partial<Options<AuthControllerRegisterData>>): UseMutationOptions<unknown, DefaultError, Options<AuthControllerRegisterData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<AuthControllerRegisterData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await authControllerRegister({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const authControllerLoginMutation = (options?: Partial<Options<AuthControllerLoginData>>): UseMutationOptions<unknown, DefaultError, Options<AuthControllerLoginData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DefaultError, Options<AuthControllerLoginData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await authControllerLogin({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

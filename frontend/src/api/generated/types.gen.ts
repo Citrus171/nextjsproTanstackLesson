@@ -10,13 +10,17 @@ export type TodoEntity = {
      */
     id: number;
     /**
-     * タイトル
+     * タイトルABC
      */
     title: string;
     /**
-     * 詳細説明
+     * 詳細説明BBC
      */
     description?: string;
+    /**
+     * 優先度 1-3
+     */
+    priority?: number;
     /**
      * 完了フラグ
      */
@@ -55,6 +59,10 @@ export type UpdateTodoDto = {
      * 完了フラグ
      */
     completed?: boolean;
+    /**
+     * 優先度 1-3
+     */
+    priority?: number;
 };
 
 export type TodosControllerFindAllData = {
@@ -149,3 +157,31 @@ export type TodosControllerUpdateResponses = {
 };
 
 export type TodosControllerUpdateResponse = TodosControllerUpdateResponses[keyof TodosControllerUpdateResponses];
+
+export type AuthControllerRegisterData = {
+    body: {
+        email?: string;
+        password?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/register';
+};
+
+export type AuthControllerRegisterResponses = {
+    201: unknown;
+};
+
+export type AuthControllerLoginData = {
+    body: {
+        email?: string;
+        password?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/login';
+};
+
+export type AuthControllerLoginResponses = {
+    201: unknown;
+};

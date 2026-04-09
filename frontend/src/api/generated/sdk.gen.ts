@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { TodosControllerCreateData, TodosControllerCreateResponses, TodosControllerFindAllData, TodosControllerFindAllResponses, TodosControllerFindOneData, TodosControllerFindOneErrors, TodosControllerFindOneResponses, TodosControllerRemoveData, TodosControllerRemoveResponses, TodosControllerUpdateData, TodosControllerUpdateResponses } from './types.gen';
+import type { AuthControllerLoginData, AuthControllerLoginResponses, AuthControllerRegisterData, AuthControllerRegisterResponses, TodosControllerCreateData, TodosControllerCreateResponses, TodosControllerFindAllData, TodosControllerFindAllResponses, TodosControllerFindOneData, TodosControllerFindOneErrors, TodosControllerFindOneResponses, TodosControllerRemoveData, TodosControllerRemoveResponses, TodosControllerUpdateData, TodosControllerUpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -21,12 +21,17 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * Todo一覧取得
  */
-export const todosControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<TodosControllerFindAllData, ThrowOnError>) => (options?.client ?? client).get<TodosControllerFindAllResponses, unknown, ThrowOnError>({ url: '/todos', ...options });
+export const todosControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<TodosControllerFindAllData, ThrowOnError>) => (options?.client ?? client).get<TodosControllerFindAllResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/todos',
+    ...options
+});
 
 /**
  * Todo作成
  */
 export const todosControllerCreate = <ThrowOnError extends boolean = false>(options: Options<TodosControllerCreateData, ThrowOnError>) => (options.client ?? client).post<TodosControllerCreateResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/todos',
     ...options,
     headers: {
@@ -38,18 +43,45 @@ export const todosControllerCreate = <ThrowOnError extends boolean = false>(opti
 /**
  * Todo削除
  */
-export const todosControllerRemove = <ThrowOnError extends boolean = false>(options: Options<TodosControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<TodosControllerRemoveResponses, unknown, ThrowOnError>({ url: '/todos/{id}', ...options });
+export const todosControllerRemove = <ThrowOnError extends boolean = false>(options: Options<TodosControllerRemoveData, ThrowOnError>) => (options.client ?? client).delete<TodosControllerRemoveResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/todos/{id}',
+    ...options
+});
 
 /**
  * Todo1件取得
  */
-export const todosControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<TodosControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<TodosControllerFindOneResponses, TodosControllerFindOneErrors, ThrowOnError>({ url: '/todos/{id}', ...options });
+export const todosControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<TodosControllerFindOneData, ThrowOnError>) => (options.client ?? client).get<TodosControllerFindOneResponses, TodosControllerFindOneErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/todos/{id}',
+    ...options
+});
 
 /**
  * Todo更新
  */
 export const todosControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<TodosControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<TodosControllerUpdateResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/todos/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const authControllerRegister = <ThrowOnError extends boolean = false>(options: Options<AuthControllerRegisterData, ThrowOnError>) => (options.client ?? client).post<AuthControllerRegisterResponses, unknown, ThrowOnError>({
+    url: '/auth/register',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const authControllerLogin = <ThrowOnError extends boolean = false>(options: Options<AuthControllerLoginData, ThrowOnError>) => (options.client ?? client).post<AuthControllerLoginResponses, unknown, ThrowOnError>({
+    url: '/auth/login',
     ...options,
     headers: {
         'Content-Type': 'application/json',
