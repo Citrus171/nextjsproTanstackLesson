@@ -1,0 +1,7 @@
+{
+  "name": "nestjspro",
+  "private": true,
+  "scripts": {
+    "gen": "npm run export:openapi --prefix backend && npm run codegen --prefix frontend"
+  }
+}
