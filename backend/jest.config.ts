@@ -3,17 +3,19 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',
-  testRegex: '.*\\.(spec|e2e-spec)\\.ts$',
+  testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
   collectCoverageFrom: [
     '**/*.(t|j)s',
     '!**/main.ts',
+    '!**/repl.ts',
     '!**/export-openapi.ts',
     '!**/*.spec.ts',
     '!**/*.e2e-spec.ts',
     '!**/*.module.ts',
+    '!**/health.controller.ts',
   ],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',

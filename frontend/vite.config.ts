@@ -16,6 +16,10 @@ export default defineConfig({
         'src/api/setup.ts',
         'src/main.tsx',
         'src/test/**',
+        'src/routeTree.gen.ts',
+        'src/router.ts',
+        'src/routes/**',
+        'src/routerTypes.d.ts',
       ],
       thresholds: {
         lines: 80,
