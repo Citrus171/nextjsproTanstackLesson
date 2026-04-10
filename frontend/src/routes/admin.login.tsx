@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { authControllerAdminLogin } from "@/api/generated/sdk.gen";
+import { adminAuthControllerAdminLogin } from "@/api/generated/sdk.gen";
 import { setToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ function AdminLoginPage() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    const { data: res, error } = await authControllerAdminLogin({
+    const { data: res, error } = await adminAuthControllerAdminLogin({
       body: data,
       throwOnError: false,
     });

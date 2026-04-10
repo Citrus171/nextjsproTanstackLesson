@@ -15,7 +15,7 @@ vi.mock('@tanstack/react-router', async () => {
 });
 
 vi.mock('@/api/generated/sdk.gen', () => ({
-  authControllerAdminLogin: (...args: unknown[]) => mockAdminLogin(...args),
+  adminAuthControllerAdminLogin: (...args: unknown[]) => mockAdminLogin(...args),
 }));
 
 vi.mock('@/lib/auth', () => ({

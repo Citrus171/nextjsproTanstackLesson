@@ -3,6 +3,12 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import type {
+  AdminAuthControllerAdminLoginData,
+  AdminAuthControllerAdminLoginResponses,
+  AdminAuthControllerAdminMeData,
+  AdminAuthControllerAdminMeResponses,
+  AdminAuthControllerSuperOnlyData,
+  AdminAuthControllerSuperOnlyResponses,
   AuthControllerAdminLoginData,
   AuthControllerAdminLoginResponses,
   AuthControllerAdminMeData,
@@ -112,7 +118,7 @@ export const authControllerAdminLogin = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
-    url: "/admin/auth/login",
+    url: "/auth/admin/login",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -127,13 +133,53 @@ export const authControllerAdminMe = <ThrowOnError extends boolean = false>(
     AuthControllerAdminMeResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/auth/me", ...options });
+  >({ url: "/auth/admin/me", ...options });
 
 export const authControllerSuperOnly = <ThrowOnError extends boolean = false>(
   options?: Options<AuthControllerSuperOnlyData, ThrowOnError>,
 ) =>
   (options?.client ?? client).get<
     AuthControllerSuperOnlyResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/auth/admin/super-only", ...options });
+
+export const adminAuthControllerAdminLogin = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminAuthControllerAdminLoginData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    AdminAuthControllerAdminLoginResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/admin/auth/login",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const adminAuthControllerAdminMe = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminAuthControllerAdminMeData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminAuthControllerAdminMeResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/auth/me", ...options });
+
+export const adminAuthControllerSuperOnly = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminAuthControllerSuperOnlyData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminAuthControllerSuperOnlyResponses,
     unknown,
     ThrowOnError
   >({ url: "/admin/auth/super-only", ...options });
