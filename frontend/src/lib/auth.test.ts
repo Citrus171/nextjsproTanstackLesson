@@ -110,10 +110,7 @@ describe("isAdminAuthenticated", () => {
   });
 
   it("typeがuserのJWTの時、falseを返すこと", () => {
-    localStorage.setItem(
-      ADMIN_TOKEN_KEY,
-      makeJwt({ sub: 1, type: "user" }),
-    );
+    localStorage.setItem(ADMIN_TOKEN_KEY, makeJwt({ sub: 1, type: "user" }));
     expect(isAdminAuthenticated()).toBe(false);
   });
 
