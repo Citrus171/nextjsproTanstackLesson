@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
-
-export type AdminRole = 'super' | 'general';
+import type { AdminRole } from '../entities/admin-user.entity';
 
 export class CreateAdminUserDto {
   @ApiProperty({ example: '管理者太郎', description: '管理者の名前' })

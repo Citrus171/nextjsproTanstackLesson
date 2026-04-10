@@ -173,7 +173,7 @@ export const adminAccountsControllerFindAll = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/accounts",
+    url: "/admin/admins",
     ...options,
   });
 
@@ -188,7 +188,7 @@ export const adminAccountsControllerCreate = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/accounts",
+    url: "/admin/admins",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -207,7 +207,7 @@ export const adminAccountsControllerDelete = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/accounts/{id}",
+    url: "/admin/admins/{id}",
     ...options,
   });
 
@@ -222,7 +222,7 @@ export const adminAccountsControllerFindById = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/accounts/{id}",
+    url: "/admin/admins/{id}",
     ...options,
   });
 
@@ -237,7 +237,7 @@ export const adminAccountsControllerUpdate = <
     ThrowOnError
   >({
     security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/accounts/{id}",
+    url: "/admin/admins/{id}",
     ...options,
     headers: {
       "Content-Type": "application/json",

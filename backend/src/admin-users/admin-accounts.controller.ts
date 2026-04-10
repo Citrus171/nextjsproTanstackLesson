@@ -6,6 +6,7 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -18,8 +19,8 @@ import { AdminUserResponseDto } from './dto/admin-user-response.dto';
 import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth.guard';
 import { SuperAdminGuard } from '../auth/guards/super-admin.guard';
 
-@ApiTags('admin/accounts')
-@Controller('admin/accounts')
+@ApiTags('admin/admins')
+@Controller('admin/admins')
 export class AdminAccountsController {
   constructor(private readonly adminUsersService: AdminUsersService) {}
 
@@ -40,8 +41,8 @@ export class AdminAccountsController {
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(AdminJwtAuthGuard, SuperAdminGuard)
-  async findById(@Param('id') id: string): Promise<AdminUserResponseDto> {
-    const admin = await this.adminUsersService.findById(Number(id));
+  async findById(@Param('id', ParseIntPipe) id: number): Promise<AdminUserResponseDto> {
+    const admin = await this.adminUsersService.findById(id);
     if (!admin) {
       throw new NotFoundException('管理者アカウントが見つかりません');
     }
@@ -52,10 +53,10 @@ export class AdminAccountsController {
   @ApiBearerAuth()
   @UseGuards(AdminJwtAuthGuard, SuperAdminGuard)
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateAdminUserDto,
   ): Promise<AdminUserResponseDto> {
-    const admin = await this.adminUsersService.update(Number(id), dto);
+    const admin = await this.adminUsersService.update(id, dto);
     if (!admin) {
       throw new NotFoundException('管理者アカウントが見つかりません');
     }
@@ -66,11 +67,11 @@ export class AdminAccountsController {
   @HttpCode(204)
   @ApiBearerAuth()
   @UseGuards(AdminJwtAuthGuard, SuperAdminGuard)
-  async delete(@Param('id') id: string): Promise<void> {
-    const admin = await this.adminUsersService.findById(Number(id));
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    const admin = await this.adminUsersService.findById(id);
     if (!admin) {
       throw new NotFoundException('管理者アカウントが見つかりません');
     }
-    await this.adminUsersService.softDelete(Number(id));
+    await this.adminUsersService.softDelete(id);
   }
 }

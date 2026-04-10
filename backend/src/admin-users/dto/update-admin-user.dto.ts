@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-
-export type AdminRole = 'super' | 'general';
+import { AdminRole } from '../entities/admin-user.entity';
 
 export class UpdateAdminUserDto {
   @ApiProperty({ example: '管理者太郎', description: '管理者の名前' })

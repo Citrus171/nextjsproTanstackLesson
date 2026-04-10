@@ -166,7 +166,7 @@
         ]
       }
     },
-    "/admin/accounts": {
+    "/admin/admins": {
       "post": {
         "operationId": "AdminAccountsController_create",
         "parameters": [],
@@ -186,7 +186,7 @@
           }
         },
         "tags": [
-          "admin/accounts"
+          "admin/admins"
         ],
         "security": [
           {
@@ -203,7 +203,7 @@
           }
         },
         "tags": [
-          "admin/accounts"
+          "admin/admins"
         ],
         "security": [
           {
@@ -212,7 +212,7 @@
         ]
       }
     },
-    "/admin/accounts/{id}": {
+    "/admin/admins/{id}": {
       "get": {
         "operationId": "AdminAccountsController_findById",
         "parameters": [
@@ -221,7 +221,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -231,7 +231,7 @@
           }
         },
         "tags": [
-          "admin/accounts"
+          "admin/admins"
         ],
         "security": [
           {
@@ -247,7 +247,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -267,7 +267,7 @@
           }
         },
         "tags": [
-          "admin/accounts"
+          "admin/admins"
         ],
         "security": [
           {
@@ -283,7 +283,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -293,7 +293,7 @@
           }
         },
         "tags": [
-          "admin/accounts"
+          "admin/admins"
         ],
         "security": [
           {

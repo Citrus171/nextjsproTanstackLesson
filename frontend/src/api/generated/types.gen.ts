@@ -174,7 +174,7 @@ export type AdminAccountsControllerFindAllData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/admin/accounts";
+  url: "/admin/admins";
 };
 
 export type AdminAccountsControllerFindAllResponses = {
@@ -185,7 +185,7 @@ export type AdminAccountsControllerCreateData = {
   body: CreateAdminUserDto;
   path?: never;
   query?: never;
-  url: "/admin/accounts";
+  url: "/admin/admins";
 };
 
 export type AdminAccountsControllerCreateResponses = {
@@ -195,10 +195,10 @@ export type AdminAccountsControllerCreateResponses = {
 export type AdminAccountsControllerDeleteData = {
   body?: never;
   path: {
-    id: string;
+    id: number;
   };
   query?: never;
-  url: "/admin/accounts/{id}";
+  url: "/admin/admins/{id}";
 };
 
 export type AdminAccountsControllerDeleteResponses = {
@@ -211,10 +211,10 @@ export type AdminAccountsControllerDeleteResponse =
 export type AdminAccountsControllerFindByIdData = {
   body?: never;
   path: {
-    id: string;
+    id: number;
   };
   query?: never;
-  url: "/admin/accounts/{id}";
+  url: "/admin/admins/{id}";
 };
 
 export type AdminAccountsControllerFindByIdResponses = {
@@ -224,10 +224,10 @@ export type AdminAccountsControllerFindByIdResponses = {
 export type AdminAccountsControllerUpdateData = {
   body: UpdateAdminUserDto;
   path: {
-    id: string;
+    id: number;
   };
   query?: never;
-  url: "/admin/accounts/{id}";
+  url: "/admin/admins/{id}";
 };
 
 export type AdminAccountsControllerUpdateResponses = {

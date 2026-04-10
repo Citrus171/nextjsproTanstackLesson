@@ -88,7 +88,7 @@ describe('AdminAccountsController', () => {
       const admin = makeAdminResponse({ id: 5 });
       service.findById.mockResolvedValue(admin);
 
-      const result = await controller.findById('5');
+      const result = await controller.findById(5);
 
       expect(service.findById).toHaveBeenCalledWith(5);
       expect(result).toEqual(admin);
@@ -97,7 +97,7 @@ describe('AdminAccountsController', () => {
     it('存在しないID時、NotFoundException投げること', async () => {
       service.findById.mockResolvedValue(null);
 
-      await expect(controller.findById('999')).rejects.toThrow(NotFoundException);
+      await expect(controller.findById(999)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -116,7 +116,7 @@ describe('AdminAccountsController', () => {
 
       service.update.mockResolvedValue(updated);
 
-      const result = await controller.update('5', dto);
+      const result = await controller.update(5, dto);
 
       expect(service.update).toHaveBeenCalledWith(5, dto);
       expect(result).toEqual(updated);
@@ -127,7 +127,7 @@ describe('AdminAccountsController', () => {
 
       const dto: UpdateAdminUserDto = { name: '新名前' };
 
-      await expect(controller.update('999', dto)).rejects.toThrow(NotFoundException);
+      await expect(controller.update(999, dto)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -137,7 +137,7 @@ describe('AdminAccountsController', () => {
       service.findById.mockResolvedValue(admin);
       service.softDelete.mockResolvedValue(undefined);
 
-      await controller.delete('5');
+      await controller.delete(5);
 
       expect(service.findById).toHaveBeenCalledWith(5);
       expect(service.softDelete).toHaveBeenCalledWith(5);
@@ -146,7 +146,7 @@ describe('AdminAccountsController', () => {
     it('存在しないID時、NotFoundException投げること', async () => {
       service.findById.mockResolvedValue(null);
 
-      await expect(controller.delete('999')).rejects.toThrow(NotFoundException);
+      await expect(controller.delete(999)).rejects.toThrow(NotFoundException);
     });
   });
 });
