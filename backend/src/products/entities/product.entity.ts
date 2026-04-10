@@ -31,7 +31,7 @@ export class ProductEntity {
   categoryId: number | null;
 
   @ManyToOne(() => CategoryEntity, { nullable: true })
-  @JoinColumn({ name: 'category_id' })
+  @JoinColumn({ name: 'categoryId' })
   category: CategoryEntity | null;
 
   @Column({ default: false })

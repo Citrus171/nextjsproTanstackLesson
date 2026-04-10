@@ -35,7 +35,7 @@ export class OrderEntity {
   userId: number;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
 
   @Column({

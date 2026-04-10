@@ -16,7 +16,7 @@ export class ProductImageEntity {
   productId: number;
 
   @ManyToOne(() => ProductEntity, (p) => p.images)
-  @JoinColumn({ name: 'product_id' })
+  @JoinColumn({ name: 'productId' })
   product: ProductEntity;
 
   @Column()

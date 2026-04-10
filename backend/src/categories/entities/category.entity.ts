@@ -20,7 +20,7 @@ export class CategoryEntity {
   parentId: number | null;
 
   @ManyToOne(() => CategoryEntity, (cat) => cat.children, { nullable: true })
-  @JoinColumn({ name: 'parent_id' })
+  @JoinColumn({ name: 'parentId' })
   parent: CategoryEntity | null;
 
   @OneToMany(() => CategoryEntity, (cat) => cat.parent)

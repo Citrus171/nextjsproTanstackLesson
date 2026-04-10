@@ -17,7 +17,7 @@ export class ProductVariationEntity {
   productId: number;
 
   @ManyToOne(() => ProductEntity, (p) => p.variations)
-  @JoinColumn({ name: 'product_id' })
+  @JoinColumn({ name: 'productId' })
   product: ProductEntity;
 
   @Column()

@@ -77,7 +77,7 @@ nestjspro/
         │           ├── テーブル名がcategoriesであること
         │           ├── nameカラムが存在すること
         │           ├── parentIdカラムがnullableで存在すること
-        │           └── 自己参照リレーション（parent_id FK）が存在すること
+        │           └── 自己参照リレーション（parentId FK）が存在すること
         ├── products/
         │   └── entities/
         │       ├── product.entity.spec.ts
@@ -85,9 +85,15 @@ nestjspro/
         │       │   ├── nameカラムが存在すること
         │       │   ├── priceカラムがINT型で存在すること
         │       │   ├── stockカラムが存在しないこと（バリエーションで管理）
-        │       │   ├── is_publishedカラムがboolean型で存在すること
+        │       │   ├── isPublishedプロパティのカラムが存在すること
         │       │   ├── deletedAtカラムが存在すること（論理削除）
         │       │   └── categoryへのリレーションが存在すること
+        │       ├── product-image.entity.spec.ts
+        │       │   ├── テーブル名がproduct_imagesであること
+        │       │   ├── productIdカラムがINT型で存在すること
+        │       │   ├── urlカラムが存在すること
+        │       │   ├── sortOrderカラムがINT型で存在すること
+        │       │   └── productsへのリレーション（productId FK）が存在すること
         │       └── product-variation.entity.spec.ts
         │           ├── テーブル名がproduct_variationsであること
         │           ├── stockカラムがINT型で存在すること
@@ -107,14 +113,25 @@ nestjspro/
         │           └── product_variationsへのリレーションが存在すること
         ├── orders/
         │   └── entities/
-        │       └── order.entity.spec.ts
-        │           ├── テーブル名がordersであること
-        │           ├── statusカラムがenum型で存在すること
-        │           ├── shippingAddressカラムがJSON型で存在すること
-        │           ├── shippingFeeカラムがINT型で存在すること
-        │           ├── totalAmountカラムがINT型で存在すること
-        │           ├── stripeSessionIdカラムがnullableで存在すること
-        │           └── usersへのリレーションが存在すること
+        │       ├── order.entity.spec.ts
+        │       │   ├── テーブル名がordersであること
+        │       │   ├── statusカラムがenum型で存在すること
+        │       │   ├── shippingAddressカラムがJSON型で存在すること
+        │       │   ├── shippingFeeカラムがINT型で存在すること
+        │       │   ├── totalAmountカラムがINT型で存在すること
+        │       │   ├── stripeSessionIdカラムがnullableで存在すること
+        │       │   └── usersへのリレーションが存在すること
+        │       └── order-item.entity.spec.ts
+        │           ├── テーブル名がorder_itemsであること
+        │           ├── orderIdカラムがINT型で存在すること
+        │           ├── variationIdカラムがINT型で存在すること
+        │           ├── productIdカラムがINT型で存在すること
+        │           ├── productNameカラムが存在すること（スナップショット）
+        │           ├── sizeカラムが存在すること（スナップショット）
+        │           ├── colorカラムが存在すること（スナップショット）
+        │           ├── priceカラムがINT型で存在すること（スナップショット）
+        │           ├── ordersへのリレーション（orderId FK）が存在すること
+        │           └── product_variationsへのリレーション（variationId FK）が存在すること
         └── store-settings/
             └── entities/
                 └── store-settings.entity.spec.ts

@@ -27,7 +27,7 @@ describe('ProductEntity', () => {
     expect(col).toBeUndefined();
   });
 
-  it('is_publishedカラムがboolean型で存在すること', () => {
+  it('isPublishedプロパティのカラムが存在すること', () => {
     const col = getColumns().find((c) => c.propertyName === 'isPublished');
     expect(col).toBeDefined();
   });

@@ -124,7 +124,8 @@ export class InitialSchema1744200000000 implements MigrationInterface {
         \`price\` INT NOT NULL,
         PRIMARY KEY (\`id\`),
         CONSTRAINT \`FK_order_items_order\` FOREIGN KEY (\`orderId\`) REFERENCES \`orders\`(\`id\`) ON DELETE CASCADE,
-        CONSTRAINT \`FK_order_items_variation\` FOREIGN KEY (\`variationId\`) REFERENCES \`product_variations\`(\`id\`)
+        CONSTRAINT \`FK_order_items_variation\` FOREIGN KEY (\`variationId\`) REFERENCES \`product_variations\`(\`id\`),
+        CONSTRAINT \`FK_order_items_product\` FOREIGN KEY (\`productId\`) REFERENCES \`products\`(\`id\`)
       ) ENGINE=InnoDB
     `);
 

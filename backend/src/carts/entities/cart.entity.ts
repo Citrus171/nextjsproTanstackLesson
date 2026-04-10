@@ -19,7 +19,7 @@ export class CartEntity {
   variationId: number;
 
   @ManyToOne(() => ProductVariationEntity)
-  @JoinColumn({ name: 'variation_id' })
+  @JoinColumn({ name: 'variationId' })
   variation: ProductVariationEntity;
 
   @Column({ type: 'int', default: 1 })
