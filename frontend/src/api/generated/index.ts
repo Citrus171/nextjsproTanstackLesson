@@ -2,8 +2,10 @@
 
 export {
   authControllerAdminLogin,
+  authControllerAdminMe,
   authControllerLogin,
   authControllerRegister,
+  authControllerSuperOnly,
   healthControllerCheck,
   type Options,
   usersControllerChangePassword,
@@ -12,10 +14,14 @@ export {
 export type {
   AuthControllerAdminLoginData,
   AuthControllerAdminLoginResponses,
+  AuthControllerAdminMeData,
+  AuthControllerAdminMeResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
+  AuthControllerSuperOnlyData,
+  AuthControllerSuperOnlyResponses,
   ChangePasswordDto,
   ClientOptions,
   HealthControllerCheckData,

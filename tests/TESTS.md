@@ -28,6 +28,18 @@
 
 ---
 
+### SuperAdminGuard `backend/src/auth/guards/super-admin.guard.spec.ts`
+
+- [ ] superロールの時、アクセスを許可すること
+- [ ] generalロールの時、ForbiddenExceptionを投げること
+- [ ] roleが存在しない時、ForbiddenExceptionを投げること
+
+ - [x] superロールの時、アクセスを許可すること
+ - [x] generalロールの時、ForbiddenExceptionを投げること
+ - [x] roleが存在しない時、ForbiddenExceptionを投げること
+
+---
+
 ### AuthService `backend/src/auth/auth.service.spec.ts`
 
 **register**
@@ -63,6 +75,12 @@
 **adminLogin**
 - [ ] 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
 - [ ] サービスがエラーを投げた時、エラーが伝播すること
+
+**adminMe**
+- [ ] 認証済み管理者のidとroleを返すこと
+
+**superOnly**
+- [ ] 到達した時、ok:trueを返すこと
 
 ---
 
@@ -109,6 +127,28 @@
 - [ ] パスワードが不一致の時、401を返すこと
 - [ ] メールアドレス形式が不正な時、400を返すこと
 - [ ] 管理者JWTのペイロードに type:'admin' と role が含まれること
+- [ ] super管理者でログインした時、accessTokenを返すこと
+
+ - [x] 正しい認証情報の時、accessTokenを返すこと
+ - [x] 未登録メールアドレスの時、401を返すこと
+ - [x] パスワードが不一致の時、401を返すこと
+ - [x] メールアドレス形式が不正な時、400を返すこと
+ - [x] 管理者JWTのペイロードに type:'admin' と role が含まれること
+ - [x] super管理者でログインした時、accessTokenを返すこと
+
+**GET /auth/admin/me**
+- [ ] 管理者JWTの時、200でid・roleを返すこと
+- [ ] 会員JWTの時、401を返すこと
+
+ - [x] 管理者JWTの時、200でid・roleを返すこと
+ - [x] 会員JWTの時、401を返すこと
+
+**GET /auth/admin/super-only**
+- [ ] general管理者JWTの時、403を返すこと
+- [ ] super管理者JWTの時、200を返すこと
+
+ - [x] general管理者JWTの時、403を返すこと
+ - [x] super管理者JWTの時、200を返すこと
 
 ---
 
@@ -276,6 +316,33 @@
 **isAuthenticated**
 - [ ] トークンが存在する時はtrueを返すこと
 - [ ] トークンが存在しない時はfalseを返すこと
+
+**isAdminAuthenticated**
+- [ ] typeがadminのJWTの時、trueを返すこと
+- [ ] typeがuserのJWTの時、falseを返すこと
+- [ ] JWT形式でないトークンの時、falseを返すこと
+
+---
+
+### admin route guard `frontend/src/routes/-_admin.test.tsx`
+
+- [ ] 管理者トークンがない時、/admin/loginへリダイレクトすること
+- [ ] 管理者トークンがある時、リダイレクトしないこと
+
+ - [x] 管理者トークンがない時、/admin/loginへリダイレクトすること
+ - [x] 管理者トークンがある時、リダイレクトしないこと
+
+---
+
+### admin login page `frontend/src/routes/-admin.login.test.tsx`
+
+- [ ] 表示時、管理者ログインフォームが表示されること
+- [ ] 有効な認証情報の時、トークンを保存して/adminへ遷移すること
+- [ ] 認証に失敗した時、エラーメッセージを表示すること
+
+ - [x] 表示時、管理者ログインフォームが表示されること
+ - [x] 有効な認証情報の時、トークンを保存して/adminへ遷移すること
+ - [x] 認証に失敗した時、エラーメッセージを表示すること
 
 ---
 

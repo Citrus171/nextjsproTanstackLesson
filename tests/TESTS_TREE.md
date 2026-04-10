@@ -21,7 +21,14 @@ nestjspro/
         │   │       ├── 未登録メールアドレスの時、401を返すこと
         │   │       ├── パスワードが不一致の時、401を返すこと
         │   │       ├── メールアドレス形式が不正な時、400を返すこと
-        │   │       └── 管理者JWTのペイロードに type:'admin' と role が含まれること
+        │   │       ├── 管理者JWTのペイロードに type:'admin' と role が含まれること
+        │   │       └── super管理者でログインした時、accessTokenを返すこと
+        │   │   ├── GET /auth/admin/me
+        │   │   │   ├── 管理者JWTの時、200でid・roleを返すこと
+        │   │   │   └── 会員JWTの時、401を返すこと
+        │   │   └── GET /auth/admin/super-only
+        │   │       ├── general管理者JWTの時、403を返すこと
+        │   │       └── super管理者JWTの時、200を返すこと
         │   ├── auth.service.spec.ts
         │   │   ├── register
         │   │   │   ├── 有効なname・メールアドレス・パスワードの時、id/emailを返すこと
@@ -45,9 +52,13 @@ nestjspro/
         │   │   ├── login
         │   │   │   ├── 有効な認証情報の時、アクセストークンを返すこと
         │   │   │   └── サービスがエラーを投げた時、エラーが伝播すること
-        │   │   └── adminLogin
-        │   │       ├── 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
-        │   │       └── サービスがエラーを投げた時、エラーが伝播すること
+        │   │   ├── adminLogin
+        │   │   │   ├── 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
+        │   │   │   └── サービスがエラーを投げた時、エラーが伝播すること
+        │   │   ├── adminMe
+        │   │   │   └── 認証済み管理者のidとroleを返すこと
+        │   │   └── superOnly
+        │   │       └── 到達した時、ok:trueを返すこと
         │   ├── dto/
         │   │   └── auth.dto.spec.ts
         │   │       ├── RegisterDto
@@ -64,6 +75,11 @@ nestjspro/
         │   │   └── validate
         │   │       ├── 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
         │   │       └── type が "user" でない時、UnauthorizedExceptionを投げること
+        │   └── guards/
+        │       └── super-admin.guard.spec.ts
+        │           ├── superロールの時、アクセスを許可すること
+        │           ├── generalロールの時、ForbiddenExceptionを投げること
+        │           └── roleが存在しない時、ForbiddenExceptionを投げること
         │   └── strategies/
         │       └── admin-jwt.strategy.spec.ts
         │           └── validate
@@ -194,9 +210,21 @@ nestjspro/
         │       │   └── トークンが未保存の時はnullを返すこと
         │       ├── removeToken
         │       │   └── localStorageからトークンを削除すること
-        │       └── isAuthenticated
+        │       ├── isAuthenticated
         │           ├── トークンが存在する時はtrueを返すこと
         │           └── トークンが存在しない時はfalseを返すこと
+        │       └── isAdminAuthenticated
+        │           ├── typeがadminのJWTの時、trueを返すこと
+        │           ├── typeがuserのJWTの時、falseを返すこと
+        │           └── JWT形式でないトークンの時、falseを返すこと
+        ├── routes/
+        │   ├── -_admin.test.tsx
+        │   │   ├── 管理者トークンがない時、/admin/loginへリダイレクトすること
+        │   │   └── 管理者トークンがある時、リダイレクトしないこと
+        │   └── -admin.login.test.tsx
+        │       ├── 表示時、管理者ログインフォームが表示されること
+        │       ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること
+        │       └── 認証に失敗した時、エラーメッセージを表示すること
         └── components/
             └── layouts/
                 ├── MemberLayout.test.tsx

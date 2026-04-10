@@ -9,8 +9,10 @@ import {
 import { client } from "../client.gen";
 import {
   authControllerAdminLogin,
+  authControllerAdminMe,
   authControllerLogin,
   authControllerRegister,
+  authControllerSuperOnly,
   healthControllerCheck,
   type Options,
   usersControllerChangePassword,
@@ -18,8 +20,10 @@ import {
 } from "../sdk.gen";
 import type {
   AuthControllerAdminLoginData,
+  AuthControllerAdminMeData,
   AuthControllerLoginData,
   AuthControllerRegisterData,
+  AuthControllerSuperOnlyData,
   HealthControllerCheckData,
   HealthControllerCheckError,
   HealthControllerCheckResponse,
@@ -189,6 +193,56 @@ export const authControllerAdminLoginMutation = (
   };
   return mutationOptions;
 };
+
+export const authControllerAdminMeQueryKey = (
+  options?: Options<AuthControllerAdminMeData>,
+) => createQueryKey("authControllerAdminMe", options);
+
+export const authControllerAdminMeOptions = (
+  options?: Options<AuthControllerAdminMeData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof authControllerAdminMeQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await authControllerAdminMe({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: authControllerAdminMeQueryKey(options),
+  });
+
+export const authControllerSuperOnlyQueryKey = (
+  options?: Options<AuthControllerSuperOnlyData>,
+) => createQueryKey("authControllerSuperOnly", options);
+
+export const authControllerSuperOnlyOptions = (
+  options?: Options<AuthControllerSuperOnlyData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof authControllerSuperOnlyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await authControllerSuperOnly({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: authControllerSuperOnlyQueryKey(options),
+  });
 
 export const healthControllerCheckQueryKey = (
   options?: Options<HealthControllerCheckData>,

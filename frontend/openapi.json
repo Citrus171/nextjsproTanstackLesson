@@ -128,6 +128,34 @@
         ]
       }
     },
+    "/auth/admin/me": {
+      "get": {
+        "operationId": "AuthController_adminMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/admin/super-only": {
+      "get": {
+        "operationId": "AuthController_superOnly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/health": {
       "get": {
         "operationId": "HealthController_check",

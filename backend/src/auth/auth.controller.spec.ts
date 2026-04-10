@@ -8,6 +8,13 @@ const mockAuthService = {
   adminLogin: jest.fn(),
 };
 
+const adminRequest = {
+  user: {
+    id: 10,
+    role: 'super' as const,
+  },
+};
+
 describe('AuthController', () => {
   let controller: AuthController;
 
@@ -69,6 +76,18 @@ describe('AuthController', () => {
       await expect(
         controller.adminLogin({ email: 'bad@example.com', password: 'wrong' }),
       ).rejects.toThrow('Unauthorized');
+    });
+  });
+
+  describe('adminMe', () => {
+    it('認証済み管理者のidとroleを返すこと', () => {
+      expect(controller.adminMe(adminRequest)).toEqual({ id: 10, role: 'super' });
+    });
+  });
+
+  describe('superOnly', () => {
+    it('到達した時、ok:trueを返すこと', () => {
+      expect(controller.superOnly()).toEqual({ ok: true });
     });
   });
 });

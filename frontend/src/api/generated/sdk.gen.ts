@@ -5,10 +5,14 @@ import { client } from "./client.gen";
 import type {
   AuthControllerAdminLoginData,
   AuthControllerAdminLoginResponses,
+  AuthControllerAdminMeData,
+  AuthControllerAdminMeResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
+  AuthControllerSuperOnlyData,
+  AuthControllerSuperOnlyResponses,
   HealthControllerCheckData,
   HealthControllerCheckErrors,
   HealthControllerCheckResponses,
@@ -28,7 +32,7 @@ export type Options<
    * individual options. This might be also useful if you want to implement a
    * custom client.
    */
-  client?: Client;
+    url: "/admin/auth/login",
   /**
    * You can pass arbitrary values through the `meta` object. This can be
    * used to access values that aren't defined as part of the SDK function.
@@ -115,6 +119,24 @@ export const authControllerAdminLogin = <ThrowOnError extends boolean = false>(
       ...options.headers,
     },
   });
+
+export const authControllerAdminMe = <ThrowOnError extends boolean = false>(
+  options?: Options<AuthControllerAdminMeData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AuthControllerAdminMeResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/auth/me", ...options });
+
+export const authControllerSuperOnly = <ThrowOnError extends boolean = false>(
+  options?: Options<AuthControllerSuperOnlyData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AuthControllerSuperOnlyResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/auth/super-only", ...options });
 
 /**
  * ヘルスチェック（DB接続確認）
