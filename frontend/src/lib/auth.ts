@@ -1,4 +1,23 @@
-const TOKEN_KEY = 'access_token';
+const TOKEN_KEY = "access_token";
+const ADMIN_TOKEN_KEY = "admin_access_token";
+
+interface JwtPayload {
+  type?: string;
+}
+
+function decodeJwtPayload(token: string): JwtPayload | null {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+
+  try {
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const json = atob(padded);
+    return JSON.parse(json) as JwtPayload;
+  } catch {
+    return null;
+  }
+}
 
 export function setToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token);
@@ -12,6 +31,30 @@ export function removeToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+export function setAdminToken(token: string): void {
+  localStorage.setItem(ADMIN_TOKEN_KEY, token);
+}
+
+export function getAdminToken(): string | null {
+  return localStorage.getItem(ADMIN_TOKEN_KEY);
+}
+
+export function removeAdminToken(): void {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+}
+
 export function isAuthenticated(): boolean {
-  return getToken() !== null;
+  const token = getToken();
+  if (!token) return false;
+
+  const payload = decodeJwtPayload(token);
+  return payload?.type === "user";
+}
+
+export function isAdminAuthenticated(): boolean {
+  const token = getAdminToken();
+  if (!token) return false;
+
+  const payload = decodeJwtPayload(token);
+  return payload?.type === "admin";
 }

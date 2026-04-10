@@ -21,7 +21,14 @@ nestjspro/
         │   │       ├── 未登録メールアドレスの時、401を返すこと
         │   │       ├── パスワードが不一致の時、401を返すこと
         │   │       ├── メールアドレス形式が不正な時、400を返すこと
-        │   │       └── 管理者JWTのペイロードに type:'admin' と role が含まれること
+        │   │       ├── 管理者JWTのペイロードに type:'admin' と role が含まれること
+        │   │       └── super管理者でログインした時、accessTokenを返すこと
+        │   │   ├── GET /auth/admin/me
+        │   │   │   ├── 管理者JWTの時、200でid・roleを返すこと
+        │   │   │   └── 会員JWTの時、401を返すこと
+        │   │   └── GET /auth/admin/super-only
+        │   │       ├── general管理者JWTの時、403を返すこと
+        │   │       └── super管理者JWTの時、200を返すこと
         │   ├── auth.service.spec.ts
         │   │   ├── register
         │   │   │   ├── 有効なname・メールアドレス・パスワードの時、id/emailを返すこと
@@ -45,9 +52,13 @@ nestjspro/
         │   │   ├── login
         │   │   │   ├── 有効な認証情報の時、アクセストークンを返すこと
         │   │   │   └── サービスがエラーを投げた時、エラーが伝播すること
-        │   │   └── adminLogin
-        │   │       ├── 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
-        │   │       └── サービスがエラーを投げた時、エラーが伝播すること
+        │   │   ├── adminLogin
+        │   │   │   ├── 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
+        │   │   │   └── サービスがエラーを投げた時、エラーが伝播すること
+        │   │   ├── adminMe
+        │   │   │   └── 認証済み管理者のidとroleを返すこと
+        │   │   └── superOnly
+        │   │       └── 到達した時、ok:trueを返すこと
         │   ├── dto/
         │   │   └── auth.dto.spec.ts
         │   │       ├── RegisterDto
@@ -64,6 +75,11 @@ nestjspro/
         │   │   └── validate
         │   │       ├── 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
         │   │       └── type が "user" でない時、UnauthorizedExceptionを投げること
+        │   └── guards/
+        │       └── super-admin.guard.spec.ts
+        │           ├── superロールの時、アクセスを許可すること
+        │           ├── generalロールの時、ForbiddenExceptionを投げること
+        │           └── roleが存在しない時、ForbiddenExceptionを投げること
         │   └── strategies/
         │       └── admin-jwt.strategy.spec.ts
         │           └── validate
@@ -72,9 +88,55 @@ nestjspro/
         │               └── type が "admin" でない時、UnauthorizedExceptionを投げること
         ├── admin-users/
         │   ├── admin-users.service.spec.ts
-        │   │   └── findByEmail
-        │   │       ├── 存在するメールアドレスの時、AdminUserEntityを返すこと
-        │   │       └── 存在しないメールアドレスの時、nullを返すこと
+        │   │   ├── findByEmail
+        │   │   │   ├── 存在するメールアドレスの時、AdminUserEntityを返すこと ✓
+        │   │   │   └── 存在しないメールアドレスの時、nullを返すこと ✓
+        │   │   ├── create
+        │   │   │   └── 有効な情報でアカウント作成され、id・email・role・createdAtを返すこと ✓
+        │   │   ├── findAll
+        │   │   │   └── 全管理者を取得され、createdAtが新しい順に並ぶこと ✓
+        │   │   ├── findById
+        │   │   │   ├── 存在するIDで詳細取得でき、passwordを含まないこと ✓
+        │   │   │   └── 存在しないIDで詳細取得した時、nullを返すこと ✓
+        │   │   ├── update
+        │   │   │   ├── 有効な更新内容でアカウント更新され、更新後の情報を返すこと ✓
+        │   │   │   └── 存在しないIDで更新した時、nullを返すこと ✓
+        │   │   ├── softDelete
+        │   │   │   ├── 存在するIDで論理削除に成功すること ✓
+        │   │   │   └── 存在しないIDで論理削除した時、何も起こらないこと ✓
+        │   │   └── 業務ルール・例外ケース
+        │   │       ├── email一意性制約違反時、エラーが伝搬すること ✓
+        │   │       ├── ロール値は super または general のみ許可（型安全） ✓
+        │   │       └── 更新時、部分的な更新（nameのみ）でroleは変更されないこと ✓
+        │   ├── admin-accounts.controller.spec.ts
+        │   │   ├── create
+        │   │   │   └── 有効なDTOでアカウント作成され、レスポンスを返すこと ✓
+        │   │   ├── findAll
+        │   │   │   └── 全管理者一覧を返すこと ✓
+        │   │   ├── findById
+        │   │   │   ├── 指定IDの管理者詳細を返すこと ✓
+        │   │   │   └── 存在しないID時、NotFoundException投げること ✓
+        │   │   ├── update
+        │   │   │   ├── 有効なDTOでアカウント更新され、更新後レスポンスを返すこと ✓
+        │   │   │   └── 存在しないID時、NotFoundException投げること ✓
+        │   │   └── delete
+        │   │       ├── 指定IDのアカウントを論理削除すること ✓
+        │   │       └── 存在しないID時、NotFoundException投げること ✓
+        │   ├── dto/
+        │   │   └── admin-user.dto.spec.ts
+        │   │       ├── CreateAdminUserDto
+        │   │       │   ├── 有効なDTOでバリデーション成功すること ✓
+        │   │       │   ├── nameがない時、バリデーションエラー ✓
+        │   │       │   ├── emailが無効形式時、バリデーションエラー ✓
+        │   │       │   ├── passwordが8文字未満時、バリデーションエラー ✓
+        │   │       │   ├── roleが super でも general でもない時、バリデーションエラー ✓
+        │   │       │   └── general ロール も有効 ✓
+        │   │       └── UpdateAdminUserDto
+        │   │           ├── 全フィールド省略可能（空オブジェクト）でバリデーション成功 ✓
+        │   │           ├── nameのみ更新 ✓
+        │   │           ├── roleのみ更新 ✓
+        │   │           ├── roleが無効値の場合、バリデーションエラー ✓
+        │   │           └── nameとroleの両方更新 ✓
         │   └── entities/
         │       └── admin-user.entity.spec.ts
         │           ├── テーブル名がadmin_usersであること
@@ -194,9 +256,25 @@ nestjspro/
         │       │   └── トークンが未保存の時はnullを返すこと
         │       ├── removeToken
         │       │   └── localStorageからトークンを削除すること
-        │       └── isAuthenticated
+        │       ├── isAuthenticated
         │           ├── トークンが存在する時はtrueを返すこと
         │           └── トークンが存在しない時はfalseを返すこと
+        │       └── isAdminAuthenticated
+        │           ├── typeがadminのJWTの時、trueを返すこと
+        │           ├── typeがuserのJWTの時、falseを返すこと
+        │           └── JWT形式でないトークンの時、falseを返すこと
+        ├── routes/
+        │   ├── -_admin.test.tsx
+        │   │   ├── 管理者トークンがない時、/admin/loginへリダイレクトすること
+        │   │   └── 管理者トークンがある時、リダイレクトしないこと
+        │   ├── -_admin.admin.admins.test.tsx
+        │   │   ├── 取得成功時、管理者一覧を表示すること
+        │   │   └── 取得失敗時、エラーメッセージを表示すること
+        │   └── -admin.login.test.tsx
+        │       ├── 表示時、管理者ログインフォームが表示されること
+        │       ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること
+        │       ├── 認証に失敗した時、エラーメッセージを表示すること
+        │       └── レスポンス形式が不正な時、エラーメッセージを表示すること
         └── components/
             └── layouts/
                 ├── MemberLayout.test.tsx

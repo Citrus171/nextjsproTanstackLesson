@@ -5,8 +5,72 @@
 ### AdminUsersService `backend/src/admin-users/admin-users.service.spec.ts`
 
 **findByEmail**
-- [ ] 存在するメールアドレスの時、AdminUserEntityを返すこと
-- [ ] 存在しないメールアドレスの時、nullを返すこと
+- [x] 存在するメールアドレスの時、AdminUserEntityを返すこと
+- [x] 存在しないメールアドレスの時、nullを返すこと
+
+**create**
+- [x] 有効な情報でアカウント作成され、id・email・role・createdAtを返すこと
+
+**findAll**
+- [x] 全管理者を取得され、createdAtが新しい順に並ぶこと
+
+**findById**
+- [x] 存在するIDで詳細取得でき、passwordを含まないこと
+- [x] 存在しないIDで詳細取得した時、nullを返すこと
+
+**update**
+- [x] 有効な更新内容でアカウント更新され、更新後の情報を返すこと
+- [x] 存在しないIDで更新した時、nullを返すこと
+
+**softDelete**
+- [x] 存在するIDで論理削除に成功すること
+- [x] 存在しないIDで論理削除した時、何も起こらないこと
+
+**業務ルール・例外ケース**
+- [x] email一意性制約違反時、エラーが伝搬すること
+- [x] ロール値は super または general のみ許可（型安全）
+- [x] 更新時、部分的な更新（nameのみ）でroleは変更されないこと
+
+---
+
+### AdminAccountsController `backend/src/admin-users/admin-accounts.controller.spec.ts`
+
+**create**
+- [x] 有効なDTOでアカウント作成され、レスポンスを返すこと
+
+**findAll**
+- [x] 全管理者一覧を返すこと
+
+**findById**
+- [x] 指定IDの管理者詳細を返すこと
+- [x] 存在しないID時、NotFoundException投げること
+
+**update**
+- [x] 有効なDTOでアカウント更新され、更新後レスポンスを返すこと
+- [x] 存在しないID時、NotFoundException投げること
+
+**delete**
+- [x] 指定IDのアカウントを論理削除すること
+- [x] 存在しないID時、NotFoundException投げること
+
+---
+
+### CreateAdminUserDto・UpdateAdminUserDto バリデーション `backend/src/admin-users/dto/admin-user.dto.spec.ts`
+
+**CreateAdminUserDto**
+- [x] 有効なDTOでバリデーション成功すること
+- [x] nameがない時、バリデーションエラー
+- [x] emailが無効形式時、バリデーションエラー
+- [x] passwordが8文字未満時、バリデーションエラー
+- [x] roleが super でも general でもない時、バリデーションエラー
+- [x] general ロール も有効
+
+**UpdateAdminUserDto**
+- [x] 全フィールド省略可能（空オブジェクト）でバリデーション成功
+- [x] nameのみ更新
+- [x] roleのみ更新
+- [x] roleが無効値の場合、バリデーションエラー
+- [x] nameとroleの両方更新
 
 ---
 
@@ -25,6 +89,14 @@
 - [ ] ユーザーのroleが必要ロールに一致する時、trueを返すこと
 - [ ] generalロールがgeneralまたはsuperのどちらの要件にも対応できること
 - [ ] ユーザーのroleが必要ロールに一致しない時、ForbiddenExceptionを投げること
+
+---
+
+### SuperAdminGuard `backend/src/auth/guards/super-admin.guard.spec.ts`
+
+- [x] superロールの時、アクセスを許可すること
+- [x] generalロールの時、ForbiddenExceptionを投げること
+- [x] roleが存在しない時、ForbiddenExceptionを投げること
 
 ---
 
@@ -63,6 +135,12 @@
 **adminLogin**
 - [ ] 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
 - [ ] サービスがエラーを投げた時、エラーが伝播すること
+
+**adminMe**
+- [ ] 認証済み管理者のidとroleを返すこと
+
+**superOnly**
+- [ ] 到達した時、ok:trueを返すこと
 
 ---
 
@@ -104,11 +182,20 @@
 - [ ] メールアドレス形式が不正な時、400を返すこと
 
 **POST /auth/admin/login**
-- [ ] 正しい認証情報の時、accessTokenを返すこと
-- [ ] 未登録メールアドレスの時、401を返すこと
-- [ ] パスワードが不一致の時、401を返すこと
-- [ ] メールアドレス形式が不正な時、400を返すこと
-- [ ] 管理者JWTのペイロードに type:'admin' と role が含まれること
+- [x] 正しい認証情報の時、accessTokenを返すこと
+- [x] 未登録メールアドレスの時、401を返すこと
+- [x] パスワードが不一致の時、401を返すこと
+- [x] メールアドレス形式が不正な時、400を返すこと
+- [x] 管理者JWTのペイロードに type:'admin' と role が含まれること
+- [x] super管理者でログインした時、accessTokenを返すこと
+
+**GET /auth/admin/me**
+- [x] 管理者JWTの時、200でid・roleを返すこと
+- [x] 会員JWTの時、401を返すこと
+
+**GET /auth/admin/super-only**
+- [x] general管理者JWTの時、403を返すこと
+- [x] super管理者JWTの時、200を返すこと
 
 ---
 
@@ -276,6 +363,34 @@
 **isAuthenticated**
 - [ ] トークンが存在する時はtrueを返すこと
 - [ ] トークンが存在しない時はfalseを返すこと
+
+**isAdminAuthenticated**
+- [ ] typeがadminのJWTの時、trueを返すこと
+- [ ] typeがuserのJWTの時、falseを返すこと
+- [ ] JWT形式でないトークンの時、falseを返すこと
+
+---
+
+### admin route guard `frontend/src/routes/-_admin.test.tsx`
+
+- [x] 管理者トークンがない時、/admin/loginへリダイレクトすること
+- [x] 管理者トークンがある時、リダイレクトしないこと
+
+---
+
+### admin login page `frontend/src/routes/-admin.login.test.tsx`
+
+- [x] 表示時、管理者ログインフォームが表示されること
+- [x] 有効な認証情報の時、トークンを保存して/adminへ遷移すること
+- [x] 認証に失敗した時、エラーメッセージを表示すること
+- [x] レスポンス形式が不正な時、エラーメッセージを表示すること
+
+---
+
+### admin admins page `frontend/src/routes/-_admin.admin.admins.test.tsx`
+
+- [x] 取得成功時、管理者一覧を表示すること
+- [x] 取得失敗時、エラーメッセージを表示すること
 
 ---
 
