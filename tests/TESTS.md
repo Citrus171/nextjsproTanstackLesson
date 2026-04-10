@@ -2,6 +2,32 @@
 
 ## バックエンド（Jest）
 
+### AdminUsersService `backend/src/admin-users/admin-users.service.spec.ts`
+
+**findByEmail**
+- [ ] 存在するメールアドレスの時、AdminUserEntityを返すこと
+- [ ] 存在しないメールアドレスの時、nullを返すこと
+
+---
+
+### AdminJwtStrategy `backend/src/auth/strategies/admin-jwt.strategy.spec.ts`
+
+**validate**
+- [ ] 有効な管理者JWTペイロードの時、id・roleをマッピングして返すこと
+- [ ] generalロールの場合もid・roleを返すこと
+- [ ] type が "admin" でない時、UnauthorizedExceptionを投げること
+
+---
+
+### RolesGuard `backend/src/auth/guards/roles.guard.spec.ts`
+
+- [ ] @Rolesが設定されていない時、trueを返すこと
+- [ ] ユーザーのroleが必要ロールに一致する時、trueを返すこと
+- [ ] generalロールがgeneralまたはsuperのどちらの要件にも対応できること
+- [ ] ユーザーのroleが必要ロールに一致しない時、ForbiddenExceptionを投げること
+
+---
+
 ### AuthService `backend/src/auth/auth.service.spec.ts`
 
 **register**
@@ -16,6 +42,13 @@
 - [ ] パスワード不一致はUnauthorizedExceptionを投げる
 - [ ] メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
 
+**adminLogin**
+- [ ] 正しい認証情報でアクセストークンを返す
+- [ ] JWTペイロードに type:"admin"・sub・role が含まれること
+- [ ] 存在しないメールアドレスはUnauthorizedExceptionを投げる
+- [ ] パスワード不一致はUnauthorizedExceptionを投げる
+- [ ] メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
+
 ---
 
 ### AuthController `backend/src/auth/auth.controller.spec.ts`
@@ -25,6 +58,10 @@
 
 **login**
 - [ ] 有効な認証情報の時、アクセストークンを返すこと
+- [ ] サービスがエラーを投げた時、エラーが伝播すること
+
+**adminLogin**
+- [ ] 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
 - [ ] サービスがエラーを投げた時、エラーが伝播すること
 
 ---
@@ -65,6 +102,13 @@
 - [ ] 未登録メールアドレスの時、401を返すこと
 - [ ] パスワードが不一致の時、401を返すこと
 - [ ] メールアドレス形式が不正な時、400を返すこと
+
+**POST /auth/admin/login**
+- [ ] 正しい認証情報の時、accessTokenを返すこと
+- [ ] 未登録メールアドレスの時、401を返すこと
+- [ ] パスワードが不一致の時、401を返すこと
+- [ ] メールアドレス形式が不正な時、400を返すこと
+- [ ] 管理者JWTのペイロードに type:'admin' と role が含まれること
 
 ---
 

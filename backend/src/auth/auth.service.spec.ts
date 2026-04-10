@@ -2,6 +2,8 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
+import { AdminUserEntity } from '../admin-users/entities/admin-user.entity';
+import { AdminUsersService } from '../admin-users/admin-users.service';
 import { UserEntity } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
@@ -15,14 +17,30 @@ const makeUser = (overrides: Partial<UserEntity> = {}): UserEntity =>
     ...overrides,
   });
 
+const makeAdmin = (overrides: Partial<AdminUserEntity> = {}): AdminUserEntity =>
+  Object.assign(new AdminUserEntity(), {
+    id: 1,
+    email: 'admin@example.com',
+    password: '',
+    name: '管理者',
+    role: 'general',
+    createdAt: new Date('2024-01-01'),
+    deletedAt: null,
+    ...overrides,
+  });
+
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: jest.Mocked<UsersService>;
+  let adminUsersService: jest.Mocked<AdminUsersService>;
   let jwtService: jest.Mocked<JwtService>;
 
   beforeEach(async () => {
     const mockUsersService: jest.Mocked<Partial<UsersService>> = {
       create: jest.fn(),
+      findByEmail: jest.fn(),
+    };
+    const mockAdminUsersService: jest.Mocked<Partial<AdminUsersService>> = {
       findByEmail: jest.fn(),
     };
     const mockJwtService = { sign: jest.fn() };
@@ -31,12 +49,14 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: UsersService, useValue: mockUsersService },
+        { provide: AdminUsersService, useValue: mockAdminUsersService },
         { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     usersService = module.get(UsersService);
+    adminUsersService = module.get(AdminUsersService);
     jwtService = module.get(JwtService);
   });
 
@@ -110,6 +130,53 @@ describe('AuthService', () => {
       const hashed = await bcrypt.hash('correct', 10);
       usersService.findByEmail.mockResolvedValue(makeUser({ password: hashed }));
       const err2 = await service.login('test@example.com', 'wrong').catch((e: UnauthorizedException) => e);
+
+      expect((err1 as UnauthorizedException).message).toBe((err2 as UnauthorizedException).message);
+    });
+  });
+
+  // ── adminLogin ────────────────────────────────────────────
+  describe('adminLogin', () => {
+    it('正しい認証情報でアクセストークンを返す', async () => {
+      const hashed = await bcrypt.hash('correct', 10);
+      const admin = makeAdmin({ password: hashed });
+      adminUsersService.findByEmail.mockResolvedValue(admin);
+      jwtService.sign.mockReturnValue('admin.jwt.token');
+
+      const result = await service.adminLogin('admin@example.com', 'correct');
+
+      expect(result).toEqual({ accessToken: 'admin.jwt.token' });
+    });
+
+    it('JWTペイロードに type:"admin"・sub・role が含まれること', async () => {
+      const hashed = await bcrypt.hash('correct', 10);
+      const admin = makeAdmin({ id: 7, role: 'super', password: hashed });
+      adminUsersService.findByEmail.mockResolvedValue(admin);
+      jwtService.sign.mockReturnValue('token');
+
+      await service.adminLogin('admin@example.com', 'correct');
+
+      expect(jwtService.sign).toHaveBeenCalledWith({ sub: 7, type: 'admin', role: 'super' });
+    });
+
+    it('存在しないメールアドレスはUnauthorizedExceptionを投げる', async () => {
+      adminUsersService.findByEmail.mockResolvedValue(null);
+      await expect(service.adminLogin('no@example.com', 'pass')).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('パスワード不一致はUnauthorizedExceptionを投げる', async () => {
+      const hashed = await bcrypt.hash('correct', 10);
+      adminUsersService.findByEmail.mockResolvedValue(makeAdmin({ password: hashed }));
+      await expect(service.adminLogin('admin@example.com', 'wrong')).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）', async () => {
+      adminUsersService.findByEmail.mockResolvedValue(null);
+      const err1 = await service.adminLogin('no@example.com', 'pass').catch((e: UnauthorizedException) => e);
+
+      const hashed = await bcrypt.hash('correct', 10);
+      adminUsersService.findByEmail.mockResolvedValue(makeAdmin({ password: hashed }));
+      const err2 = await service.adminLogin('admin@example.com', 'wrong').catch((e: UnauthorizedException) => e);
 
       expect((err1 as UnauthorizedException).message).toBe((err2 as UnauthorizedException).message);
     });

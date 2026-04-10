@@ -11,27 +11,42 @@ nestjspro/
         │   │   │   ├── メールアドレス形式が不正な時、400を返すこと
         │   │   │   ├── パスワードが8文字未満の時、400を返すこと
         │   │   │   └── 同じメールアドレスが既に存在する時、409を返すこと
-        │   │   └── POST /auth/login
+        │   │   ├── POST /auth/login
+        │   │   │   ├── 正しい認証情報の時、accessTokenを返すこと
+        │   │   │   ├── 未登録メールアドレスの時、401を返すこと
+        │   │   │   ├── パスワードが不一致の時、401を返すこと
+        │   │   │   └── メールアドレス形式が不正な時、400を返すこと
+        │   │   └── POST /auth/admin/login
         │   │       ├── 正しい認証情報の時、accessTokenを返すこと
         │   │       ├── 未登録メールアドレスの時、401を返すこと
         │   │       ├── パスワードが不一致の時、401を返すこと
-        │   │       └── メールアドレス形式が不正な時、400を返すこと
+        │   │       ├── メールアドレス形式が不正な時、400を返すこと
+        │   │       └── 管理者JWTのペイロードに type:'admin' と role が含まれること
         │   ├── auth.service.spec.ts
         │   │   ├── register
         │   │   │   ├── 有効なname・メールアドレス・パスワードの時、id/emailを返すこと
         │   │   │   ├── nameをusersService.create()に渡すこと
         │   │   │   └── パスワードをレスポンスに含まない
-        │   │   └── login
+        │   │   ├── login
+        │   │   │   ├── 正しい認証情報でアクセストークンを返す
+        │   │   │   ├── JWTペイロードに type:"user" と sub が含まれること
+        │   │   │   ├── 存在しないメールアドレスはUnauthorizedExceptionを投げる
+        │   │   │   ├── パスワード不一致はUnauthorizedExceptionを投げる
+        │   │   │   └── メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
+        │   │   └── adminLogin
         │   │       ├── 正しい認証情報でアクセストークンを返す
-        │   │       ├── JWTペイロードに type:"user" と sub が含まれること
+        │   │       ├── JWTペイロードに type:"admin"・sub・role が含まれること
         │   │       ├── 存在しないメールアドレスはUnauthorizedExceptionを投げる
         │   │       ├── パスワード不一致はUnauthorizedExceptionを投げる
         │   │       └── メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
         │   ├── auth.controller.spec.ts
         │   │   ├── register
         │   │   │   └── 有効な入力の時、nameをサービスに渡してユーザー登録結果を返すこと
-        │   │   └── login
-        │   │       ├── 有効な認証情報の時、アクセストークンを返すこと
+        │   │   ├── login
+        │   │   │   ├── 有効な認証情報の時、アクセストークンを返すこと
+        │   │   │   └── サービスがエラーを投げた時、エラーが伝播すること
+        │   │   └── adminLogin
+        │   │       ├── 有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと
         │   │       └── サービスがエラーを投げた時、エラーが伝播すること
         │   ├── dto/
         │   │   └── auth.dto.spec.ts
@@ -45,9 +60,29 @@ nestjspro/
         │   │           ├── 有効なメールアドレスとパスワードの時、エラーがないこと
         │   │           ├── メールアドレス形式が不正な時、emailがエラーになること
         │   │           └── パスワードが空文字の時、passwordがエラーになること
-        │   └── jwt.strategy.spec.ts
-        │       └── validate
-        │           └── 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
+        │   ├── jwt.strategy.spec.ts
+        │   │   └── validate
+        │   │       ├── 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
+        │   │       └── type が "user" でない時、UnauthorizedExceptionを投げること
+        │   └── strategies/
+        │       └── admin-jwt.strategy.spec.ts
+        │           └── validate
+        │               ├── 有効な管理者JWTペイロードの時、id・roleをマッピングして返すこと
+        │               ├── generalロールの場合もid・roleを返すこと
+        │               └── type が "admin" でない時、UnauthorizedExceptionを投げること
+        ├── admin-users/
+        │   ├── admin-users.service.spec.ts
+        │   │   └── findByEmail
+        │   │       ├── 存在するメールアドレスの時、AdminUserEntityを返すこと
+        │   │       └── 存在しないメールアドレスの時、nullを返すこと
+        │   └── entities/
+        │       └── admin-user.entity.spec.ts
+        │           ├── テーブル名がadmin_usersであること
+        │           ├── emailカラムがunique制約付きで存在すること
+        │           ├── passwordカラムが存在すること
+        │           ├── nameカラムが存在すること
+        │           ├── roleカラムがenum('super','general')で存在すること
+        │           └── deletedAtカラムが存在すること（論理削除）
         ├── users/
         │   ├── users.controller.spec.ts
         │   │   ├── getMe
@@ -79,15 +114,6 @@ nestjspro/
         │           ├── passwordカラムが存在すること
         │           ├── nameカラムが存在すること
         │           ├── addressカラムが存在すること
-        │           └── deletedAtカラムが存在すること（論理削除）
-        ├── admin-users/
-        │   └── entities/
-        │       └── admin-user.entity.spec.ts
-        │           ├── テーブル名がadmin_usersであること
-        │           ├── emailカラムがunique制約付きで存在すること
-        │           ├── passwordカラムが存在すること
-        │           ├── nameカラムが存在すること
-        │           ├── roleカラムがenum('super','general')で存在すること
         │           └── deletedAtカラムが存在すること（論理削除）
         ├── categories/
         │   └── entities/

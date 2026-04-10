@@ -1,8 +1,11 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import * as bcrypt from "bcrypt";
+import { DataSource } from "typeorm";
 import request from "supertest";
 import { AuthModule } from "./auth.module";
+import { AdminUserEntity } from "../admin-users/entities/admin-user.entity";
 import { UserEntity } from "../users/entities/user.entity";
 
 async function createTestApp(): Promise<INestApplication> {
@@ -15,7 +18,7 @@ async function createTestApp(): Promise<INestApplication> {
         username: process.env.DB_USER ?? "root",
         password: process.env.DB_PASSWORD ?? "password",
         database: process.env.DB_TEST_NAME ?? "todo_test",
-        entities: [UserEntity],
+        entities: [UserEntity, AdminUserEntity],
         synchronize: true,
         dropSchema: true,
       }),
@@ -44,7 +47,7 @@ describe("Auth E2E", () => {
     it("有効な入力の時、ユーザーを作成してid/emailを返すこと", async () => {
       const res = await request(app.getHttpServer())
         .post("/auth/register")
-        .send({ email: "new-user@example.com", password: "password123" })
+        .send({ name: "新規ユーザー", email: "new-user@example.com", password: "password123" })
         .expect(201);
 
       expect(res.body).toEqual({
@@ -69,7 +72,7 @@ describe("Auth E2E", () => {
     });
 
     it("同じメールアドレスが既に存在する時、409を返すこと", async () => {
-      const body = { email: "duplicate@example.com", password: "password123" };
+      const body = { name: "重複ユーザー", email: "duplicate@example.com", password: "password123" };
 
       await request(app.getHttpServer())
         .post("/auth/register")
@@ -86,7 +89,7 @@ describe("Auth E2E", () => {
     beforeAll(async () => {
       await request(app.getHttpServer())
         .post("/auth/register")
-        .send({ email: "login-user@example.com", password: "password123" })
+        .send({ name: "ログインユーザー", email: "login-user@example.com", password: "password123" })
         .expect(201);
     });
 
@@ -118,6 +121,62 @@ describe("Auth E2E", () => {
         .post("/auth/login")
         .send({ email: "invalid-email", password: "password123" })
         .expect(400);
+    });
+  });
+
+  describe("POST /auth/admin/login", () => {
+    beforeAll(async () => {
+      const dataSource = app.get(DataSource);
+      const hashed = await bcrypt.hash("admin-pass123", 10);
+      await dataSource.getRepository(AdminUserEntity).save({
+        email: "admin@example.com",
+        password: hashed,
+        name: "管理者テスト",
+        role: "general",
+      });
+    });
+
+    it("正しい認証情報の時、accessTokenを返すこと", async () => {
+      const res = await request(app.getHttpServer())
+        .post("/auth/admin/login")
+        .send({ email: "admin@example.com", password: "admin-pass123" })
+        .expect(201);
+
+      expect(res.body).toEqual({ accessToken: expect.any(String) });
+    });
+
+    it("未登録メールアドレスの時、401を返すこと", async () => {
+      await request(app.getHttpServer())
+        .post("/auth/admin/login")
+        .send({ email: "notfound@example.com", password: "admin-pass123" })
+        .expect(401);
+    });
+
+    it("パスワードが不一致の時、401を返すこと", async () => {
+      await request(app.getHttpServer())
+        .post("/auth/admin/login")
+        .send({ email: "admin@example.com", password: "wrong-password" })
+        .expect(401);
+    });
+
+    it("メールアドレス形式が不正な時、400を返すこと", async () => {
+      await request(app.getHttpServer())
+        .post("/auth/admin/login")
+        .send({ email: "invalid-email", password: "admin-pass123" })
+        .expect(400);
+    });
+
+    it("管理者JWTのペイロードに type:'admin' と role が含まれること", async () => {
+      const res = await request(app.getHttpServer())
+        .post("/auth/admin/login")
+        .send({ email: "admin@example.com", password: "admin-pass123" })
+        .expect(201);
+
+      const token = res.body.accessToken as string;
+      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
+      expect(payload.type).toBe("admin");
+      expect(payload.role).toBe("general");
+      expect(typeof payload.sub).toBe("number");
     });
   });
 });
