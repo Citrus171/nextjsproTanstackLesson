@@ -13,7 +13,7 @@ export class UsersController {
 
   @Get('me')
   async getMe(@CurrentUser() user: { id: number }) {
-    const { password, ...profile } = await this.usersService.findById(user.id);
+    const { password: _password, ...profile } = await this.usersService.findById(user.id);
     return profile;
   }
 
