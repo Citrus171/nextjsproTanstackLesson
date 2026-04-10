@@ -54,6 +54,36 @@ export type LoginDto = {
   password: string;
 };
 
+export type CreateAdminUserDto = {
+  /**
+   * 管理者の名前
+   */
+  name: string;
+  /**
+   * メールアドレス
+   */
+  email: string;
+  /**
+   * 8文字以上のパスワード
+   */
+  password: string;
+  /**
+   * ロール: super または general
+   */
+  role: string;
+};
+
+export type UpdateAdminUserDto = {
+  /**
+   * 管理者の名前
+   */
+  name: string;
+  /**
+   * ロール: super または general
+   */
+  role: string;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -137,6 +167,70 @@ export type AdminAuthControllerSuperOnlyData = {
 };
 
 export type AdminAuthControllerSuperOnlyResponses = {
+  200: unknown;
+};
+
+export type AdminAccountsControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/admin/accounts";
+};
+
+export type AdminAccountsControllerFindAllResponses = {
+  200: unknown;
+};
+
+export type AdminAccountsControllerCreateData = {
+  body: CreateAdminUserDto;
+  path?: never;
+  query?: never;
+  url: "/admin/accounts";
+};
+
+export type AdminAccountsControllerCreateResponses = {
+  201: unknown;
+};
+
+export type AdminAccountsControllerDeleteData = {
+  body?: never;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: "/admin/accounts/{id}";
+};
+
+export type AdminAccountsControllerDeleteResponses = {
+  204: void;
+};
+
+export type AdminAccountsControllerDeleteResponse =
+  AdminAccountsControllerDeleteResponses[keyof AdminAccountsControllerDeleteResponses];
+
+export type AdminAccountsControllerFindByIdData = {
+  body?: never;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: "/admin/accounts/{id}";
+};
+
+export type AdminAccountsControllerFindByIdResponses = {
+  200: unknown;
+};
+
+export type AdminAccountsControllerUpdateData = {
+  body: UpdateAdminUserDto;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: "/admin/accounts/{id}";
+};
+
+export type AdminAccountsControllerUpdateResponses = {
   200: unknown;
 };
 

@@ -3,6 +3,16 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import type {
+  AdminAccountsControllerCreateData,
+  AdminAccountsControllerCreateResponses,
+  AdminAccountsControllerDeleteData,
+  AdminAccountsControllerDeleteResponses,
+  AdminAccountsControllerFindAllData,
+  AdminAccountsControllerFindAllResponses,
+  AdminAccountsControllerFindByIdData,
+  AdminAccountsControllerFindByIdResponses,
+  AdminAccountsControllerUpdateData,
+  AdminAccountsControllerUpdateResponses,
   AdminAuthControllerAdminLoginData,
   AdminAuthControllerAdminLoginResponses,
   AdminAuthControllerAdminMeData,
@@ -150,6 +160,89 @@ export const adminAuthControllerSuperOnly = <
     security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/auth/super-only",
     ...options,
+  });
+
+export const adminAccountsControllerFindAll = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminAccountsControllerFindAllData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminAccountsControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/accounts",
+    ...options,
+  });
+
+export const adminAccountsControllerCreate = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminAccountsControllerCreateData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    AdminAccountsControllerCreateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/accounts",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const adminAccountsControllerDelete = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminAccountsControllerDeleteData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    AdminAccountsControllerDeleteResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/accounts/{id}",
+    ...options,
+  });
+
+export const adminAccountsControllerFindById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminAccountsControllerFindByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    AdminAccountsControllerFindByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/accounts/{id}",
+    ...options,
+  });
+
+export const adminAccountsControllerUpdate = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminAccountsControllerUpdateData, ThrowOnError>,
+) =>
+  (options.client ?? client).patch<
+    AdminAccountsControllerUpdateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/accounts/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
   });
 
 /**

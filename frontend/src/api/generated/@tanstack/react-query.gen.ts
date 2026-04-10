@@ -8,6 +8,11 @@ import {
 
 import { client } from "../client.gen";
 import {
+  adminAccountsControllerCreate,
+  adminAccountsControllerDelete,
+  adminAccountsControllerFindAll,
+  adminAccountsControllerFindById,
+  adminAccountsControllerUpdate,
   adminAuthControllerAdminLogin,
   adminAuthControllerAdminMe,
   adminAuthControllerSuperOnly,
@@ -19,6 +24,12 @@ import {
   usersControllerGetMe,
 } from "../sdk.gen";
 import type {
+  AdminAccountsControllerCreateData,
+  AdminAccountsControllerDeleteData,
+  AdminAccountsControllerDeleteResponse,
+  AdminAccountsControllerFindAllData,
+  AdminAccountsControllerFindByIdData,
+  AdminAccountsControllerUpdateData,
   AdminAuthControllerAdminLoginData,
   AdminAuthControllerAdminMeData,
   AdminAuthControllerSuperOnlyData,
@@ -243,6 +254,128 @@ export const adminAuthControllerSuperOnlyOptions = (
     },
     queryKey: adminAuthControllerSuperOnlyQueryKey(options),
   });
+
+export const adminAccountsControllerFindAllQueryKey = (
+  options?: Options<AdminAccountsControllerFindAllData>,
+) => createQueryKey("adminAccountsControllerFindAll", options);
+
+export const adminAccountsControllerFindAllOptions = (
+  options?: Options<AdminAccountsControllerFindAllData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof adminAccountsControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminAccountsControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminAccountsControllerFindAllQueryKey(options),
+  });
+
+export const adminAccountsControllerCreateMutation = (
+  options?: Partial<Options<AdminAccountsControllerCreateData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<AdminAccountsControllerCreateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<AdminAccountsControllerCreateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminAccountsControllerCreate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const adminAccountsControllerDeleteMutation = (
+  options?: Partial<Options<AdminAccountsControllerDeleteData>>,
+): UseMutationOptions<
+  AdminAccountsControllerDeleteResponse,
+  DefaultError,
+  Options<AdminAccountsControllerDeleteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AdminAccountsControllerDeleteResponse,
+    DefaultError,
+    Options<AdminAccountsControllerDeleteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminAccountsControllerDelete({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const adminAccountsControllerFindByIdQueryKey = (
+  options: Options<AdminAccountsControllerFindByIdData>,
+) => createQueryKey("adminAccountsControllerFindById", options);
+
+export const adminAccountsControllerFindByIdOptions = (
+  options: Options<AdminAccountsControllerFindByIdData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof adminAccountsControllerFindByIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminAccountsControllerFindById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminAccountsControllerFindByIdQueryKey(options),
+  });
+
+export const adminAccountsControllerUpdateMutation = (
+  options?: Partial<Options<AdminAccountsControllerUpdateData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<AdminAccountsControllerUpdateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<AdminAccountsControllerUpdateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminAccountsControllerUpdate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const healthControllerCheckQueryKey = (
   options?: Options<HealthControllerCheckData>,
