@@ -32,7 +32,7 @@ export type Options<
    * individual options. This might be also useful if you want to implement a
    * custom client.
    */
-    url: "/admin/auth/login",
+  client?: Client;
   /**
    * You can pass arbitrary values through the `meta` object. This can be
    * used to access values that aren't defined as part of the SDK function.
@@ -112,7 +112,7 @@ export const authControllerAdminLogin = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
-    url: "/auth/admin/login",
+    url: "/admin/auth/login",
     ...options,
     headers: {
       "Content-Type": "application/json",
