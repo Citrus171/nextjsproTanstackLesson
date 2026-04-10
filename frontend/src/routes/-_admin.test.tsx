@@ -10,9 +10,7 @@ import { Route } from "./_admin";
 const beforeLoad = Route.options.beforeLoad as NonNullable<
   typeof Route.options.beforeLoad
 >;
-const beforeLoadContext = {} as NonNullable<Parameters<
-  typeof beforeLoad
->[0]>;
+const beforeLoadContext = {} as NonNullable<Parameters<typeof beforeLoad>[0]>;
 
 describe("admin route guard", () => {
   beforeEach(() => {
