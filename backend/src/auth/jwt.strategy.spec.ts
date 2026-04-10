@@ -8,14 +8,10 @@ describe('JwtStrategy', () => {
   });
 
   describe('validate', () => {
-    it('JWTペイロードからid/emailを返す', () => {
+    it('有効なJWTペイロードの時、subをidにマッピングしてid/emailを返すこと', () => {
       const result = strategy.validate({ sub: 42, email: 'user@example.com' });
       expect(result).toEqual({ id: 42, email: 'user@example.com' });
     });
 
-    it('subをidにマッピングする', () => {
-      const result = strategy.validate({ sub: 99, email: 'other@example.com' });
-      expect(result.id).toBe(99);
-    });
   });
 });

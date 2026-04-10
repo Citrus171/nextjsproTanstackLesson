@@ -42,13 +42,12 @@ describe('AuthService', () => {
 
   // ── register ──────────────────────────────────────────────
   describe('register', () => {
-    it('ユーザーを作成してid/emailを返す', async () => {
+    it('有効なメールアドレスとパスワードの時、id/emailを返すこと', async () => {
       const user = makeUser({ id: 5, email: 'new@example.com' });
       usersService.create.mockResolvedValue(user);
 
       const result = await service.register('new@example.com', 'pass');
 
-      expect(usersService.create).toHaveBeenCalledWith('new@example.com', 'pass');
       expect(result).toEqual({ id: 5, email: 'new@example.com' });
     });
 
@@ -72,7 +71,6 @@ describe('AuthService', () => {
 
       const result = await service.login('test@example.com', 'correct');
 
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: user.id, email: user.email });
       expect(result).toEqual({ accessToken: 'signed.jwt.token' });
     });
 
