@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { adminAuthControllerAdminLogin } from "@/api/generated/sdk.gen";
-import { setToken } from "@/lib/auth";
+import { setAdminToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +42,7 @@ function AdminLoginPage() {
     }
 
     const token = (res as { accessToken: string }).accessToken;
-    setToken(token);
+    setAdminToken(token);
     await navigate({ to: "/admin" });
   };
 

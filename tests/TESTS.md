@@ -30,13 +30,9 @@
 
 ### SuperAdminGuard `backend/src/auth/guards/super-admin.guard.spec.ts`
 
-- [ ] superロールの時、アクセスを許可すること
-- [ ] generalロールの時、ForbiddenExceptionを投げること
-- [ ] roleが存在しない時、ForbiddenExceptionを投げること
-
- - [x] superロールの時、アクセスを許可すること
- - [x] generalロールの時、ForbiddenExceptionを投げること
- - [x] roleが存在しない時、ForbiddenExceptionを投げること
+- [x] superロールの時、アクセスを許可すること
+- [x] generalロールの時、ForbiddenExceptionを投げること
+- [x] roleが存在しない時、ForbiddenExceptionを投げること
 
 ---
 
@@ -122,33 +118,20 @@
 - [ ] メールアドレス形式が不正な時、400を返すこと
 
 **POST /auth/admin/login**
-- [ ] 正しい認証情報の時、accessTokenを返すこと
-- [ ] 未登録メールアドレスの時、401を返すこと
-- [ ] パスワードが不一致の時、401を返すこと
-- [ ] メールアドレス形式が不正な時、400を返すこと
-- [ ] 管理者JWTのペイロードに type:'admin' と role が含まれること
-- [ ] super管理者でログインした時、accessTokenを返すこと
-
- - [x] 正しい認証情報の時、accessTokenを返すこと
- - [x] 未登録メールアドレスの時、401を返すこと
- - [x] パスワードが不一致の時、401を返すこと
- - [x] メールアドレス形式が不正な時、400を返すこと
- - [x] 管理者JWTのペイロードに type:'admin' と role が含まれること
- - [x] super管理者でログインした時、accessTokenを返すこと
+- [x] 正しい認証情報の時、accessTokenを返すこと
+- [x] 未登録メールアドレスの時、401を返すこと
+- [x] パスワードが不一致の時、401を返すこと
+- [x] メールアドレス形式が不正な時、400を返すこと
+- [x] 管理者JWTのペイロードに type:'admin' と role が含まれること
+- [x] super管理者でログインした時、accessTokenを返すこと
 
 **GET /auth/admin/me**
-- [ ] 管理者JWTの時、200でid・roleを返すこと
-- [ ] 会員JWTの時、401を返すこと
-
- - [x] 管理者JWTの時、200でid・roleを返すこと
- - [x] 会員JWTの時、401を返すこと
+- [x] 管理者JWTの時、200でid・roleを返すこと
+- [x] 会員JWTの時、401を返すこと
 
 **GET /auth/admin/super-only**
-- [ ] general管理者JWTの時、403を返すこと
-- [ ] super管理者JWTの時、200を返すこと
-
- - [x] general管理者JWTの時、403を返すこと
- - [x] super管理者JWTの時、200を返すこと
+- [x] general管理者JWTの時、403を返すこと
+- [x] super管理者JWTの時、200を返すこと
 
 ---
 

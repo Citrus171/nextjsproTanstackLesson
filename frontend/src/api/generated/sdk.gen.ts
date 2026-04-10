@@ -133,7 +133,11 @@ export const authControllerAdminMe = <ThrowOnError extends boolean = false>(
     AuthControllerAdminMeResponses,
     unknown,
     ThrowOnError
-  >({ url: "/auth/admin/me", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/admin/me",
+    ...options,
+  });
 
 export const authControllerSuperOnly = <ThrowOnError extends boolean = false>(
   options?: Options<AuthControllerSuperOnlyData, ThrowOnError>,
@@ -142,7 +146,11 @@ export const authControllerSuperOnly = <ThrowOnError extends boolean = false>(
     AuthControllerSuperOnlyResponses,
     unknown,
     ThrowOnError
-  >({ url: "/auth/admin/super-only", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/admin/super-only",
+    ...options,
+  });
 
 export const adminAuthControllerAdminLogin = <
   ThrowOnError extends boolean = false,
@@ -171,7 +179,11 @@ export const adminAuthControllerAdminMe = <
     AdminAuthControllerAdminMeResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/auth/me", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/auth/me",
+    ...options,
+  });
 
 export const adminAuthControllerSuperOnly = <
   ThrowOnError extends boolean = false,
@@ -182,7 +194,11 @@ export const adminAuthControllerSuperOnly = <
     AdminAuthControllerSuperOnlyResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/auth/super-only", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/auth/super-only",
+    ...options,
+  });
 
 /**
  * ヘルスチェック（DB接続確認）

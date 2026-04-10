@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 import { AuthService } from "./auth.service";
 import { AdminGuard } from "./guards/admin.guard";
@@ -16,12 +16,14 @@ export class AdminAuthController {
   }
 
   @Get("me")
+  @ApiBearerAuth()
   @UseGuards(AdminGuard)
   adminMe(@Req() req: { user: { id: number; role: "super" | "general" } }) {
     return { id: req.user.id, role: req.user.role };
   }
 
   @Get("super-only")
+  @ApiBearerAuth()
   @UseGuards(AdminGuard, SuperAdminGuard)
   superOnly() {
     return { ok: true };
