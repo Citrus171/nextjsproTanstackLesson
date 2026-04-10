@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerModule } from 'nestjs-pino';
-import { TodosModule } from './todos/todos.module';
-import { TodoEntity } from './todos/entities/todo.entity';
 import { UsersModule } from './users/users.module';
 import { UserEntity } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
@@ -26,10 +24,9 @@ import { HealthModule } from './health/health.module';
       username: process.env.DB_USER ?? 'root',
       password: process.env.DB_PASSWORD ?? 'password',
       database: process.env.DB_NAME ?? 'todo',
-      entities: [TodoEntity, UserEntity],
+      entities: [UserEntity],
       synchronize: true,
     }),
-    TodosModule,
     UsersModule,
     AuthModule,
     HealthModule,
