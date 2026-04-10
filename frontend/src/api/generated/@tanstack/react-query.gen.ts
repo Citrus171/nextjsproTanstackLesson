@@ -8,6 +8,7 @@ import {
 
 import { client } from "../client.gen";
 import {
+  authControllerAdminLogin,
   authControllerLogin,
   authControllerRegister,
   healthControllerCheck,
@@ -16,6 +17,7 @@ import {
   usersControllerGetMe,
 } from "../sdk.gen";
 import type {
+  AuthControllerAdminLoginData,
   AuthControllerLoginData,
   AuthControllerRegisterData,
   HealthControllerCheckData,
@@ -154,6 +156,30 @@ export const authControllerLoginMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await authControllerLogin({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const authControllerAdminLoginMutation = (
+  options?: Partial<Options<AuthControllerAdminLoginData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<AuthControllerAdminLoginData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<AuthControllerAdminLoginData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await authControllerAdminLogin({
         ...options,
         ...fnOptions,
         throwOnError: true,

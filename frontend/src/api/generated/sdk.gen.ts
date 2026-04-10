@@ -3,6 +3,8 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import type {
+  AuthControllerAdminLoginData,
+  AuthControllerAdminLoginResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
@@ -91,6 +93,22 @@ export const authControllerLogin = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     url: "/auth/login",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const authControllerAdminLogin = <ThrowOnError extends boolean = false>(
+  options: Options<AuthControllerAdminLoginData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    AuthControllerAdminLoginResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/auth/admin/login",
     ...options,
     headers: {
       "Content-Type": "application/json",
