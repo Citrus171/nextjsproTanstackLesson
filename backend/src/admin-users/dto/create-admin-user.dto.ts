@@ -18,7 +18,11 @@ export class CreateAdminUserDto {
   @MinLength(8)
   password: string;
 
-  @ApiProperty({ example: 'general', description: 'ロール: super または general' })
+  @ApiProperty({
+    example: 'general',
+    description: 'ロール: super または general',
+    enum: ['super', 'general'],
+  })
   @IsEnum(['super', 'general'])
   role: AdminRole;
 }

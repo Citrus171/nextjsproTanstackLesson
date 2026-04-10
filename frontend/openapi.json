@@ -605,7 +605,11 @@
           "role": {
             "type": "string",
             "example": "general",
-            "description": "ロール: super または general"
+            "description": "ロール: super または general",
+            "enum": [
+              "super",
+              "general"
+            ]
           }
         },
         "required": [
@@ -626,13 +630,13 @@
           "role": {
             "type": "string",
             "example": "general",
-            "description": "ロール: super または general"
+            "description": "ロール: super または general",
+            "enum": [
+              "super",
+              "general"
+            ]
           }
-        },
-        "required": [
-          "name",
-          "role"
-        ]
+        }
       }
     }
   }

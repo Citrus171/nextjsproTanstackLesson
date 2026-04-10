@@ -70,18 +70,18 @@ export type CreateAdminUserDto = {
   /**
    * ロール: super または general
    */
-  role: string;
+  role: "super" | "general";
 };
 
 export type UpdateAdminUserDto = {
   /**
    * 管理者の名前
    */
-  name: string;
+  name?: string;
   /**
    * ロール: super または general
    */
-  role: string;
+  role?: "super" | "general";
 };
 
 export type UsersControllerGetMeData = {
