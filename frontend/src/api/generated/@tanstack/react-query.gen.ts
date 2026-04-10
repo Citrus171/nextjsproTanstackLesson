@@ -12,6 +12,8 @@ import {
   authControllerRegister,
   healthControllerCheck,
   type Options,
+  usersControllerChangePassword,
+  usersControllerGetMe,
 } from "../sdk.gen";
 import type {
   AuthControllerLoginData,
@@ -19,7 +21,99 @@ import type {
   HealthControllerCheckData,
   HealthControllerCheckError,
   HealthControllerCheckResponse,
+  UsersControllerChangePasswordData,
+  UsersControllerChangePasswordResponse,
+  UsersControllerGetMeData,
 } from "../types.gen";
+
+export type QueryKey<TOptions extends Options> = [
+  Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
+    _id: string;
+    _infinite?: boolean;
+    tags?: ReadonlyArray<string>;
+  },
+];
+
+const createQueryKey = <TOptions extends Options>(
+  id: string,
+  options?: TOptions,
+  infinite?: boolean,
+  tags?: ReadonlyArray<string>,
+): [QueryKey<TOptions>[0]] => {
+  const params: QueryKey<TOptions>[0] = {
+    _id: id,
+    baseUrl:
+      options?.baseUrl || (options?.client ?? client).getConfig().baseUrl,
+  } as QueryKey<TOptions>[0];
+  if (infinite) {
+    params._infinite = infinite;
+  }
+  if (tags) {
+    params.tags = tags;
+  }
+  if (options?.body) {
+    params.body = options.body;
+  }
+  if (options?.headers) {
+    params.headers = options.headers;
+  }
+  if (options?.path) {
+    params.path = options.path;
+  }
+  if (options?.query) {
+    params.query = options.query;
+  }
+  return [params];
+};
+
+export const usersControllerGetMeQueryKey = (
+  options?: Options<UsersControllerGetMeData>,
+) => createQueryKey("usersControllerGetMe", options);
+
+export const usersControllerGetMeOptions = (
+  options?: Options<UsersControllerGetMeData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof usersControllerGetMeQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await usersControllerGetMe({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: usersControllerGetMeQueryKey(options),
+  });
+
+export const usersControllerChangePasswordMutation = (
+  options?: Partial<Options<UsersControllerChangePasswordData>>,
+): UseMutationOptions<
+  UsersControllerChangePasswordResponse,
+  DefaultError,
+  Options<UsersControllerChangePasswordData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UsersControllerChangePasswordResponse,
+    DefaultError,
+    Options<UsersControllerChangePasswordData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await usersControllerChangePassword({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export const authControllerRegisterMutation = (
   options?: Partial<Options<AuthControllerRegisterData>>,
@@ -67,46 +161,6 @@ export const authControllerLoginMutation = (
     },
   };
   return mutationOptions;
-};
-
-export type QueryKey<TOptions extends Options> = [
-  Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
-    _id: string;
-    _infinite?: boolean;
-    tags?: ReadonlyArray<string>;
-  },
-];
-
-const createQueryKey = <TOptions extends Options>(
-  id: string,
-  options?: TOptions,
-  infinite?: boolean,
-  tags?: ReadonlyArray<string>,
-): [QueryKey<TOptions>[0]] => {
-  const params: QueryKey<TOptions>[0] = {
-    _id: id,
-    baseUrl:
-      options?.baseUrl || (options?.client ?? client).getConfig().baseUrl,
-  } as QueryKey<TOptions>[0];
-  if (infinite) {
-    params._infinite = infinite;
-  }
-  if (tags) {
-    params.tags = tags;
-  }
-  if (options?.body) {
-    params.body = options.body;
-  }
-  if (options?.headers) {
-    params.headers = options.headers;
-  }
-  if (options?.path) {
-    params.path = options.path;
-  }
-  if (options?.query) {
-    params.query = options.query;
-  }
-  return [params];
 };
 
 export const healthControllerCheckQueryKey = (

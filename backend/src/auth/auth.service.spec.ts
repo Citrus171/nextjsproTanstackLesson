@@ -42,12 +42,13 @@ describe('AuthService', () => {
 
   // ── register ──────────────────────────────────────────────
   describe('register', () => {
-    it('有効なメールアドレスとパスワードの時、id/emailを返すこと', async () => {
-      const user = makeUser({ id: 5, email: 'new@example.com' });
+    it('有効なname・メールアドレス・パスワードの時、id/emailを返すこと', async () => {
+      const user = makeUser({ id: 5, email: 'new@example.com', name: '山田太郎' });
       usersService.create.mockResolvedValue(user);
 
-      const result = await service.register('new@example.com', 'pass');
+      const result = await service.register('山田太郎', 'new@example.com', 'pass');
 
+      expect(usersService.create).toHaveBeenCalledWith('山田太郎', 'new@example.com', 'pass');
       expect(result).toEqual({ id: 5, email: 'new@example.com' });
     });
 
@@ -55,7 +56,7 @@ describe('AuthService', () => {
       const user = makeUser({ password: 'hashed' });
       usersService.create.mockResolvedValue(user);
 
-      const result = await service.register('test@example.com', 'pass');
+      const result = await service.register('山田太郎', 'test@example.com', 'pass');
 
       expect(result).not.toHaveProperty('password');
     });
@@ -72,6 +73,17 @@ describe('AuthService', () => {
       const result = await service.login('test@example.com', 'correct');
 
       expect(result).toEqual({ accessToken: 'signed.jwt.token' });
+    });
+
+    it('JWTペイロードに type:"user" と sub が含まれること', async () => {
+      const hashed = await bcrypt.hash('correct', 10);
+      const user = makeUser({ id: 42, password: hashed });
+      usersService.findByEmail.mockResolvedValue(user);
+      jwtService.sign.mockReturnValue('token');
+
+      await service.login('test@example.com', 'correct');
+
+      expect(jwtService.sign).toHaveBeenCalledWith({ sub: 42, type: 'user' });
     });
 
     it('存在しないメールアドレスはUnauthorizedExceptionを投げる', async () => {

@@ -5,12 +5,15 @@ export {
   authControllerRegister,
   healthControllerCheck,
   type Options,
+  usersControllerChangePassword,
+  usersControllerGetMe,
 } from "./sdk.gen";
 export type {
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
+  ChangePasswordDto,
   ClientOptions,
   HealthControllerCheckData,
   HealthControllerCheckError,
@@ -19,4 +22,9 @@ export type {
   HealthControllerCheckResponses,
   LoginDto,
   RegisterDto,
+  UsersControllerChangePasswordData,
+  UsersControllerChangePasswordResponse,
+  UsersControllerChangePasswordResponses,
+  UsersControllerGetMeData,
+  UsersControllerGetMeResponses,
 } from "./types.gen";

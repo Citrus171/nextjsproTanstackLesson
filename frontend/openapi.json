@@ -1,6 +1,44 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/users/me/password": {
+      "put": {
+        "operationId": "UsersController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/auth/register": {
       "post": {
         "operationId": "AuthController_register",
@@ -236,9 +274,31 @@
       }
     },
     "schemas": {
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "現在のパスワード"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "新しいパスワード（8文字以上）"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
       "RegisterDto": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "example": "山田太郎",
+            "description": "名前"
+          },
           "email": {
             "type": "string",
             "example": "user@example.com",
@@ -251,6 +311,7 @@
           }
         },
         "required": [
+          "name",
           "email",
           "password"
         ]

@@ -5,11 +5,13 @@
 ### AuthService `backend/src/auth/auth.service.spec.ts`
 
 **register**
-- [ ] 有効なメールアドレスとパスワードの時、id/emailを返すこと
+- [ ] 有効なname・メールアドレス・パスワードの時、id/emailを返すこと
+- [ ] nameをusersService.create()に渡すこと
 - [ ] パスワードをレスポンスに含まない
 
 **login**
 - [ ] 正しい認証情報でアクセストークンを返す
+- [ ] JWTペイロードに type:"user" と sub が含まれること
 - [ ] 存在しないメールアドレスはUnauthorizedExceptionを投げる
 - [ ] パスワード不一致はUnauthorizedExceptionを投げる
 - [ ] メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
@@ -19,7 +21,7 @@
 ### AuthController `backend/src/auth/auth.controller.spec.ts`
 
 **register**
-- [ ] 有効な入力の時、ユーザー登録結果を返すこと
+- [ ] 有効な入力の時、nameをサービスに渡してユーザー登録結果を返すこと
 
 **login**
 - [ ] 有効な認証情報の時、アクセストークンを返すこと
@@ -30,14 +32,16 @@
 ### JwtStrategy `backend/src/auth/jwt.strategy.spec.ts`
 
 **validate**
-- [ ] 有効なJWTペイロードの時、subをidにマッピングしてid/emailを返すこと
+- [ ] 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
 
 ---
 
 ### Auth DTO `backend/src/auth/dto/auth.dto.spec.ts`
 
 **RegisterDto**
-- [ ] 有効なメールアドレスとパスワードの時、エラーがないこと
+- [ ] 有効なname・メールアドレス・パスワードの時、エラーがないこと
+- [ ] nameが空文字の時、nameがエラーになること
+- [ ] nameが省略された時、nameがエラーになること
 - [ ] メールアドレス形式が不正な時、emailがエラーになること
 - [ ] パスワードが8文字未満の時、passwordがエラーになること
 
@@ -67,13 +71,34 @@
 ### UsersService `backend/src/users/users.service.spec.ts`
 
 **create**
-- [ ] 新規ユーザーを作成してパスワードをハッシュ化する
+- [ ] 新規ユーザーを作成してname・emailを保存しパスワードをハッシュ化する
 - [ ] 既存メールアドレスはConflictExceptionを投げる
 - [ ] ConflictException時はsaveを呼ばない
 
 **findByEmail**
 - [ ] 存在するメールアドレスのユーザーを返す
 - [ ] 存在しないメールアドレスはnullを返す
+
+**findById**
+- [ ] 存在するIDのユーザーを返す
+- [ ] 存在しないIDはNotFoundExceptionを投げる
+
+**changePassword**
+- [ ] 正しい現在のパスワードの時、新しいパスワードをハッシュ化して保存する
+- [ ] 現在のパスワードが不一致の時、UnauthorizedExceptionを投げる
+- [ ] パスワード不一致の時はupdateを呼ばない
+
+---
+
+### UsersController `backend/src/users/users.controller.spec.ts`
+
+**getMe**
+- [ ] 認証済みユーザーのプロフィールを返すこと（passwordを除く）
+- [ ] ユーザーが存在しない時、NotFoundExceptionが伝播すること
+
+**changePassword**
+- [ ] 正しい現在のパスワードの時、204を返すこと
+- [ ] 現在のパスワードが不一致の時、UnauthorizedExceptionが伝播すること
 
 ---
 
@@ -191,6 +216,24 @@
 ---
 
 ## フロントエンド（Vitest）
+
+### auth ユーティリティ `frontend/src/lib/auth.test.ts`
+
+**setToken**
+- [ ] トークンをlocalStorageに保存すること
+
+**getToken**
+- [ ] 保存済みトークンを返すこと
+- [ ] トークンが未保存の時はnullを返すこと
+
+**removeToken**
+- [ ] localStorageからトークンを削除すること
+
+**isAuthenticated**
+- [ ] トークンが存在する時はtrueを返すこと
+- [ ] トークンが存在しない時はfalseを返すこと
+
+---
 
 ### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`
 

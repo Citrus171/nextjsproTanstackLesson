@@ -9,12 +9,32 @@ async function validateDto<T extends object>(cls: new () => T, plain: object) {
 }
 
 describe("RegisterDto", () => {
-  it("有効なメールアドレスとパスワードの時、エラーがないこと", async () => {
+  it("有効なname・メールアドレス・パスワードの時、エラーがないこと", async () => {
     const errors = await validateDto(RegisterDto, {
+      name: "テストユーザー",
       email: "user@example.com",
       password: "password123",
     });
     expect(errors).toHaveLength(0);
+  });
+
+  it("nameが空文字の時、nameがエラーになること", async () => {
+    const errors = await validateDto(RegisterDto, {
+      name: "",
+      email: "user@example.com",
+      password: "password123",
+    });
+    const nameError = errors.find((e) => e.property === "name");
+    expect(nameError?.constraints).toHaveProperty("isNotEmpty");
+  });
+
+  it("nameが省略された時、nameがエラーになること", async () => {
+    const errors = await validateDto(RegisterDto, {
+      email: "user@example.com",
+      password: "password123",
+    });
+    const nameError = errors.find((e) => e.property === "name");
+    expect(nameError).toBeDefined();
   });
 
   it("メールアドレス形式が不正な時、emailがエラーになること", async () => {

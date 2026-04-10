@@ -4,7 +4,22 @@ export type ClientOptions = {
   baseUrl: string;
 };
 
+export type ChangePasswordDto = {
+  /**
+   * 現在のパスワード
+   */
+  currentPassword: string;
+  /**
+   * 新しいパスワード（8文字以上）
+   */
+  newPassword: string;
+};
+
 export type RegisterDto = {
+  /**
+   * 名前
+   */
+  name: string;
   /**
    * メールアドレス
    */
@@ -25,6 +40,31 @@ export type LoginDto = {
    */
   password: string;
 };
+
+export type UsersControllerGetMeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/users/me";
+};
+
+export type UsersControllerGetMeResponses = {
+  200: unknown;
+};
+
+export type UsersControllerChangePasswordData = {
+  body: ChangePasswordDto;
+  path?: never;
+  query?: never;
+  url: "/users/me/password";
+};
+
+export type UsersControllerChangePasswordResponses = {
+  204: void;
+};
+
+export type UsersControllerChangePasswordResponse =
+  UsersControllerChangePasswordResponses[keyof UsersControllerChangePasswordResponses];
 
 export type AuthControllerRegisterData = {
   body: RegisterDto;

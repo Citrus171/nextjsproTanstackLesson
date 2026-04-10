@@ -21,12 +21,13 @@ describe('AuthController', () => {
   });
 
   describe('register', () => {
-    it('有効な入力の時、ユーザー登録結果を返すこと', async () => {
+    it('有効な入力の時、nameをサービスに渡してユーザー登録結果を返すこと', async () => {
       const expected = { id: 1, email: 'test@example.com' };
       mockAuthService.register.mockResolvedValue(expected);
 
-      const result = await controller.register({ email: 'test@example.com', password: 'pass' });
+      const result = await controller.register({ name: '山田太郎', email: 'test@example.com', password: 'pass' });
 
+      expect(mockAuthService.register).toHaveBeenCalledWith('山田太郎', 'test@example.com', 'pass');
       expect(result).toEqual(expected);
     });
   });
