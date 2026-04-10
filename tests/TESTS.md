@@ -75,3 +75,115 @@
 - [ ] 存在するメールアドレスのユーザーを返す
 - [ ] 存在しないメールアドレスはnullを返す
 
+---
+
+### UserEntity `backend/src/users/entities/user.entity.spec.ts`
+
+- [ ] テーブル名がusersであること
+- [ ] idカラムが存在すること（PrimaryGeneratedColumn）
+- [ ] emailカラムがunique制約付きで存在すること
+- [ ] passwordカラムが存在すること
+- [ ] nameカラムが存在すること
+- [ ] addressカラムが存在すること
+- [ ] deletedAtカラムが存在すること（論理削除）
+
+---
+
+### AdminUserEntity `backend/src/admin-users/entities/admin-user.entity.spec.ts`
+
+- [ ] テーブル名がadmin_usersであること
+- [ ] emailカラムがunique制約付きで存在すること
+- [ ] passwordカラムが存在すること
+- [ ] nameカラムが存在すること
+- [ ] roleカラムがenum('super','general')で存在すること
+- [ ] deletedAtカラムが存在すること（論理削除）
+
+---
+
+### CategoryEntity `backend/src/categories/entities/category.entity.spec.ts`
+
+- [ ] テーブル名がcategoriesであること
+- [ ] nameカラムが存在すること
+- [ ] parentIdカラムがnullableで存在すること
+- [ ] 自己参照リレーション（parentId FK）が存在すること
+
+---
+
+### ProductEntity `backend/src/products/entities/product.entity.spec.ts`
+
+- [ ] テーブル名がproductsであること
+- [ ] nameカラムが存在すること
+- [ ] priceカラムがINT型で存在すること
+- [ ] stockカラムが存在しないこと（バリエーションで管理）
+- [ ] isPublishedプロパティのカラムが存在すること
+- [ ] deletedAtカラムが存在すること（論理削除）
+- [ ] categoryへのリレーションが存在すること
+
+---
+
+### ProductImageEntity `backend/src/products/entities/product-image.entity.spec.ts`
+
+- [ ] テーブル名がproduct_imagesであること
+- [ ] productIdカラムがINT型で存在すること
+- [ ] urlカラムが存在すること
+- [ ] sortOrderカラムがINT型で存在すること
+- [ ] productsへのリレーション（productId FK）が存在すること
+
+---
+
+### ProductVariationEntity `backend/src/products/entities/product-variation.entity.spec.ts`
+
+- [ ] テーブル名がproduct_variationsであること
+- [ ] stockカラムがINT型で存在すること
+- [ ] sizeカラムが存在すること
+- [ ] colorカラムが存在すること
+- [ ] priceカラムがINT型で存在すること
+- [ ] deletedAtカラムが存在すること（論理削除）
+
+---
+
+### CartEntity `backend/src/carts/entities/cart.entity.spec.ts`
+
+- [ ] テーブル名がcartsであること
+- [ ] sessionIdカラムが存在すること
+- [ ] variationIdカラムが存在すること
+- [ ] quantityカラムがINT型で存在すること
+- [ ] reservedAtカラムが存在すること
+- [ ] expiresAtカラムが存在すること
+- [ ] product_variationsへのリレーションが存在すること
+
+---
+
+### OrderEntity `backend/src/orders/entities/order.entity.spec.ts`
+
+- [ ] テーブル名がordersであること
+- [ ] statusカラムがenum型で存在すること
+- [ ] shippingAddressカラムがJSON型で存在すること
+- [ ] shippingFeeカラムがINT型で存在すること
+- [ ] totalAmountカラムがINT型で存在すること
+- [ ] stripeSessionIdカラムがnullableで存在すること
+- [ ] usersへのリレーションが存在すること
+
+---
+
+### OrderItemEntity `backend/src/orders/entities/order-item.entity.spec.ts`
+
+- [ ] テーブル名がorder_itemsであること
+- [ ] orderIdカラムがINT型で存在すること
+- [ ] variationIdカラムがINT型で存在すること
+- [ ] productIdカラムがINT型で存在すること
+- [ ] productNameカラムが存在すること（スナップショット）
+- [ ] sizeカラムが存在すること（スナップショット）
+- [ ] colorカラムが存在すること（スナップショット）
+- [ ] priceカラムがINT型で存在すること（スナップショット）
+- [ ] ordersへのリレーション（orderId FK）が存在すること
+- [ ] product_variationsへのリレーション（variationId FK）が存在すること
+
+---
+
+### StoreSettingsEntity `backend/src/store-settings/entities/store-settings.entity.spec.ts`
+
+- [ ] テーブル名がstore_settingsであること
+- [ ] invoiceNumberカラムがnullableで存在すること
+- [ ] shippingFixedFeeカラムがINT型で存在すること
+- [ ] shippingFreeThresholdカラムがINT型で存在すること

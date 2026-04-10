@@ -6,8 +6,10 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 
-@Entity('users')
-export class UserEntity {
+export type AdminRole = 'super' | 'general';
+
+@Entity('admin_users')
+export class AdminUserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,8 +22,8 @@ export class UserEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true, type: 'varchar' })
-  address: string | null;
+  @Column({ type: 'enum', enum: ['super', 'general'] })
+  role: AdminRole;
 
   @CreateDateColumn()
   createdAt: Date;
