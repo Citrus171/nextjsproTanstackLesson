@@ -9,6 +9,38 @@ permissions:
   contents: read
 
 jobs:
+  codegen-drift-check:
+    name: Codegen Drift Check (Node 20)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Generate OpenAPI and frontend client
+        run: npm run gen
+
+      - name: Check generated files are committed
+        run: |
+          if ! git diff --quiet -- frontend/openapi.json frontend/src/api/generated; then
+            echo "Generated files are out of date."
+            echo "Run: npm run gen"
+            echo "Then commit updated frontend/openapi.json and frontend/src/api/generated/."
+            git --no-pager diff -- frontend/openapi.json frontend/src/api/generated
+            exit 1
+          fi
+
   backend-test:
     name: Backend Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
