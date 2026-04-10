@@ -34,9 +34,6 @@ async function createTestApp(): Promise<INestApplication> {
 
 describe("Auth E2E", () => {
   let app: INestApplication;
-  let userAccessToken = "";
-  let adminGeneralAccessToken = "";
-  let adminSuperAccessToken = "";
 
   beforeAll(async () => {
     app = await createTestApp();
@@ -115,7 +112,6 @@ describe("Auth E2E", () => {
         .expect(201);
 
       expect(res.body).toEqual({ accessToken: expect.any(String) });
-      userAccessToken = res.body.accessToken as string;
     });
 
     it("未登録メールアドレスの時、401を返すこと", async () => {

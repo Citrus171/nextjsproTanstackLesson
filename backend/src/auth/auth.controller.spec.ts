@@ -5,14 +5,6 @@ import { AuthService } from "./auth.service";
 const mockAuthService = {
   register: jest.fn(),
   login: jest.fn(),
-  adminLogin: jest.fn(),
-};
-
-const adminRequest = {
-  user: {
-    id: 10,
-    role: "super" as const,
-  },
 };
 
 describe("AuthController", () => {
