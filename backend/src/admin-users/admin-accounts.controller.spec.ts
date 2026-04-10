@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { AdminAccountsController } from './admin-accounts.controller';
 import { AdminUsersService } from './admin-users.service';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 
-const makeAdminResponse = (overrides: any = {}) => ({
+const makeAdminResponse = (overrides: Record<string, unknown> = {}) => ({
   id: 1,
   name: '管理者',
   email: 'admin@example.com',
