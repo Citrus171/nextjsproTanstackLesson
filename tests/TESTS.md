@@ -187,3 +187,37 @@
 - [ ] invoiceNumberカラムがnullableで存在すること
 - [ ] shippingFixedFeeカラムがINT型で存在すること
 - [ ] shippingFreeThresholdカラムがINT型で存在すること
+
+---
+
+## フロントエンド（Vitest）
+
+### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`
+
+- [ ] ロゴが表示されること
+- [ ] 商品一覧リンクが表示されること
+- [ ] カートリンクが表示されること
+- [ ] ログインリンクが表示されること
+- [ ] フッターにコピーライトが表示されること
+- [ ] childrenが描画されること
+
+---
+
+### AdminLayout `frontend/src/components/layouts/AdminLayout.test.tsx`
+
+- [ ] サイドバーに「ダッシュボード」リンクが表示されること
+- [ ] サイドバーに「商品管理」リンクが表示されること
+- [ ] サイドバーに「注文管理」リンクが表示されること
+- [ ] サイドバーに「会員管理」リンクが表示されること
+- [ ] サイドバーに「管理者アカウント管理」リンクが表示されること
+- [ ] サイドバーに「店舗設定」リンクが表示されること
+- [ ] childrenが描画されること
+- [ ] モバイルメニュートグルボタンが存在すること
+- [ ] モバイルメニュートグルを押すとサイドバーが開閉すること
+
+---
+
+### RootLayout（Toast統合） `frontend/src/components/layouts/RootLayout.test.tsx`
+
+- [ ] childrenが描画されること
+- [ ] toast()を呼ぶとトースト通知が表示されること
