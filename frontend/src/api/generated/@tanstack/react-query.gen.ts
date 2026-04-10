@@ -8,7 +8,9 @@ import {
 
 import { client } from "../client.gen";
 import {
-  authControllerAdminLogin,
+  adminAuthControllerAdminLogin,
+  adminAuthControllerAdminMe,
+  adminAuthControllerSuperOnly,
   authControllerLogin,
   authControllerRegister,
   healthControllerCheck,
@@ -17,7 +19,9 @@ import {
   usersControllerGetMe,
 } from "../sdk.gen";
 import type {
-  AuthControllerAdminLoginData,
+  AdminAuthControllerAdminLoginData,
+  AdminAuthControllerAdminMeData,
+  AdminAuthControllerSuperOnlyData,
   AuthControllerLoginData,
   AuthControllerRegisterData,
   HealthControllerCheckData,
@@ -166,20 +170,20 @@ export const authControllerLoginMutation = (
   return mutationOptions;
 };
 
-export const authControllerAdminLoginMutation = (
-  options?: Partial<Options<AuthControllerAdminLoginData>>,
+export const adminAuthControllerAdminLoginMutation = (
+  options?: Partial<Options<AdminAuthControllerAdminLoginData>>,
 ): UseMutationOptions<
   unknown,
   DefaultError,
-  Options<AuthControllerAdminLoginData>
+  Options<AdminAuthControllerAdminLoginData>
 > => {
   const mutationOptions: UseMutationOptions<
     unknown,
     DefaultError,
-    Options<AuthControllerAdminLoginData>
+    Options<AdminAuthControllerAdminLoginData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await authControllerAdminLogin({
+      const { data } = await adminAuthControllerAdminLogin({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -189,6 +193,56 @@ export const authControllerAdminLoginMutation = (
   };
   return mutationOptions;
 };
+
+export const adminAuthControllerAdminMeQueryKey = (
+  options?: Options<AdminAuthControllerAdminMeData>,
+) => createQueryKey("adminAuthControllerAdminMe", options);
+
+export const adminAuthControllerAdminMeOptions = (
+  options?: Options<AdminAuthControllerAdminMeData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof adminAuthControllerAdminMeQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminAuthControllerAdminMe({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminAuthControllerAdminMeQueryKey(options),
+  });
+
+export const adminAuthControllerSuperOnlyQueryKey = (
+  options?: Options<AdminAuthControllerSuperOnlyData>,
+) => createQueryKey("adminAuthControllerSuperOnly", options);
+
+export const adminAuthControllerSuperOnlyOptions = (
+  options?: Options<AdminAuthControllerSuperOnlyData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof adminAuthControllerSuperOnlyQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminAuthControllerSuperOnly({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminAuthControllerSuperOnlyQueryKey(options),
+  });
 
 export const healthControllerCheckQueryKey = (
   options?: Options<HealthControllerCheckData>,

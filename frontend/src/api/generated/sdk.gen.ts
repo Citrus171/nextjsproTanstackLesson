@@ -3,8 +3,12 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import type {
-  AuthControllerAdminLoginData,
-  AuthControllerAdminLoginResponses,
+  AdminAuthControllerAdminLoginData,
+  AdminAuthControllerAdminLoginResponses,
+  AdminAuthControllerAdminMeData,
+  AdminAuthControllerAdminMeResponses,
+  AdminAuthControllerSuperOnlyData,
+  AdminAuthControllerSuperOnlyResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
@@ -100,20 +104,52 @@ export const authControllerLogin = <ThrowOnError extends boolean = false>(
     },
   });
 
-export const authControllerAdminLogin = <ThrowOnError extends boolean = false>(
-  options: Options<AuthControllerAdminLoginData, ThrowOnError>,
+export const adminAuthControllerAdminLogin = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminAuthControllerAdminLoginData, ThrowOnError>,
 ) =>
   (options.client ?? client).post<
-    AuthControllerAdminLoginResponses,
+    AdminAuthControllerAdminLoginResponses,
     unknown,
     ThrowOnError
   >({
-    url: "/auth/admin/login",
+    url: "/admin/auth/login",
     ...options,
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
     },
+  });
+
+export const adminAuthControllerAdminMe = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminAuthControllerAdminMeData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminAuthControllerAdminMeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/auth/me",
+    ...options,
+  });
+
+export const adminAuthControllerSuperOnly = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminAuthControllerSuperOnlyData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminAuthControllerSuperOnlyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/auth/super-only",
+    ...options,
   });
 
 /**

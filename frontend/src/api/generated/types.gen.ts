@@ -107,15 +107,37 @@ export type AuthControllerLoginResponses = {
   201: unknown;
 };
 
-export type AuthControllerAdminLoginData = {
+export type AdminAuthControllerAdminLoginData = {
   body: LoginDto;
   path?: never;
   query?: never;
-  url: "/auth/admin/login";
+  url: "/admin/auth/login";
 };
 
-export type AuthControllerAdminLoginResponses = {
+export type AdminAuthControllerAdminLoginResponses = {
   201: unknown;
+};
+
+export type AdminAuthControllerAdminMeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/admin/auth/me";
+};
+
+export type AdminAuthControllerAdminMeResponses = {
+  200: unknown;
+};
+
+export type AdminAuthControllerSuperOnlyData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/admin/auth/super-only";
+};
+
+export type AdminAuthControllerSuperOnlyResponses = {
+  200: unknown;
 };
 
 export type HealthControllerCheckData = {

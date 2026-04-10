@@ -104,9 +104,9 @@
         ]
       }
     },
-    "/auth/admin/login": {
+    "/admin/auth/login": {
       "post": {
-        "operationId": "AuthController_adminLogin",
+        "operationId": "AdminAuthController_adminLogin",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -125,6 +125,44 @@
         },
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/admin/auth/me": {
+      "get": {
+        "operationId": "AdminAuthController_adminMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/auth/super-only": {
+      "get": {
+        "operationId": "AdminAuthController_superOnly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
