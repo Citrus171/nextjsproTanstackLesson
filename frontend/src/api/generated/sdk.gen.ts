@@ -9,16 +9,10 @@ import type {
   AdminAuthControllerAdminMeResponses,
   AdminAuthControllerSuperOnlyData,
   AdminAuthControllerSuperOnlyResponses,
-  AuthControllerAdminLoginData,
-  AuthControllerAdminLoginResponses,
-  AuthControllerAdminMeData,
-  AuthControllerAdminMeResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
-  AuthControllerSuperOnlyData,
-  AuthControllerSuperOnlyResponses,
   HealthControllerCheckData,
   HealthControllerCheckErrors,
   HealthControllerCheckResponses,
@@ -108,48 +102,6 @@ export const authControllerLogin = <ThrowOnError extends boolean = false>(
       "Content-Type": "application/json",
       ...options.headers,
     },
-  });
-
-export const authControllerAdminLogin = <ThrowOnError extends boolean = false>(
-  options: Options<AuthControllerAdminLoginData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    AuthControllerAdminLoginResponses,
-    unknown,
-    ThrowOnError
-  >({
-    url: "/auth/admin/login",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-
-export const authControllerAdminMe = <ThrowOnError extends boolean = false>(
-  options?: Options<AuthControllerAdminMeData, ThrowOnError>,
-) =>
-  (options?.client ?? client).get<
-    AuthControllerAdminMeResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/auth/admin/me",
-    ...options,
-  });
-
-export const authControllerSuperOnly = <ThrowOnError extends boolean = false>(
-  options?: Options<AuthControllerSuperOnlyData, ThrowOnError>,
-) =>
-  (options?.client ?? client).get<
-    AuthControllerSuperOnlyResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/auth/admin/super-only",
-    ...options,
   });
 
 export const adminAuthControllerAdminLogin = <

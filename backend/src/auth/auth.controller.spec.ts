@@ -69,45 +69,4 @@ describe("AuthController", () => {
       ).rejects.toThrow("Unauthorized");
     });
   });
-
-  describe("adminLogin", () => {
-    it("有効な認証情報の時、adminLoginサービスを呼びアクセストークンを返すこと", async () => {
-      const expected = { accessToken: "admin-jwt-token" };
-      mockAuthService.adminLogin.mockResolvedValue(expected);
-
-      const result = await controller.adminLogin({
-        email: "admin@example.com",
-        password: "password123",
-      });
-
-      expect(mockAuthService.adminLogin).toHaveBeenCalledWith(
-        "admin@example.com",
-        "password123",
-      );
-      expect(result).toEqual(expected);
-    });
-
-    it("サービスがエラーを投げた時、エラーが伝播すること", async () => {
-      mockAuthService.adminLogin.mockRejectedValue(new Error("Unauthorized"));
-
-      await expect(
-        controller.adminLogin({ email: "bad@example.com", password: "wrong" }),
-      ).rejects.toThrow("Unauthorized");
-    });
-  });
-
-  describe("adminMe", () => {
-    it("認証済み管理者のidとroleを返すこと", () => {
-      expect(controller.adminMe(adminRequest)).toEqual({
-        id: 10,
-        role: "super",
-      });
-    });
-  });
-
-  describe("superOnly", () => {
-    it("到達した時、ok:trueを返すこと", () => {
-      expect(controller.superOnly()).toEqual({ ok: true });
-    });
-  });
 });

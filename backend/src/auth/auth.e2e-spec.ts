@@ -140,7 +140,7 @@ describe("Auth E2E", () => {
     });
   });
 
-  describe("POST /auth/admin/login", () => {
+  describe("POST /admin/auth/login", () => {
     beforeAll(async () => {
       const dataSource = app.get(DataSource);
       const generalHashed = await bcrypt.hash("admin-pass123", 10);
@@ -161,38 +161,37 @@ describe("Auth E2E", () => {
 
     it("正しい認証情報の時、accessTokenを返すこと", async () => {
       const res = await request(app.getHttpServer())
-        .post("/auth/admin/login")
+        .post("/admin/auth/login")
         .send({ email: "admin@example.com", password: "admin-pass123" })
         .expect(201);
 
       expect(res.body).toEqual({ accessToken: expect.any(String) });
-      adminGeneralAccessToken = res.body.accessToken as string;
     });
 
     it("未登録メールアドレスの時、401を返すこと", async () => {
       await request(app.getHttpServer())
-        .post("/auth/admin/login")
+        .post("/admin/auth/login")
         .send({ email: "notfound@example.com", password: "admin-pass123" })
         .expect(401);
     });
 
     it("パスワードが不一致の時、401を返すこと", async () => {
       await request(app.getHttpServer())
-        .post("/auth/admin/login")
+        .post("/admin/auth/login")
         .send({ email: "admin@example.com", password: "wrong-password" })
         .expect(401);
     });
 
     it("メールアドレス形式が不正な時、400を返すこと", async () => {
       await request(app.getHttpServer())
-        .post("/auth/admin/login")
+        .post("/admin/auth/login")
         .send({ email: "invalid-email", password: "admin-pass123" })
         .expect(400);
     });
 
     it("管理者JWTのペイロードに type:'admin' と role が含まれること", async () => {
       const res = await request(app.getHttpServer())
-        .post("/auth/admin/login")
+        .post("/admin/auth/login")
         .send({ email: "admin@example.com", password: "admin-pass123" })
         .expect(201);
 
@@ -207,71 +206,11 @@ describe("Auth E2E", () => {
 
     it("super管理者でログインした時、accessTokenを返すこと", async () => {
       const res = await request(app.getHttpServer())
-        .post("/auth/admin/login")
+        .post("/admin/auth/login")
         .send({ email: "super-admin@example.com", password: "super-pass123" })
         .expect(201);
 
       expect(res.body).toEqual({ accessToken: expect.any(String) });
-      adminSuperAccessToken = res.body.accessToken as string;
-    });
-  });
-
-  describe("GET /auth/admin/me", () => {
-    it("管理者JWTの時、200でid・roleを返すこと", async () => {
-      const res = await request(app.getHttpServer())
-        .get("/auth/admin/me")
-        .set("Authorization", `Bearer ${adminGeneralAccessToken}`)
-        .expect(200);
-
-      expect(res.body).toEqual({ id: expect.any(Number), role: "general" });
-    });
-
-    it("会員JWTの時、401を返すこと", async () => {
-      await request(app.getHttpServer())
-        .get("/auth/admin/me")
-        .set("Authorization", `Bearer ${userAccessToken}`)
-        .expect(401);
-    });
-
-    it("会員JWTで /admin/auth/me にアクセスした時、401を返すこと", async () => {
-      await request(app.getHttpServer())
-        .get("/admin/auth/me")
-        .set("Authorization", `Bearer ${userAccessToken}`)
-        .expect(401);
-    });
-  });
-
-  describe("GET /auth/admin/super-only", () => {
-    it("general管理者JWTの時、403を返すこと", async () => {
-      await request(app.getHttpServer())
-        .get("/auth/admin/super-only")
-        .set("Authorization", `Bearer ${adminGeneralAccessToken}`)
-        .expect(403);
-    });
-
-    it("super管理者JWTの時、200を返すこと", async () => {
-      const res = await request(app.getHttpServer())
-        .get("/auth/admin/super-only")
-        .set("Authorization", `Bearer ${adminSuperAccessToken}`)
-        .expect(200);
-
-      expect(res.body).toEqual({ ok: true });
-    });
-
-    it("general管理者JWTで /admin/auth/super-only にアクセスした時、403を返すこと", async () => {
-      await request(app.getHttpServer())
-        .get("/admin/auth/super-only")
-        .set("Authorization", `Bearer ${adminGeneralAccessToken}`)
-        .expect(403);
-    });
-
-    it("super管理者JWTで /admin/auth/super-only にアクセスした時、200を返すこと", async () => {
-      const res = await request(app.getHttpServer())
-        .get("/admin/auth/super-only")
-        .set("Authorization", `Bearer ${adminSuperAccessToken}`)
-        .expect(200);
-
-      expect(res.body).toEqual({ ok: true });
     });
   });
 });

@@ -104,68 +104,6 @@
         ]
       }
     },
-    "/auth/admin/login": {
-      "post": {
-        "operationId": "AuthController_adminLogin",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ]
-      }
-    },
-    "/auth/admin/me": {
-      "get": {
-        "operationId": "AuthController_adminMe",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/auth/admin/super-only": {
-      "get": {
-        "operationId": "AuthController_superOnly",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "auth"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/admin/auth/login": {
       "post": {
         "operationId": "AdminAuthController_adminLogin",

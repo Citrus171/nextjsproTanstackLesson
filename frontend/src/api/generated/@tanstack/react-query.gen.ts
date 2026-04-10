@@ -11,11 +11,8 @@ import {
   adminAuthControllerAdminLogin,
   adminAuthControllerAdminMe,
   adminAuthControllerSuperOnly,
-  authControllerAdminLogin,
-  authControllerAdminMe,
   authControllerLogin,
   authControllerRegister,
-  authControllerSuperOnly,
   healthControllerCheck,
   type Options,
   usersControllerChangePassword,
@@ -25,11 +22,8 @@ import type {
   AdminAuthControllerAdminLoginData,
   AdminAuthControllerAdminMeData,
   AdminAuthControllerSuperOnlyData,
-  AuthControllerAdminLoginData,
-  AuthControllerAdminMeData,
   AuthControllerLoginData,
   AuthControllerRegisterData,
-  AuthControllerSuperOnlyData,
   HealthControllerCheckData,
   HealthControllerCheckError,
   HealthControllerCheckResponse,
@@ -175,80 +169,6 @@ export const authControllerLoginMutation = (
   };
   return mutationOptions;
 };
-
-export const authControllerAdminLoginMutation = (
-  options?: Partial<Options<AuthControllerAdminLoginData>>,
-): UseMutationOptions<
-  unknown,
-  DefaultError,
-  Options<AuthControllerAdminLoginData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    unknown,
-    DefaultError,
-    Options<AuthControllerAdminLoginData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await authControllerAdminLogin({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const authControllerAdminMeQueryKey = (
-  options?: Options<AuthControllerAdminMeData>,
-) => createQueryKey("authControllerAdminMe", options);
-
-export const authControllerAdminMeOptions = (
-  options?: Options<AuthControllerAdminMeData>,
-) =>
-  queryOptions<
-    unknown,
-    DefaultError,
-    unknown,
-    ReturnType<typeof authControllerAdminMeQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await authControllerAdminMe({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: authControllerAdminMeQueryKey(options),
-  });
-
-export const authControllerSuperOnlyQueryKey = (
-  options?: Options<AuthControllerSuperOnlyData>,
-) => createQueryKey("authControllerSuperOnly", options);
-
-export const authControllerSuperOnlyOptions = (
-  options?: Options<AuthControllerSuperOnlyData>,
-) =>
-  queryOptions<
-    unknown,
-    DefaultError,
-    unknown,
-    ReturnType<typeof authControllerSuperOnlyQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await authControllerSuperOnly({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: authControllerSuperOnlyQueryKey(options),
-  });
 
 export const adminAuthControllerAdminLoginMutation = (
   options?: Partial<Options<AdminAuthControllerAdminLoginData>>,
