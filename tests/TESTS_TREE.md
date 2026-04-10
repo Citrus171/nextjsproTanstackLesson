@@ -45,12 +45,81 @@ nestjspro/
         │       └── validate
         │           └── 有効なJWTペイロードの時、subをidにマッピングしてid/emailを返すこと
         ├── users/
-        │   └── users.service.spec.ts
-        │       ├── create
-        │       │   ├── 新規ユーザーを作成してパスワードをハッシュ化する
-        │       │   ├── 既存メールアドレスはConflictExceptionを投げる
-        │       │   └── ConflictException時はsaveを呼ばない
-        │       └── findByEmail
-        │           ├── 存在するメールアドレスのユーザーを返す
-        │           └── 存在しないメールアドレスはnullを返す
+        │   ├── users.service.spec.ts
+        │   │   ├── create
+        │   │   │   ├── 新規ユーザーを作成してパスワードをハッシュ化する
+        │   │   │   ├── 既存メールアドレスはConflictExceptionを投げる
+        │   │   │   └── ConflictException時はsaveを呼ばない
+        │   │   └── findByEmail
+        │   │       ├── 存在するメールアドレスのユーザーを返す
+        │   │       └── 存在しないメールアドレスはnullを返す
+        │   └── entities/
+        │       └── user.entity.spec.ts
+        │           ├── テーブル名がusersであること
+        │           ├── idカラムが存在すること（PrimaryGeneratedColumn）
+        │           ├── emailカラムがunique制約付きで存在すること
+        │           ├── passwordカラムが存在すること
+        │           ├── nameカラムが存在すること
+        │           ├── addressカラムが存在すること
+        │           └── deletedAtカラムが存在すること（論理削除）
+        ├── admin-users/
+        │   └── entities/
+        │       └── admin-user.entity.spec.ts
+        │           ├── テーブル名がadmin_usersであること
+        │           ├── emailカラムがunique制約付きで存在すること
+        │           ├── passwordカラムが存在すること
+        │           ├── nameカラムが存在すること
+        │           ├── roleカラムがenum('super','general')で存在すること
+        │           └── deletedAtカラムが存在すること（論理削除）
+        ├── categories/
+        │   └── entities/
+        │       └── category.entity.spec.ts
+        │           ├── テーブル名がcategoriesであること
+        │           ├── nameカラムが存在すること
+        │           ├── parentIdカラムがnullableで存在すること
+        │           └── 自己参照リレーション（parent_id FK）が存在すること
+        ├── products/
+        │   └── entities/
+        │       ├── product.entity.spec.ts
+        │       │   ├── テーブル名がproductsであること
+        │       │   ├── nameカラムが存在すること
+        │       │   ├── priceカラムがINT型で存在すること
+        │       │   ├── stockカラムが存在しないこと（バリエーションで管理）
+        │       │   ├── is_publishedカラムがboolean型で存在すること
+        │       │   ├── deletedAtカラムが存在すること（論理削除）
+        │       │   └── categoryへのリレーションが存在すること
+        │       └── product-variation.entity.spec.ts
+        │           ├── テーブル名がproduct_variationsであること
+        │           ├── stockカラムがINT型で存在すること
+        │           ├── sizeカラムが存在すること
+        │           ├── colorカラムが存在すること
+        │           ├── priceカラムがINT型で存在すること
+        │           └── deletedAtカラムが存在すること（論理削除）
+        ├── carts/
+        │   └── entities/
+        │       └── cart.entity.spec.ts
+        │           ├── テーブル名がcartsであること
+        │           ├── sessionIdカラムが存在すること
+        │           ├── variationIdカラムが存在すること
+        │           ├── quantityカラムがINT型で存在すること
+        │           ├── reservedAtカラムが存在すること
+        │           ├── expiresAtカラムが存在すること
+        │           └── product_variationsへのリレーションが存在すること
+        ├── orders/
+        │   └── entities/
+        │       └── order.entity.spec.ts
+        │           ├── テーブル名がordersであること
+        │           ├── statusカラムがenum型で存在すること
+        │           ├── shippingAddressカラムがJSON型で存在すること
+        │           ├── shippingFeeカラムがINT型で存在すること
+        │           ├── totalAmountカラムがINT型で存在すること
+        │           ├── stripeSessionIdカラムがnullableで存在すること
+        │           └── usersへのリレーションが存在すること
+        └── store-settings/
+            └── entities/
+                └── store-settings.entity.spec.ts
+                    ├── テーブル名がstore_settingsであること
+                    ├── invoiceNumberカラムがnullableで存在すること
+                    ├── shippingFixedFeeカラムがINT型で存在すること
+                    └── shippingFreeThresholdカラムがINT型で存在すること
 ```
