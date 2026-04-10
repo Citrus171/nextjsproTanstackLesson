@@ -10,6 +10,10 @@ import type {
   HealthControllerCheckData,
   HealthControllerCheckErrors,
   HealthControllerCheckResponses,
+  UsersControllerChangePasswordData,
+  UsersControllerChangePasswordResponses,
+  UsersControllerGetMeData,
+  UsersControllerGetMeResponses,
 } from "./types.gen";
 
 export type Options<
@@ -29,6 +33,38 @@ export type Options<
    */
   meta?: Record<string, unknown>;
 };
+
+export const usersControllerGetMe = <ThrowOnError extends boolean = false>(
+  options?: Options<UsersControllerGetMeData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    UsersControllerGetMeResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/users/me",
+    ...options,
+  });
+
+export const usersControllerChangePassword = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UsersControllerChangePasswordData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    UsersControllerChangePasswordResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/users/me/password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 
 export const authControllerRegister = <ThrowOnError extends boolean = false>(
   options: Options<AuthControllerRegisterData, ThrowOnError>,

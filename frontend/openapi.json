@@ -1,6 +1,61 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/users/me/password": {
+      "put": {
+        "operationId": "UsersController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "パスワード変更成功"
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/auth/register": {
       "post": {
         "operationId": "AuthController_register",
@@ -236,9 +291,65 @@
       }
     },
     "schemas": {
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "address",
+          "createdAt",
+          "deletedAt"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "現在のパスワード"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "新しいパスワード（8文字以上）"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
       "RegisterDto": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "example": "山田太郎",
+            "description": "名前"
+          },
           "email": {
             "type": "string",
             "example": "user@example.com",
@@ -251,6 +362,7 @@
           }
         },
         "required": [
+          "name",
           "email",
           "password"
         ]

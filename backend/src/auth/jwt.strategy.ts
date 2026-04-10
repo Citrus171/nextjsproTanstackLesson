@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 export interface JwtPayload {
   sub: number;
-  email: string;
+  type: 'user';
 }
 
 @Injectable()
@@ -17,6 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: JwtPayload) {
-    return { id: payload.sub, email: payload.email };
+    if (payload.type !== 'user') throw new UnauthorizedException('無効なトークンです');
+    return { id: payload.sub };
   }
 }

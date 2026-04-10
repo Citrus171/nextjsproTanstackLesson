@@ -10,8 +10,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(email: string, password: string) {
-    const user = await this.usersService.create(email, password);
+  async register(name: string, email: string, password: string) {
+    const user = await this.usersService.create(name, email, password);
     return { id: user.id, email: user.email };
   }
 
@@ -22,7 +22,7 @@ export class AuthService {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new UnauthorizedException('メールアドレスまたはパスワードが正しくありません');
 
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, type: 'user' as const };
     return { accessToken: this.jwtService.sign(payload) };
   }
 }
