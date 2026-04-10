@@ -135,18 +135,15 @@ describe("AdminAccountsController", () => {
 
   describe("delete", () => {
     it("指定IDのアカウントを論理削除すること", async () => {
-      const admin = makeAdminResponse({ id: 5 });
-      service.findById.mockResolvedValue(admin);
-      service.softDelete.mockResolvedValue(undefined);
+      service.softDelete.mockResolvedValue(true);
 
       await controller.delete(5);
 
-      expect(service.findById).toHaveBeenCalledWith(5);
       expect(service.softDelete).toHaveBeenCalledWith(5);
     });
 
     it("存在しないID時、NotFoundException投げること", async () => {
-      service.findById.mockResolvedValue(null);
+      service.softDelete.mockResolvedValue(false);
 
       await expect(controller.delete(999)).rejects.toThrow(NotFoundException);
     });

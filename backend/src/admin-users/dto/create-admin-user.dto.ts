@@ -15,6 +15,7 @@ export class CreateAdminUserDto {
   name: string;
 
   @ApiProperty({ example: "admin@example.com", description: "メールアドレス" })
+  @IsNotEmpty()
   @IsEmail()
   email: string;
 
@@ -29,6 +30,7 @@ export class CreateAdminUserDto {
     description: "ロール: super または general",
     enum: ["super", "general"],
   })
+  @IsNotEmpty()
   @IsEnum(["super", "general"])
   role: AdminRole;
 }

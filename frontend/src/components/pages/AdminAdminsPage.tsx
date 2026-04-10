@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { adminAccountsControllerFindAll } from "@/api/generated/sdk.gen";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
+import { getAdminToken } from "@/lib/auth";
 
 const adminUserSchema = z.object({
   id: z.number(),
@@ -25,6 +26,7 @@ export function AdminAdminsPage() {
 
     const fetchAdmins = async () => {
       const { data, error } = await adminAccountsControllerFindAll({
+        auth: getAdminToken() ?? undefined,
         throwOnError: false,
       });
 

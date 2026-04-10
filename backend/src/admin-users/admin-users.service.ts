@@ -76,14 +76,15 @@ export class AdminUsersService {
     return this.toResponse(updated);
   }
 
-  async softDelete(id: number): Promise<void> {
+  async softDelete(id: number): Promise<boolean> {
     const admin = await this.adminUserRepository.findOneBy({ id });
     if (!admin) {
-      return;
+      return false;
     }
 
     admin.deletedAt = new Date();
     await this.adminUserRepository.save(admin);
+    return true;
   }
 
   private toResponse(admin: AdminUserEntity): AdminUserResponse {

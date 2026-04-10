@@ -196,7 +196,7 @@ describe("AdminUsersService", () => {
   });
 
   describe("softDelete", () => {
-    it("存在するIDで論理削除に成功すること", async () => {
+    it("存在するIDで論理削除に成功し、trueを返すこと", async () => {
       const admin = makeAdmin({ id: 5 });
       repo.findOneBy.mockResolvedValue(admin);
       repo.save.mockResolvedValue({
@@ -204,7 +204,7 @@ describe("AdminUsersService", () => {
         deletedAt: new Date(),
       });
 
-      await service.softDelete(5);
+      const result = await service.softDelete(5);
 
       expect(repo.findOneBy).toHaveBeenCalledWith({ id: 5 });
       expect(repo.save).toHaveBeenCalledWith(
@@ -213,14 +213,16 @@ describe("AdminUsersService", () => {
           deletedAt: expect.any(Date),
         }),
       );
+      expect(result).toBe(true);
     });
 
-    it("存在しないIDで論理削除した時、何も起こらないこと", async () => {
+    it("存在しないIDで論理削除した時、falseを返すこと", async () => {
       repo.findOneBy.mockResolvedValue(null);
 
-      await service.softDelete(999);
+      const result = await service.softDelete(999);
 
       expect(repo.save).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
   });
 

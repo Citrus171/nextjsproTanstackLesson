@@ -29,6 +29,18 @@ describe('CreateAdminUserDto バリデーション', () => {
     expect(errors.some((e) => e.property === 'name')).toBe(true);
   });
 
+  it('emailがない時、バリデーションエラー', async () => {
+    const dto = plainToInstance(CreateAdminUserDto, {
+      name: '管理者',
+      password: 'password123',
+      role: 'super',
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.some((e) => e.property === 'email')).toBe(true);
+  });
+
   it('emailが無効形式時、バリデーションエラー', async () => {
     const dto = plainToInstance(CreateAdminUserDto, {
       name: '管理者',
@@ -53,6 +65,18 @@ describe('CreateAdminUserDto バリデーション', () => {
     const errors = await validate(dto);
 
     expect(errors.some((e) => e.property === 'password')).toBe(true);
+  });
+
+  it('roleがない時、バリデーションエラー', async () => {
+    const dto = plainToInstance(CreateAdminUserDto, {
+      name: '管理者',
+      email: 'admin@example.com',
+      password: 'password123',
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.some((e) => e.property === 'role')).toBe(true);
   });
 
   it('roleが super でも general でもない時、バリデーションエラー', async () => {

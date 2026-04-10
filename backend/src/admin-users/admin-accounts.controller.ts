@@ -75,10 +75,9 @@ export class AdminAccountsController {
   @ApiBearerAuth()
   @UseGuards(AdminJwtAuthGuard, SuperAdminGuard)
   async delete(@Param("id", ParseIntPipe) id: number): Promise<void> {
-    const admin = await this.adminUsersService.findById(id);
-    if (!admin) {
+    const deleted = await this.adminUsersService.softDelete(id);
+    if (!deleted) {
       throw new NotFoundException("管理者アカウントが見つかりません");
     }
-    await this.adminUsersService.softDelete(id);
   }
 }
