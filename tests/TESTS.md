@@ -5,8 +5,72 @@
 ### AdminUsersService `backend/src/admin-users/admin-users.service.spec.ts`
 
 **findByEmail**
-- [ ] 存在するメールアドレスの時、AdminUserEntityを返すこと
-- [ ] 存在しないメールアドレスの時、nullを返すこと
+- [x] 存在するメールアドレスの時、AdminUserEntityを返すこと
+- [x] 存在しないメールアドレスの時、nullを返すこと
+
+**create**
+- [x] 有効な情報でアカウント作成され、id・email・role・createdAtを返すこと
+
+**findAll**
+- [x] 全管理者を取得され、createdAtが新しい順に並ぶこと
+
+**findById**
+- [x] 存在するIDで詳細取得でき、passwordを含まないこと
+- [x] 存在しないIDで詳細取得した時、nullを返すこと
+
+**update**
+- [x] 有効な更新内容でアカウント更新され、更新後の情報を返すこと
+- [x] 存在しないIDで更新した時、nullを返すこと
+
+**softDelete**
+- [x] 存在するIDで論理削除に成功すること
+- [x] 存在しないIDで論理削除した時、何も起こらないこと
+
+**業務ルール・例外ケース**
+- [x] email一意性制約違反時、エラーが伝搬すること
+- [x] ロール値は super または general のみ許可（型安全）
+- [x] 更新時、部分的な更新（nameのみ）でroleは変更されないこと
+
+---
+
+### AdminAccountsController `backend/src/admin-users/admin-accounts.controller.spec.ts`
+
+**create**
+- [x] 有効なDTOでアカウント作成され、レスポンスを返すこと
+
+**findAll**
+- [x] 全管理者一覧を返すこと
+
+**findById**
+- [x] 指定IDの管理者詳細を返すこと
+- [x] 存在しないID時、NotFoundException投げること
+
+**update**
+- [x] 有効なDTOでアカウント更新され、更新後レスポンスを返すこと
+- [x] 存在しないID時、NotFoundException投げること
+
+**delete**
+- [x] 指定IDのアカウントを論理削除すること
+- [x] 存在しないID時、NotFoundException投げること
+
+---
+
+### CreateAdminUserDto・UpdateAdminUserDto バリデーション `backend/src/admin-users/dto/admin-user.dto.spec.ts`
+
+**CreateAdminUserDto**
+- [x] 有効なDTOでバリデーション成功すること
+- [x] nameがない時、バリデーションエラー
+- [x] emailが無効形式時、バリデーションエラー
+- [x] passwordが8文字未満時、バリデーションエラー
+- [x] roleが super でも general でもない時、バリデーションエラー
+- [x] general ロール も有効
+
+**UpdateAdminUserDto**
+- [x] 全フィールド省略可能（空オブジェクト）でバリデーション成功
+- [x] nameのみ更新
+- [x] roleのみ更新
+- [x] roleが無効値の場合、バリデーションエラー
+- [x] nameとroleの両方更新
 
 ---
 
