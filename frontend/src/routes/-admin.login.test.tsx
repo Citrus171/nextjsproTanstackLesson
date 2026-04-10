@@ -101,4 +101,29 @@ describe("admin login page", () => {
     expect(mockSetAdminToken).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
+
+  it("レスポンス形式が不正な時、エラーメッセージを表示すること", async () => {
+    const user = userEvent.setup();
+    mockAdminLogin.mockResolvedValue({
+      data: { token: "invalid-shape" },
+      error: undefined,
+    });
+
+    render(<AdminLoginPage />);
+
+    await user.type(
+      screen.getByLabelText("メールアドレス"),
+      "admin@example.com",
+    );
+    await user.type(screen.getByLabelText("パスワード"), "password123");
+    await user.click(screen.getByRole("button", { name: "ログイン" }));
+
+    expect(
+      await screen.findByText(
+        "メールアドレスまたはパスワードが正しくありません",
+      ),
+    ).toBeInTheDocument();
+    expect(mockSetAdminToken).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
 });

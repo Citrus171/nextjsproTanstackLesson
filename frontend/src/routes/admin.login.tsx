@@ -17,6 +17,10 @@ const schema = z.object({
   password: z.string().min(8, "8文字以上で入力してください"),
 });
 
+const adminLoginResponseSchema = z.object({
+  accessToken: z.string().min(1),
+});
+
 type FormValues = z.infer<typeof schema>;
 
 function AdminLoginPage() {
@@ -34,15 +38,16 @@ function AdminLoginPage() {
       throwOnError: false,
     });
 
-    if (error || !res) {
+    const parsed = adminLoginResponseSchema.safeParse(res);
+
+    if (error || !parsed.success) {
       setError("root", {
         message: "メールアドレスまたはパスワードが正しくありません",
       });
       return;
     }
 
-    const token = (res as { accessToken: string }).accessToken;
-    setAdminToken(token);
+    setAdminToken(parsed.data.accessToken);
     await navigate({ to: "/admin" });
   };
 

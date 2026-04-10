@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
-import { AdminAccountsController } from './admin-accounts.controller';
-import { AdminUsersService } from './admin-users.service';
-import { CreateAdminUserDto } from './dto/create-admin-user.dto';
-import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
+import { Test, TestingModule } from "@nestjs/testing";
+import { NotFoundException } from "@nestjs/common";
+import { AdminAccountsController } from "./admin-accounts.controller";
+import { AdminUsersService } from "./admin-users.service";
+import { CreateAdminUserDto } from "./dto/create-admin-user.dto";
+import { UpdateAdminUserDto } from "./dto/update-admin-user.dto";
 
 const makeAdminResponse = (overrides: Record<string, unknown> = {}) => ({
   id: 1,
-  name: '管理者',
-  email: 'admin@example.com',
-  role: 'general' as const,
-  createdAt: new Date('2024-01-01'),
+  name: "管理者",
+  email: "admin@example.com",
+  role: "general" as const,
+  createdAt: new Date("2024-01-01"),
   ...overrides,
 });
 
-describe('AdminAccountsController', () => {
+describe("AdminAccountsController", () => {
   let controller: AdminAccountsController;
   let service: jest.Mocked<AdminUsersService>;
 
@@ -36,20 +36,20 @@ describe('AdminAccountsController', () => {
     service = module.get(AdminUsersService) as jest.Mocked<AdminUsersService>;
   });
 
-  describe('create', () => {
-    it('有効なDTOでアカウント作成され、レスポンスを返すこと', async () => {
+  describe("create", () => {
+    it("有効なDTOでアカウント作成され、レスポンスを返すこと", async () => {
       const dto: CreateAdminUserDto = {
-        name: '新管理者',
-        email: 'new@example.com',
-        password: 'password123',
-        role: 'super',
+        name: "新管理者",
+        email: "new@example.com",
+        password: "password123",
+        role: "super",
       };
 
       const response = makeAdminResponse({
         id: 2,
-        name: '新管理者',
-        email: 'new@example.com',
-        role: 'super',
+        name: "新管理者",
+        email: "new@example.com",
+        role: "super",
       });
 
       service.create.mockResolvedValue(response);
@@ -57,20 +57,20 @@ describe('AdminAccountsController', () => {
       const result = await controller.create(dto);
 
       expect(service.create).toHaveBeenCalledWith(
-        '新管理者',
-        'new@example.com',
-        'password123',
-        'super',
+        "新管理者",
+        "new@example.com",
+        "password123",
+        "super",
       );
       expect(result).toEqual(response);
     });
   });
 
-  describe('findAll', () => {
-    it('全管理者一覧を返すこと', async () => {
+  describe("findAll", () => {
+    it("全管理者一覧を返すこと", async () => {
       const admins = [
         makeAdminResponse({ id: 1 }),
-        makeAdminResponse({ id: 2, name: '別の管理者' }),
+        makeAdminResponse({ id: 2, name: "別の管理者" }),
       ];
 
       service.findAll.mockResolvedValue(admins);
@@ -83,8 +83,8 @@ describe('AdminAccountsController', () => {
     });
   });
 
-  describe('findById', () => {
-    it('指定IDの管理者詳細を返すこと', async () => {
+  describe("findById", () => {
+    it("指定IDの管理者詳細を返すこと", async () => {
       const admin = makeAdminResponse({ id: 5 });
       service.findById.mockResolvedValue(admin);
 
@@ -94,24 +94,24 @@ describe('AdminAccountsController', () => {
       expect(result).toEqual(admin);
     });
 
-    it('存在しないID時、NotFoundException投げること', async () => {
+    it("存在しないID時、NotFoundException投げること", async () => {
       service.findById.mockResolvedValue(null);
 
       await expect(controller.findById(999)).rejects.toThrow(NotFoundException);
     });
   });
 
-  describe('update', () => {
-    it('有効なDTOでアカウント更新され、更新後レスポンスを返すこと', async () => {
+  describe("update", () => {
+    it("有効なDTOでアカウント更新され、更新後レスポンスを返すこと", async () => {
       const dto: UpdateAdminUserDto = {
-        name: '更新名',
-        role: 'super',
+        name: "更新名",
+        role: "super",
       };
 
       const updated = makeAdminResponse({
         id: 5,
-        name: '更新名',
-        role: 'super',
+        name: "更新名",
+        role: "super",
       });
 
       service.update.mockResolvedValue(updated);
@@ -122,17 +122,19 @@ describe('AdminAccountsController', () => {
       expect(result).toEqual(updated);
     });
 
-    it('存在しないID時、NotFoundException投げること', async () => {
+    it("存在しないID時、NotFoundException投げること", async () => {
       service.update.mockResolvedValue(null);
 
-      const dto: UpdateAdminUserDto = { name: '新名前' };
+      const dto: UpdateAdminUserDto = { name: "新名前" };
 
-      await expect(controller.update(999, dto)).rejects.toThrow(NotFoundException);
+      await expect(controller.update(999, dto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
-  describe('delete', () => {
-    it('指定IDのアカウントを論理削除すること', async () => {
+  describe("delete", () => {
+    it("指定IDのアカウントを論理削除すること", async () => {
       const admin = makeAdminResponse({ id: 5 });
       service.findById.mockResolvedValue(admin);
       service.softDelete.mockResolvedValue(undefined);
@@ -143,7 +145,7 @@ describe('AdminAccountsController', () => {
       expect(service.softDelete).toHaveBeenCalledWith(5);
     });
 
-    it('存在しないID時、NotFoundException投げること', async () => {
+    it("存在しないID時、NotFoundException投げること", async () => {
       service.findById.mockResolvedValue(null);
 
       await expect(controller.delete(999)).rejects.toThrow(NotFoundException);
