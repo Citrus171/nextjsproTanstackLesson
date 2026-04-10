@@ -7,11 +7,23 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
           }
         },
         "tags": [
           "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -31,11 +43,16 @@
         },
         "responses": {
           "204": {
-            "description": ""
+            "description": "パスワード変更成功"
           }
         },
         "tags": [
           "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -274,6 +291,40 @@
       }
     },
     "schemas": {
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "address",
+          "createdAt",
+          "deletedAt"
+        ]
+      },
       "ChangePasswordDto": {
         "type": "object",
         "properties": {

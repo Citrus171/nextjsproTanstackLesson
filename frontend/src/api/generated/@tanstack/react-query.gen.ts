@@ -24,6 +24,7 @@ import type {
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponse,
   UsersControllerGetMeData,
+  UsersControllerGetMeResponse,
 } from "../types.gen";
 
 export type QueryKey<TOptions extends Options> = [
@@ -74,9 +75,9 @@ export const usersControllerGetMeOptions = (
   options?: Options<UsersControllerGetMeData>,
 ) =>
   queryOptions<
-    unknown,
+    UsersControllerGetMeResponse,
     DefaultError,
-    unknown,
+    UsersControllerGetMeResponse,
     ReturnType<typeof usersControllerGetMeQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {

@@ -29,14 +29,13 @@ function RegisterPage() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormValues) => {
-    const { error } = await authControllerRegister({
+    const { error, response } = await authControllerRegister({
       body: data,
       throwOnError: false,
     });
 
     if (error) {
-      const status = (error as { status?: number }).status;
-      if (status === 409) {
+      if (response?.status === 409) {
         setError('email', { message: 'このメールアドレスは既に登録されています' });
       } else {
         setError('root', { message: '登録に失敗しました。もう一度お試しください' });

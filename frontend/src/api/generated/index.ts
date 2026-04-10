@@ -22,9 +22,11 @@ export type {
   HealthControllerCheckResponses,
   LoginDto,
   RegisterDto,
+  UserProfileDto,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponse,
   UsersControllerChangePasswordResponses,
   UsersControllerGetMeData,
+  UsersControllerGetMeResponse,
   UsersControllerGetMeResponses,
 } from "./types.gen";

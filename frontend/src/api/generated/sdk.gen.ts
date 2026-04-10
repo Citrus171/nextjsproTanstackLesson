@@ -41,7 +41,11 @@ export const usersControllerGetMe = <ThrowOnError extends boolean = false>(
     UsersControllerGetMeResponses,
     unknown,
     ThrowOnError
-  >({ url: "/users/me", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/users/me",
+    ...options,
+  });
 
 export const usersControllerChangePassword = <
   ThrowOnError extends boolean = false,
@@ -53,6 +57,7 @@ export const usersControllerChangePassword = <
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/users/me/password",
     ...options,
     headers: {

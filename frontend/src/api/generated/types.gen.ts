@@ -4,6 +4,19 @@ export type ClientOptions = {
   baseUrl: string;
 };
 
+export type UserProfileDto = {
+  id: number;
+  name: string;
+  email: string;
+  address: {
+    [key: string]: unknown;
+  } | null;
+  createdAt: string;
+  deletedAt: {
+    [key: string]: unknown;
+  } | null;
+};
+
 export type ChangePasswordDto = {
   /**
    * 現在のパスワード
@@ -49,8 +62,11 @@ export type UsersControllerGetMeData = {
 };
 
 export type UsersControllerGetMeResponses = {
-  200: unknown;
+  200: UserProfileDto;
 };
+
+export type UsersControllerGetMeResponse =
+  UsersControllerGetMeResponses[keyof UsersControllerGetMeResponses];
 
 export type UsersControllerChangePasswordData = {
   body: ChangePasswordDto;
@@ -60,6 +76,9 @@ export type UsersControllerChangePasswordData = {
 };
 
 export type UsersControllerChangePasswordResponses = {
+  /**
+   * パスワード変更成功
+   */
   204: void;
 };
 
