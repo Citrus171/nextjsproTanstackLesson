@@ -9,7 +9,6 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { ProductsService } from './products.service';
-import { ProductEntity } from './entities/product.entity';
 import { PublicProductResponseDto } from './dto/public-product-response.dto';
 
 @ApiTags('Public - Products')
