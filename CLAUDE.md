@@ -127,11 +127,12 @@ docs: README更新
    git checkout -b feat/issue8/product-management
    ```
 
-2. **開発・テスト**
+2. **開発・テスト**（ローカル）
    ```bash
-   npm run test       # テスト実行
+   npm run test       # ユニットテスト実行
    npm run lint       # ESLint実行
    ```
+   ✅ ローカルで全テスト通過を確認してからコミット
 
 3. **コミット**
    ```bash
@@ -139,22 +140,24 @@ docs: README更新
    git commit -m "feat: issue#8 商品管理機能を実装"
    ```
 
-4. **CI/CD パイプライン実行**（自動）
+4. **main へマージ**
+   ```bash
+   git checkout main
+   git merge feat/issue8/product-management
+   ```
+
+5. **push（GitHub Actions 自動実行）**
+   ```bash
+   git push origin main
+   ```
    
-   GitHub Actions が以下を自動実行：
+   この時点で GitHub Actions が自動実行：
    - OpenAPI コード生成チェック
    - バックエンド: ESLint + ユニットテスト（カバレッジ 80%）
    - フロントエンド: ESLint + ユニットテスト（カバレッジ 80%）
    
-   ✅ 全チェック通過後のみ main へのマージが可能
-   ❌ チェック失敗時は修正が必須
-
-5. **main へマージ**
-   ```bash
-   git checkout main
-   git merge feat/issue8/product-management
-   git push origin main
-   ```
+   ✅ 全チェック通過で main に確定
+   ❌ チェック失敗時は修正・再 push が必須
 
 6. **ブランチ削除**
    ```bash
