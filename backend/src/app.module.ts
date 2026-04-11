@@ -6,6 +6,7 @@ import { UserEntity } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
 import { AdminUserEntity } from './admin-users/entities/admin-user.entity';
 import { CategoryEntity } from './categories/entities/category.entity';
 import { ProductEntity } from './products/entities/product.entity';
@@ -53,6 +54,7 @@ import { StoreSettingsEntity } from './store-settings/entities/store-settings.en
     AuthModule,
     HealthModule,
     CategoriesModule,
+    ProductsModule,
   ],
 })
 export class AppModule {}
