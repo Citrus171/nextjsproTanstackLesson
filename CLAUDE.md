@@ -140,26 +140,37 @@ docs: README更新
    git commit -m "feat: issue#8 商品管理機能を実装"
    ```
 
-4. **main へマージ**
+4. **プッシュ**（feature ブランチ）
    ```bash
-   git checkout main
-   git merge feat/issue8/product-management
+   git push origin feat/issue8/product-management
    ```
 
-5. **push（GitHub Actions 自動実行）**
+5. **GitHub で PR 作成**
    ```bash
-   git push origin main
+   gh pr create --base main --head feat/issue8/product-management --title "feat: issue#8 商品管理機能を実装"
    ```
+   
+   GitHub Issues と自動連携（PR が閉じると Issue も自動クローズ）
+
+6. **GitHub Actions チェック確認**
    
    この時点で GitHub Actions が自動実行：
    - OpenAPI コード生成チェック
    - バックエンド: ESLint + ユニットテスト（カバレッジ 80%）
    - フロントエンド: ESLint + ユニットテスト（カバレッジ 80%）
    
-   ✅ 全チェック通過で main に確定
-   ❌ チェック失敗時は修正・再 push が必須
+   ✅ 全チェック通過 → PR マージ可能
+   ❌ チェック失敗 → 修正・再プッシュ（PR が自動更新）
 
-6. **ブランチ削除**
+7. **PR マージ**（GitHub Web UI）
+   ```bash
+   gh pr merge feat/issue8/product-management --merge
+   ```
+   
+   ✅ main に確定
+
+8. **ブランチ削除**
    ```bash
    git branch -d feat/issue8/product-management
+   git push origin --delete feat/issue8/product-management
    ```
