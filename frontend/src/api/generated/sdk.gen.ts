@@ -60,6 +60,10 @@ import type {
   ProductsControllerUpdateResponses,
   ProductsControllerUpdateVariationData,
   ProductsControllerUpdateVariationResponses,
+  PublicProductsControllerFindAllData,
+  PublicProductsControllerFindAllResponses,
+  PublicProductsControllerFindByIdData,
+  PublicProductsControllerFindByIdResponses,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponses,
   UsersControllerGetMeData,
@@ -526,3 +530,25 @@ export const productsControllerDeleteImage = <
     unknown,
     ThrowOnError
   >({ url: "/admin/products/images/{imageId}", ...options });
+
+export const publicProductsControllerFindAll = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PublicProductsControllerFindAllData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    PublicProductsControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/products", ...options });
+
+export const publicProductsControllerFindById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PublicProductsControllerFindByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    PublicProductsControllerFindByIdResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/products/{id}", ...options });

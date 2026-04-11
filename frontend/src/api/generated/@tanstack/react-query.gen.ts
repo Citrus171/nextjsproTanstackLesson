@@ -39,6 +39,8 @@ import {
   productsControllerUnpublish,
   productsControllerUpdate,
   productsControllerUpdateVariation,
+  publicProductsControllerFindAll,
+  publicProductsControllerFindById,
   usersControllerChangePassword,
   usersControllerGetMe,
 } from "../sdk.gen";
@@ -75,6 +77,8 @@ import type {
   ProductsControllerUnpublishData,
   ProductsControllerUpdateData,
   ProductsControllerUpdateVariationData,
+  PublicProductsControllerFindAllData,
+  PublicProductsControllerFindByIdData,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponse,
   UsersControllerGetMeData,
@@ -934,3 +938,100 @@ export const productsControllerDeleteImageMutation = (
   };
   return mutationOptions;
 };
+
+export const publicProductsControllerFindAllQueryKey = (
+  options: Options<PublicProductsControllerFindAllData>,
+) => createQueryKey("publicProductsControllerFindAll", options);
+
+export const publicProductsControllerFindAllOptions = (
+  options: Options<PublicProductsControllerFindAllData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof publicProductsControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await publicProductsControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: publicProductsControllerFindAllQueryKey(options),
+  });
+
+export const publicProductsControllerFindAllInfiniteQueryKey = (
+  options: Options<PublicProductsControllerFindAllData>,
+): QueryKey<Options<PublicProductsControllerFindAllData>> =>
+  createQueryKey("publicProductsControllerFindAll", options, true);
+
+export const publicProductsControllerFindAllInfiniteOptions = (
+  options: Options<PublicProductsControllerFindAllData>,
+) =>
+  infiniteQueryOptions<
+    unknown,
+    DefaultError,
+    InfiniteData<unknown>,
+    QueryKey<Options<PublicProductsControllerFindAllData>>,
+    | number
+    | Pick<
+        QueryKey<Options<PublicProductsControllerFindAllData>>[0],
+        "body" | "headers" | "path" | "query"
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<PublicProductsControllerFindAllData>>[0],
+          "body" | "headers" | "path" | "query"
+        > =
+          typeof pageParam === "object"
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await publicProductsControllerFindAll({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: publicProductsControllerFindAllInfiniteQueryKey(options),
+    },
+  );
+
+export const publicProductsControllerFindByIdQueryKey = (
+  options: Options<PublicProductsControllerFindByIdData>,
+) => createQueryKey("publicProductsControllerFindById", options);
+
+export const publicProductsControllerFindByIdOptions = (
+  options: Options<PublicProductsControllerFindByIdData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof publicProductsControllerFindByIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await publicProductsControllerFindById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: publicProductsControllerFindByIdQueryKey(options),
+  });

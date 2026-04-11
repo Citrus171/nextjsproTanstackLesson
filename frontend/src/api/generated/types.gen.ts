@@ -563,3 +563,33 @@ export type ProductsControllerDeleteImageData = {
 export type ProductsControllerDeleteImageResponses = {
   200: unknown;
 };
+
+export type PublicProductsControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query: {
+    page: number;
+    limit: number;
+    category_id: number;
+    keyword: string;
+    sort: string;
+  };
+  url: "/products";
+};
+
+export type PublicProductsControllerFindAllResponses = {
+  200: unknown;
+};
+
+export type PublicProductsControllerFindByIdData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/products/{id}";
+};
+
+export type PublicProductsControllerFindByIdResponses = {
+  200: unknown;
+};
