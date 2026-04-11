@@ -28,7 +28,7 @@ describe('PublicProductsController', () => {
   describe('findAll', () => {
     it('公開商品一覧を返すこと', async () => {
       const mockProducts = [
-        { id: 1, name: 'Product 1', price: 1000, isPublished: true } as ProductEntity,
+        { id: 1, name: 'Product 1', price: 1000, isPublished: true, categoryId: 1, category: null, description: null, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null } as unknown as ProductEntity,
       ];
       const mockResult = { data: mockProducts, total: 1 };
 
@@ -36,7 +36,11 @@ describe('PublicProductsController', () => {
 
       const result = await controller.findAll(1, 10);
 
-      expect(result).toEqual(mockResult);
+      expect(result.total).toBe(1);
+      expect(Array.isArray(result.data)).toBe(true);
+      expect(result.data.length).toBe(1);
+      expect(result.data[0]).toHaveProperty('id', 1);
+      expect(result.data[0]).toHaveProperty('name', 'Product 1');
       expect(service.findAllPublished).toHaveBeenCalledWith({
         page: 1,
         limit: 10,
@@ -113,7 +117,14 @@ describe('PublicProductsController', () => {
 
       const result = await controller.findById(1);
 
-      expect(result).toEqual(mockProduct);
+      // @Exclude() で除外されたフィールドが含まれていないことを確認
+      expect(result).toHaveProperty('id', 1);
+      expect(result).toHaveProperty('name', 'Product 1');
+      expect(result).toHaveProperty('price', 1000);
+      expect(result).not.toHaveProperty('createdAt');
+      expect(result).not.toHaveProperty('updatedAt');
+      expect(result).not.toHaveProperty('deletedAt');
+      expect(result).not.toHaveProperty('isPublished');
       expect(service.findByIdPublished).toHaveBeenCalledWith(1);
     });
 

@@ -367,8 +367,8 @@ export class ProductsService {
     keyword?: string;
     sort?: string;
   }): Promise<{ data: ProductEntity[]; total: number }> {
-    const page = options.page || 1;
-    const limit = options.limit || 10;
+    const page = Math.max(1, options.page || 1);
+    const limit = Math.max(1, Math.min(options.limit || 10, 100));
     const skip = (page - 1) * limit;
 
     const query = this.productRepository
