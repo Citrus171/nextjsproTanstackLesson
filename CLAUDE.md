@@ -85,3 +85,78 @@ npm run gen
 
 - バックエンド・フロントエンドともに `type-coverage` で 95% 以上を維持
 - `any` は原則禁止
+
+## Git ワークフロー
+
+### ブランチ命名規則
+
+```bash
+git checkout -b feat/issue{number}/{description}
+git checkout -b fix/issue{number}/{description}
+git checkout -b chore/issue{number}/{description}
+```
+
+**例**
+```bash
+feat/issue8/product-management     # Issue #8: 商品管理機能
+fix/issue9/cart-validation         # Issue #9: カート検証のバグ修正
+chore/issue10/dependency-upgrade   # Issue #10: 依存関係更新
+```
+
+**メリット**
+- GitHub Issues と自動連携（コミットで `#8` を参照可能）
+- git log で issue 追跡が容易
+- PR作成時にコンテキストが明確
+
+### コミットメッセージ規則
+
+Conventional Commits に従う：
+
+```
+feat: issue#8 商品管理機能を実装
+fix: issue#9 カート検証エラーを修正
+chore: 依存関係更新
+test: issue#8 商品管理のテスト追加
+docs: README更新
+```
+
+### 開発フロー
+
+1. **ブランチ作成**（Issue 単位）
+   ```bash
+   git checkout -b feat/issue8/product-management
+   ```
+
+2. **開発・テスト**
+   ```bash
+   npm run test       # テスト実行
+   npm run lint       # ESLint実行
+   ```
+
+3. **コミット**
+   ```bash
+   git add .
+   git commit -m "feat: issue#8 商品管理機能を実装"
+   ```
+
+4. **CI/CD パイプライン実行**（自動）
+   
+   GitHub Actions が以下を自動実行：
+   - OpenAPI コード生成チェック
+   - バックエンド: ESLint + ユニットテスト（カバレッジ 80%）
+   - フロントエンド: ESLint + ユニットテスト（カバレッジ 80%）
+   
+   ✅ 全チェック通過後のみ main へのマージが可能
+   ❌ チェック失敗時は修正が必須
+
+5. **main へマージ**
+   ```bash
+   git checkout main
+   git merge feat/issue8/product-management
+   git push origin main
+   ```
+
+6. **ブランチ削除**
+   ```bash
+   git branch -d feat/issue8/product-management
+   ```
