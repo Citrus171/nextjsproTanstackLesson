@@ -346,4 +346,74 @@ export class ProductsService {
 
     await this.imageRepository.delete(id);
   }
+
+  async findByIdPublished(id: number): Promise<ProductEntity> {
+    const product = await this.productRepository.findOne({
+      where: { id, isPublished: true },
+      relations: ['images', 'variations', 'category'],
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
+
+    return product;
+  }
+
+  async findAllPublished(options: {
+    page?: number;
+    limit?: number;
+    categoryId?: number;
+    keyword?: string;
+    sort?: string;
+  }): Promise<{ data: ProductEntity[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const query = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.images', 'images')
+      .leftJoinAndSelect('product.variations', 'variations')
+      .leftJoinAndSelect('product.category', 'category')
+      .where('product.isPublished = :isPublished', { isPublished: true });
+
+    // フィルター: カテゴリ
+    if (options.categoryId) {
+      query.andWhere('product.categoryId = :categoryId', { categoryId: options.categoryId });
+    }
+
+    // フィルター: キーワード
+    if (options.keyword) {
+      const keyword = `%${options.keyword}%`;
+      query.andWhere(
+        '(product.name LIKE :keyword OR product.description LIKE :keyword)',
+        { keyword },
+      );
+    }
+
+    // ソート
+    const sortBy = options.sort || 'newest';
+    switch (sortBy) {
+      case 'price_asc':
+        query.orderBy('product.price', 'ASC');
+        break;
+      case 'price_desc':
+        query.orderBy('product.price', 'DESC');
+        break;
+      case 'newest':
+      default:
+        query.orderBy('product.createdAt', 'DESC');
+    }
+
+    const [products, total] = await Promise.all([
+      query.skip(skip).take(limit).getMany(),
+      query.getCount(),
+    ]);
+
+    return {
+      data: products,
+      total,
+    };
+  }
 }

@@ -322,6 +322,24 @@
 
 ---
 
+### Public Products E2E `backend/src/products/public-products.e2e-spec.ts`
+
+**GET /products**
+- [x] 公開商品一覧を返すこと
+- [x] 非公開商品は含まれないこと
+- [x] ページネーション（page, limit）が機能すること
+- [x] カテゴリフィルター（category_id）が機能すること
+- [x] キーワード検索（keyword）が機能すること
+- [x] ソート（sort=price_asc）が機能すること
+- [x] ソート（sort=price_desc）が機能すること
+
+**GET /products/:id**
+- [x] 商品詳細をバリエーション・画像付きで返すこと
+- [x] 存在しない商品は404を返すこと
+- [x] 非公開商品は404を返すこと
+
+---
+
 ### Auth E2E `backend/src/auth/auth.e2e-spec.ts`
 
 **POST /auth/register**

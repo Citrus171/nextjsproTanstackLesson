@@ -5,6 +5,7 @@ import { ProductImageEntity } from './entities/product-image.entity';
 import { ProductVariationEntity } from './entities/product-variation.entity';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
+import { PublicProductsController } from './public-products.controller';
 import { CategoryEntity } from '../categories/entities/category.entity';
 
 @Module({
@@ -17,7 +18,7 @@ import { CategoryEntity } from '../categories/entities/category.entity';
     ]),
   ],
   providers: [ProductsService],
-  controllers: [ProductsController],
+  controllers: [ProductsController, PublicProductsController],
   exports: [ProductsService],
 })
 export class ProductsModule {}
