@@ -17,6 +17,7 @@ import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth.guard';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryResponseDto } from './dto/category-response.dto';
+import { CategoryEntity } from './entities/category.entity';
 
 @ApiTags('admin/categories')
 @Controller('admin/categories')
@@ -55,12 +56,14 @@ export class AdminCategoriesController {
     await this.categoriesService.remove(id);
   }
 
-  private toResponse(category: any): CategoryResponseDto {
+  private toResponse(category: CategoryEntity): CategoryResponseDto {
     return {
       id: category.id,
       name: category.name,
       parentId: category.parentId,
-      children: (category.children || []).map((child: any) => this.toResponse(child)),
+      children: (category.children || []).map((child: CategoryEntity) =>
+        this.toResponse(child),
+      ),
       createdAt: category.createdAt,
     };
   }

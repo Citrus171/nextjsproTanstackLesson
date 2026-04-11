@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CategoryEntity } from './entities/category.entity';
