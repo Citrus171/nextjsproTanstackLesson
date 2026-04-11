@@ -134,25 +134,31 @@ docs: README更新
    ```
    ✅ ローカルで全テスト通過を確認してからコミット
 
-3. **コミット**
+3. **テスト一覧ファイルの更新**（TDD 完了後）
+   ```bash
+   # tests/TESTS.md と tests/TESTS_TREE.md を最新の状態に更新
+   # チェックボックス ✓ を付けて完了状況を記録
+   ```
+
+4. **コミット**
    ```bash
    git add .
    git commit -m "feat: issue#8 商品管理機能を実装"
    ```
 
-4. **プッシュ**（feature ブランチ）
+5. **プッシュ**（feature ブランチ）
    ```bash
    git push origin feat/issue8/product-management
    ```
 
-5. **GitHub で PR 作成**
+6. **GitHub で PR 作成**
    ```bash
    gh pr create --base main --head feat/issue8/product-management --title "feat: issue#8 商品管理機能を実装"
    ```
    
    GitHub Issues と自動連携（PR が閉じると Issue も自動クローズ）
 
-6. **GitHub Actions チェック確認**
+7. **GitHub Actions チェック確認**
    
    この時点で GitHub Actions が自動実行：
    - OpenAPI コード生成チェック
@@ -162,14 +168,14 @@ docs: README更新
    ✅ 全チェック通過 → PR マージ可能
    ❌ チェック失敗 → 修正・再プッシュ（PR が自動更新）
 
-7. **PR マージ**（GitHub Web UI）
+8. **PR マージ**（GitHub Web UI）
    ```bash
    gh pr merge feat/issue8/product-management --merge
    ```
    
    ✅ main に確定
 
-8. **ブランチ削除**
+9. **ブランチ削除**
    ```bash
    git branch -d feat/issue8/product-management
    git push origin --delete feat/issue8/product-management
