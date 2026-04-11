@@ -19,10 +19,20 @@ import type {
   AdminAuthControllerAdminMeResponses,
   AdminAuthControllerSuperOnlyData,
   AdminAuthControllerSuperOnlyResponses,
+  AdminCategoriesControllerCreateData,
+  AdminCategoriesControllerCreateResponses,
+  AdminCategoriesControllerFindAllData,
+  AdminCategoriesControllerFindAllResponses,
+  AdminCategoriesControllerRemoveData,
+  AdminCategoriesControllerRemoveResponses,
+  AdminCategoriesControllerUpdateData,
+  AdminCategoriesControllerUpdateResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
+  CategoriesControllerFindAllData,
+  CategoriesControllerFindAllResponses,
   HealthControllerCheckData,
   HealthControllerCheckErrors,
   HealthControllerCheckResponses,
@@ -256,3 +266,82 @@ export const healthControllerCheck = <ThrowOnError extends boolean = false>(
     HealthControllerCheckErrors,
     ThrowOnError
   >({ url: "/health", ...options });
+
+export const adminCategoriesControllerFindAll = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminCategoriesControllerFindAllData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminCategoriesControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/categories",
+    ...options,
+  });
+
+export const adminCategoriesControllerCreate = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminCategoriesControllerCreateData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    AdminCategoriesControllerCreateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/categories",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const adminCategoriesControllerRemove = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminCategoriesControllerRemoveData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    AdminCategoriesControllerRemoveResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/categories/{id}",
+    ...options,
+  });
+
+export const adminCategoriesControllerUpdate = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminCategoriesControllerUpdateData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    AdminCategoriesControllerUpdateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/categories/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const categoriesControllerFindAll = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<CategoriesControllerFindAllData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    CategoriesControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/categories", ...options });

@@ -167,6 +167,72 @@
 
 ---
 
+### CreateCategoryDto・UpdateCategoryDto バリデーション `backend/src/categories/dto/category.dto.spec.ts`
+
+**CreateCategoryDto**
+- [x] nameが50文字以内の時、バリデーション成功すること
+- [x] nameが空の場合はバリデーションエラーになること
+- [x] nameが50文字超の場合はバリデーションエラーになること
+- [x] parentIdが省略可能であること
+- [x] parentIdがnullでもバリデーションエラーにならないこと
+- [x] parentIdが整数の場合はバリデーションエラーにならないこと
+
+**UpdateCategoryDto**
+- [x] 空のオブジェクトでもバリデーションエラーにならないこと
+- [x] nameが50文字超の場合はバリデーションエラーになること
+- [x] nameとparentIdの両方が指定されてもバリデーションエラーにならないこと
+
+---
+
+### CategoriesService `backend/src/categories/categories.service.spec.ts`
+
+**findAll**
+- [x] 全カテゴリを親子構造で返すこと
+
+**create**
+- [x] parentIdが指定される場合、親カテゴリが存在することを確認すること
+- [x] 親が存在する場合はカテゴリを作成すること
+- [x] parentIdが指定されない場合は親カテゴリなしで作成すること
+
+**findById**
+- [x] 存在するカテゴリを返すこと
+- [x] 存在しないカテゴリはnullを返すこと
+
+**update**
+- [x] 存在するカテゴリを更新できること
+- [x] 存在しないカテゴリはnullを返すこと
+- [x] 更新時に親カテゴリが存在することを確認すること
+
+**remove**
+- [x] 商品が紐付いている場合はConflictExceptionをスローすること
+- [x] 商品がない場合は削除できること
+
+---
+
+### AdminCategoriesController `backend/src/categories/admin-categories.controller.spec.ts`
+
+**findAll**
+- [x] 全カテゴリを返すこと
+
+**create**
+- [x] 新規カテゴリを作成すること
+
+**update**
+- [x] 存在するカテゴリを更新すること
+- [x] 存在しないカテゴリではNotFoundExceptionをスローすること
+
+**remove**
+- [x] カテゴリを削除すること
+
+---
+
+### CategoriesController `backend/src/categories/categories.controller.spec.ts`
+
+**findAll**
+- [x] 全カテゴリを親子構造で返すこと
+
+---
+
 ### Auth E2E `backend/src/auth/auth.e2e-spec.ts`
 
 **POST /auth/register**

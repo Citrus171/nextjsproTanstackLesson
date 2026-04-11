@@ -84,6 +84,32 @@ export type UpdateAdminUserDto = {
   role?: "super" | "general";
 };
 
+export type CreateCategoryDto = {
+  /**
+   * カテゴリ名
+   */
+  name: string;
+  /**
+   * 親カテゴリのID
+   */
+  parentId?: {
+    [key: string]: unknown;
+  } | null;
+};
+
+export type UpdateCategoryDto = {
+  /**
+   * カテゴリ名
+   */
+  name?: string;
+  /**
+   * 親カテゴリのID
+   */
+  parentId?: {
+    [key: string]: unknown;
+  } | null;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -300,3 +326,65 @@ export type HealthControllerCheckResponses = {
 
 export type HealthControllerCheckResponse =
   HealthControllerCheckResponses[keyof HealthControllerCheckResponses];
+
+export type AdminCategoriesControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/admin/categories";
+};
+
+export type AdminCategoriesControllerFindAllResponses = {
+  200: unknown;
+};
+
+export type AdminCategoriesControllerCreateData = {
+  body: CreateCategoryDto;
+  path?: never;
+  query?: never;
+  url: "/admin/categories";
+};
+
+export type AdminCategoriesControllerCreateResponses = {
+  201: unknown;
+};
+
+export type AdminCategoriesControllerRemoveData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/categories/{id}";
+};
+
+export type AdminCategoriesControllerRemoveResponses = {
+  204: void;
+};
+
+export type AdminCategoriesControllerRemoveResponse =
+  AdminCategoriesControllerRemoveResponses[keyof AdminCategoriesControllerRemoveResponses];
+
+export type AdminCategoriesControllerUpdateData = {
+  body: UpdateCategoryDto;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/categories/{id}";
+};
+
+export type AdminCategoriesControllerUpdateResponses = {
+  200: unknown;
+};
+
+export type CategoriesControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/categories";
+};
+
+export type CategoriesControllerFindAllResponses = {
+  200: unknown;
+};

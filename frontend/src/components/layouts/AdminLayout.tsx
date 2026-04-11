@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 
 const NAV_ITEMS = [
   { label: 'ダッシュボード', href: '/admin/dashboard' },
+  { label: 'カテゴリ管理', href: '/admin/categories' },
   { label: '商品管理', href: '/admin/products' },
   { label: '注文管理', href: '/admin/orders' },
   { label: '会員管理', href: '/admin/members' },

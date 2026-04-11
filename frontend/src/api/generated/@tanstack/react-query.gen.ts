@@ -16,8 +16,13 @@ import {
   adminAuthControllerAdminLogin,
   adminAuthControllerAdminMe,
   adminAuthControllerSuperOnly,
+  adminCategoriesControllerCreate,
+  adminCategoriesControllerFindAll,
+  adminCategoriesControllerRemove,
+  adminCategoriesControllerUpdate,
   authControllerLogin,
   authControllerRegister,
+  categoriesControllerFindAll,
   healthControllerCheck,
   type Options,
   usersControllerChangePassword,
@@ -33,8 +38,14 @@ import type {
   AdminAuthControllerAdminLoginData,
   AdminAuthControllerAdminMeData,
   AdminAuthControllerSuperOnlyData,
+  AdminCategoriesControllerCreateData,
+  AdminCategoriesControllerFindAllData,
+  AdminCategoriesControllerRemoveData,
+  AdminCategoriesControllerRemoveResponse,
+  AdminCategoriesControllerUpdateData,
   AuthControllerLoginData,
   AuthControllerRegisterData,
+  CategoriesControllerFindAllData,
   HealthControllerCheckData,
   HealthControllerCheckError,
   HealthControllerCheckResponse,
@@ -403,4 +414,126 @@ export const healthControllerCheckOptions = (
       return data;
     },
     queryKey: healthControllerCheckQueryKey(options),
+  });
+
+export const adminCategoriesControllerFindAllQueryKey = (
+  options?: Options<AdminCategoriesControllerFindAllData>,
+) => createQueryKey("adminCategoriesControllerFindAll", options);
+
+export const adminCategoriesControllerFindAllOptions = (
+  options?: Options<AdminCategoriesControllerFindAllData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof adminCategoriesControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminCategoriesControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminCategoriesControllerFindAllQueryKey(options),
+  });
+
+export const adminCategoriesControllerCreateMutation = (
+  options?: Partial<Options<AdminCategoriesControllerCreateData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<AdminCategoriesControllerCreateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<AdminCategoriesControllerCreateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminCategoriesControllerCreate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const adminCategoriesControllerRemoveMutation = (
+  options?: Partial<Options<AdminCategoriesControllerRemoveData>>,
+): UseMutationOptions<
+  AdminCategoriesControllerRemoveResponse,
+  DefaultError,
+  Options<AdminCategoriesControllerRemoveData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AdminCategoriesControllerRemoveResponse,
+    DefaultError,
+    Options<AdminCategoriesControllerRemoveData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminCategoriesControllerRemove({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const adminCategoriesControllerUpdateMutation = (
+  options?: Partial<Options<AdminCategoriesControllerUpdateData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<AdminCategoriesControllerUpdateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<AdminCategoriesControllerUpdateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminCategoriesControllerUpdate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const categoriesControllerFindAllQueryKey = (
+  options?: Options<CategoriesControllerFindAllData>,
+) => createQueryKey("categoriesControllerFindAll", options);
+
+export const categoriesControllerFindAllOptions = (
+  options?: Options<CategoriesControllerFindAllData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof categoriesControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await categoriesControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: categoriesControllerFindAllQueryKey(options),
   });

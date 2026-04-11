@@ -178,6 +178,49 @@ nestjspro/
         │           ├── addressカラムが存在すること
         │           └── deletedAtカラムが存在すること（論理削除）
         ├── categories/
+        │   ├── categories.service.spec.ts
+        │   │   ├── findAll
+        │   │   │   └── 全カテゴリを親子構造で返すこと ✓
+        │   │   ├── create
+        │   │   │   ├── parentIdが指定される場合、親カテゴリが存在することを確認すること ✓
+        │   │   │   ├── 親が存在する場合はカテゴリを作成すること ✓
+        │   │   │   └── parentIdが指定されない場合は親カテゴリなしで作成すること ✓
+        │   │   ├── findById
+        │   │   │   ├── 存在するカテゴリを返すこと ✓
+        │   │   │   └── 存在しないカテゴリはnullを返すこと ✓
+        │   │   ├── update
+        │   │   │   ├── 存在するカテゴリを更新できること ✓
+        │   │   │   ├── 存在しないカテゴリはnullを返すこと ✓
+        │   │   │   └── 更新時に親カテゴリが存在することを確認すること ✓
+        │   │   └── remove
+        │   │       ├── 商品が紐付いている場合はConflictExceptionをスローすること ✓
+        │   │       └── 商品がない場合は削除できること ✓
+        │   ├── admin-categories.controller.spec.ts
+        │   │   ├── findAll
+        │   │   │   └── 全カテゴリを返すこと ✓
+        │   │   ├── create
+        │   │   │   └── 新規カテゴリを作成すること ✓
+        │   │   ├── update
+        │   │   │   ├── 存在するカテゴリを更新すること ✓
+        │   │   │   └── 存在しないカテゴリではNotFoundExceptionをスローすること ✓
+        │   │   └── remove
+        │   │       └── カテゴリを削除すること ✓
+        │   ├── categories.controller.spec.ts
+        │   │   └── findAll
+        │   │       └── 全カテゴリを親子構造で返すこと ✓
+        │   ├── dto/
+        │   │   └── category.dto.spec.ts
+        │   │       ├── CreateCategoryDto
+        │   │       │   ├── nameが50文字以内の時、バリデーション成功すること ✓
+        │   │       │   ├── nameが空の場合はバリデーションエラーになること ✓
+        │   │       │   ├── nameが50文字超の場合はバリデーションエラーになること ✓
+        │   │       │   ├── parentIdが省略可能であること ✓
+        │   │       │   ├── parentIdがnullでもバリデーションエラーにならないこと ✓
+        │   │       │   └── parentIdが整数の場合はバリデーションエラーにならないこと ✓
+        │   │       └── UpdateCategoryDto
+        │   │           ├── 空のオブジェクトでもバリデーションエラーにならないこと ✓
+        │   │           ├── nameが50文字超の場合はバリデーションエラーになること ✓
+        │   │           └── nameとparentIdの両方が指定されてもバリデーションエラーにならないこと ✓
         │   └── entities/
         │       └── category.entity.spec.ts
         │           ├── テーブル名がcategoriesであること
@@ -267,6 +310,9 @@ nestjspro/
         │   ├── -_admin.test.tsx
         │   │   ├── 管理者トークンがない時、/admin/loginへリダイレクトすること
         │   │   └── 管理者トークンがある時、リダイレクトしないこと
+        │   ├── -_admin.admin.categories.test.tsx
+        │   │   ├── カテゴリ一覧が表示されること ✓
+        │   │   └── エラー時にエラーメッセージが表示されること ✓
         │   ├── -_admin.admin.admins.test.tsx
         │   │   ├── 取得成功時、管理者一覧を表示すること
         │   │   └── 取得失敗時、エラーメッセージを表示すること
