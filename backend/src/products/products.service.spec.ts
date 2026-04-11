@@ -869,4 +869,72 @@ describe('ProductsService', () => {
       await expect(service.deleteImage(999)).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('branches カバレッジ改善', () => {
+    it('updateで nameが長すぎる場合はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.update(1, { name: 'a'.repeat(101) })).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateで priceが最大値超過はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.update(1, { price: 1000000000 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('addVariationで stockが負数はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.addVariation(1, { size: 'M', color: '黒', price: 1500, stock: -1 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('addVariationで priceが最大値超過はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.addVariation(1, { size: 'M', color: '黒', price: 1000000000, stock: 10 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateVariationで priceが最小値未満はエラー', async () => {
+      const variation = { id: 1, productId: 1, size: 'M', color: '黒', price: 1500, stock: 10, imageUrl: null, deletedAt: null };
+      mockVariationRepository.findOne.mockResolvedValue(variation);
+      await expect(service.updateVariation(1, { price: 50 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateVariationで sizeが長すぎるはエラー', async () => {
+      const variation = { id: 1, productId: 1, size: 'M', color: '黒', price: 1500, stock: 10, imageUrl: null, deletedAt: null };
+      mockVariationRepository.findOne.mockResolvedValue(variation);
+      await expect(service.updateVariation(1, { size: 'a'.repeat(51) })).rejects.toThrow(BadRequestException);
+    });
+
+    it('addVariationで colorが空はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.addVariation(1, { size: 'M', color: '', price: 1500, stock: 10 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('addVariationで sizeが空はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.addVariation(1, { size: '', color: '黒', price: 1500, stock: 10 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('addImageで urlが空はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.addImage(1, { url: '', sortOrder: 0 })).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateで nameが空の場合はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.update(1, { name: '' })).rejects.toThrow(BadRequestException);
+    });
+
+    it('updateで price が最小値未満はエラー', async () => {
+      const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
+      mockProductRepository.findOne.mockResolvedValue(product);
+      await expect(service.update(1, { price: 50 })).rejects.toThrow(BadRequestException);
+    });
+  });
 });
