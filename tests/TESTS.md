@@ -233,6 +233,95 @@
 
 ---
 
+### ProductsService `backend/src/products/products.service.spec.ts`
+
+**create**
+- [x] 基本情報でプロダクトを作成できること
+- [x] categoryIdが指定されたとき、カテゴリが存在すること
+- [x] categoryIdが存在しない場合、NotFoundException を throw すること
+- [x] nameが空の場合、BadRequestException を throw すること
+- [x] priceが100未満の場合、BadRequestException を throw すること
+
+**findById**
+- [x] IDで商品を取得できること
+- [x] IDが見つからない場合、NotFoundException を throw すること
+
+**findAll**
+- [x] 全商品を取得できること
+
+**update**
+- [x] 商品情報を更新できること
+- [x] 更新するカテゴリが存在しない場合、NotFoundException を throw すること
+- [x] 更新対象の商品が見つからない場合、NotFoundException を throw すること
+- [x] updateで nameが長すぎる場合はエラー
+- [x] updateで priceが最大値超過はエラー
+- [x] updateで nameが空の場合はエラー
+- [x] updateで price が最小値未満はエラー
+
+**delete**
+- [x] 商品を論理削除できること
+- [x] 削除対象の商品が見つからない場合、NotFoundException を throw すること
+
+**addVariation**
+- [x] バリエーションを商品に追加できること
+- [x] バリエーション追加時にsizeが空の場合、BadRequestException を throw すること
+- [x] バリエーション追加時にpriceが100未満の場合、BadRequestException を throw すること
+- [x] addVariationで stockが負数はエラー
+- [x] addVariationで priceが最大値超過はエラー
+- [x] addVariationで colorが空はエラー
+- [x] addVariationで sizeが空はエラー
+
+**updateVariation**
+- [x] バリエーションを更新できること
+- [x] 更新対象のバリエーションが見つからない場合、NotFoundException を throw すること
+- [x] updateVariationで priceが最小値未満はエラー
+- [x] updateVariationで sizeが長すぎるはエラー
+
+**deleteVariation**
+- [x] バリエーションを削除できること
+- [x] 削除対象のバリエーションが見つからない場合、NotFoundException を throw すること
+
+**publish**
+- [x] 商品を公開できること
+- [x] 公開対象の商品が見つからない場合、NotFoundException を throw すること
+
+**unpublish**
+- [x] 商品を非公開にできること
+- [x] 非公開対象の商品が見つからない場合、NotFoundException を throw すること
+
+**addImage**
+- [x] 商品に画像を追加できること
+- [x] 追加対象の商品が見つからない場合、NotFoundException を throw すること
+
+**deleteImage**
+- [x] 画像を削除できること
+- [x] 削除対象の画像が見つからない場合、NotFoundException を throw すること
+- [x] addImageで urlが空はエラー
+
+---
+
+### ProductsController `backend/src/products/products.controller.spec.ts`
+
+**create**
+- [x] POST /admin/products で商品を作成できること
+
+**findAll**
+- [x] GET /admin/products で全商品を取得できること
+
+**findById**
+- [x] GET /admin/products/:id で商品を取得できること
+
+**update**
+- [x] PUT /admin/products/:id で商品を更新できること
+
+**delete**
+- [x] DELETE /admin/products/:id で商品を削除できること
+
+**addVariation**
+- [x] POST /admin/products/:id/variations でバリエーションを追加できること
+
+---
+
 ### Auth E2E `backend/src/auth/auth.e2e-spec.ts`
 
 **POST /auth/register**

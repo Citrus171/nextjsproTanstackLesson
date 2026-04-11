@@ -228,6 +228,77 @@ nestjspro/
         │           ├── parentIdカラムがnullableで存在すること
         │           └── 自己参照リレーション（parentId FK）が存在すること
         ├── products/
+        │   ├── products.service.spec.ts
+        │   │   ├── create
+        │   │   │   ├── 基本情報でプロダクトを作成できること ✓
+        │   │   │   ├── categoryIdが指定されたとき、カテゴリが存在すること ✓
+        │   │   │   ├── categoryIdが存在しない場合、NotFoundException を throw すること ✓
+        │   │   │   ├── nameが空の場合、BadRequestException を throw すること ✓
+        │   │   │   └── priceが100未満の場合、BadRequestException を throw すること ✓
+        │   │   ├── findById
+        │   │   │   ├── IDで商品を取得できること ✓
+        │   │   │   └── IDが見つからない場合、NotFoundException を throw すること ✓
+        │   │   ├── findAll
+        │   │   │   └── 全商品を取得できること ✓
+        │   │   ├── update
+        │   │   │   ├── 商品情報を更新できること ✓
+        │   │   │   ├── 更新するカテゴリが存在しない場合、NotFoundException を throw すること ✓
+        │   │   │   ├── 更新対象の商品が見つからない場合、NotFoundException を throw すること ✓
+        │   │   │   ├── updateで nameが長すぎる場合はエラー ✓
+        │   │   │   ├── updateで priceが最大値超過はエラー ✓
+        │   │   │   ├── updateで nameが空の場合はエラー ✓
+        │   │   │   └── updateで price が最小値未満はエラー ✓
+        │   │   ├── delete
+        │   │   │   ├── 商品を論理削除できること ✓
+        │   │   │   └── 削除対象の商品が見つからない場合、NotFoundException を throw すること ✓
+        │   │   ├── addVariation
+        │   │   │   ├── バリエーションを商品に追加できること ✓
+        │   │   │   ├── バリエーション追加時にsizeが空の場合、BadRequestException を throw すること ✓
+        │   │   │   ├── バリエーション追加時にpriceが100未満の場合、BadRequestException を throw すること ✓
+        │   │   │   ├── addVariationで stockが負数はエラー ✓
+        │   │   │   ├── addVariationで priceが最大値超過はエラー ✓
+        │   │   │   ├── addVariationで colorが空はエラー ✓
+        │   │   │   └── addVariationで sizeが空はエラー ✓
+        │   │   ├── updateVariation
+        │   │   │   ├── バリエーションを更新できること ✓
+        │   │   │   ├── 更新対象のバリエーションが見つからない場合、NotFoundException を throw すること ✓
+        │   │   │   ├── updateVariationで priceが最小値未満はエラー ✓
+        │   │   │   └── updateVariationで sizeが長すぎるはエラー ✓
+        │   │   ├── deleteVariation
+        │   │   │   ├── バリエーションを削除できること ✓
+        │   │   │   └── 削除対象のバリエーションが見つからない場合、NotFoundException を throw すること ✓
+        │   │   ├── publish
+        │   │   │   ├── 商品を公開できること ✓
+        │   │   │   └── 公開対象の商品が見つからない場合、NotFoundException を throw すること ✓
+        │   │   ├── unpublish
+        │   │   │   ├── 商品を非公開にできること ✓
+        │   │   │   └── 非公開対象の商品が見つからない場合、NotFoundException を throw すること ✓
+        │   │   ├── addImage
+        │   │   │   ├── 商品に画像を追加できること ✓
+        │   │   │   └── 追加対象の商品が見つからない場合、NotFoundException を throw すること ✓
+        │   │   └── deleteImage
+        │   │       ├── 画像を削除できること ✓
+        │   │       ├── 削除対象の画像が見つからない場合、NotFoundException を throw すること ✓
+        │   │       └── addImageで urlが空はエラー ✓
+        │   ├── products.controller.spec.ts
+        │   │   ├── create
+        │   │   │   └── POST /admin/products で商品を作成できること ✓
+        │   │   ├── findAll
+        │   │   │   └── GET /admin/products で全商品を取得できること ✓
+        │   │   ├── findById
+        │   │   │   └── GET /admin/products/:id で商品を取得できること ✓
+        │   │   ├── update
+        │   │   │   └── PUT /admin/products/:id で商品を更新できること ✓
+        │   │   ├── delete
+        │   │   │   └── DELETE /admin/products/:id で商品を削除できること ✓
+        │   │   └── addVariation
+        │   │       └── POST /admin/products/:id/variations でバリエーションを追加できること ✓
+        │   ├── dto/
+        │   │   ├── create-product.dto.ts ✓
+        │   │   ├── update-product.dto.ts ✓
+        │   │   ├── add-variation.dto.ts ✓
+        │   │   ├── update-variation.dto.ts ✓
+        │   │   └── add-image.dto.ts ✓
         │   └── entities/
         │       ├── product.entity.spec.ts
         │       │   ├── テーブル名がproductsであること
