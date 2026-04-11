@@ -870,6 +870,164 @@ describe('ProductsService', () => {
     });
   });
 
+  describe('findByIdPublished', () => {
+    it('公開商品を返すこと', async () => {
+      const product = {
+        id: 1,
+        name: 'Public Product',
+        price: 1000,
+        isPublished: true,
+        images: [],
+        variations: [],
+        category: null,
+      };
+
+      mockProductRepository.findOne.mockResolvedValue(product);
+
+      const result = await service.findByIdPublished(1);
+
+      expect(result).toEqual(product);
+      expect(mockProductRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, isPublished: true },
+        relations: ['images', 'variations', 'category'],
+      });
+    });
+
+    it('非公開商品は404を返すこと', async () => {
+      mockProductRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findByIdPublished(999)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findAllPublished', () => {
+    it('公開商品一覧を返すこと', async () => {
+      const products = [
+        { id: 1, name: 'Product 1', price: 1000, isPublished: true },
+      ];
+
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(products),
+        getCount: jest.fn().mockResolvedValue(1),
+      };
+
+      mockProductRepository.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      const result = await service.findAllPublished({ page: 1, limit: 10 });
+
+      expect(result.data).toEqual(products);
+      expect(result.total).toBe(1);
+    });
+
+    it('カテゴリフィルターが機能すること', async () => {
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+        getCount: jest.fn().mockResolvedValue(0),
+      };
+
+      mockProductRepository.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      await service.findAllPublished({ page: 1, limit: 10, categoryId: 5 });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'product.categoryId = :categoryId',
+        { categoryId: 5 },
+      );
+    });
+
+    it('キーワード検索が機能すること', async () => {
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+        getCount: jest.fn().mockResolvedValue(0),
+      };
+
+      mockProductRepository.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      await service.findAllPublished({ page: 1, limit: 10, keyword: 'test' });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        '(product.name LIKE :keyword OR product.description LIKE :keyword)',
+        { keyword: '%test%' },
+      );
+    });
+
+    it('ソート（price_asc）が機能すること', async () => {
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+        getCount: jest.fn().mockResolvedValue(0),
+      };
+
+      mockProductRepository.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      await service.findAllPublished({ page: 1, limit: 10, sort: 'price_asc' });
+
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('product.price', 'ASC');
+    });
+
+    it('ソート（price_desc）が機能すること', async () => {
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+        getCount: jest.fn().mockResolvedValue(0),
+      };
+
+      mockProductRepository.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      await service.findAllPublished({ page: 1, limit: 10, sort: 'price_desc' });
+
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('product.price', 'DESC');
+    });
+
+    it('ページネーションが機能すること', async () => {
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+        getCount: jest.fn().mockResolvedValue(100),
+      };
+
+      mockProductRepository.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      await service.findAllPublished({ page: 2, limit: 10 });
+
+      expect(mockQueryBuilder.skip).toHaveBeenCalledWith(10);
+      expect(mockQueryBuilder.take).toHaveBeenCalledWith(10);
+    });
+  });
+
   describe('branches カバレッジ改善', () => {
     it('updateで nameが長すぎる場合はエラー', async () => {
       const product = { id: 1, name: 'a', price: 1000, categoryId: null, isPublished: false, images: [], variations: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: null };
