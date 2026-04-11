@@ -2,6 +2,8 @@
 
 import {
   type DefaultError,
+  type InfiniteData,
+  infiniteQueryOptions,
   queryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -25,6 +27,18 @@ import {
   categoriesControllerFindAll,
   healthControllerCheck,
   type Options,
+  productsControllerAddImage,
+  productsControllerAddVariation,
+  productsControllerCreate,
+  productsControllerDelete,
+  productsControllerDeleteImage,
+  productsControllerDeleteVariation,
+  productsControllerFindAll,
+  productsControllerFindById,
+  productsControllerPublish,
+  productsControllerUnpublish,
+  productsControllerUpdate,
+  productsControllerUpdateVariation,
   usersControllerChangePassword,
   usersControllerGetMe,
 } from "../sdk.gen";
@@ -49,6 +63,18 @@ import type {
   HealthControllerCheckData,
   HealthControllerCheckError,
   HealthControllerCheckResponse,
+  ProductsControllerAddImageData,
+  ProductsControllerAddVariationData,
+  ProductsControllerCreateData,
+  ProductsControllerDeleteData,
+  ProductsControllerDeleteImageData,
+  ProductsControllerDeleteVariationData,
+  ProductsControllerFindAllData,
+  ProductsControllerFindByIdData,
+  ProductsControllerPublishData,
+  ProductsControllerUnpublishData,
+  ProductsControllerUpdateData,
+  ProductsControllerUpdateVariationData,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponse,
   UsersControllerGetMeData,
@@ -537,3 +563,374 @@ export const categoriesControllerFindAllOptions = (
     },
     queryKey: categoriesControllerFindAllQueryKey(options),
   });
+
+export const productsControllerFindAllQueryKey = (
+  options: Options<ProductsControllerFindAllData>,
+) => createQueryKey("productsControllerFindAll", options);
+
+export const productsControllerFindAllOptions = (
+  options: Options<ProductsControllerFindAllData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof productsControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await productsControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: productsControllerFindAllQueryKey(options),
+  });
+
+const createInfiniteParams = <
+  K extends Pick<QueryKey<Options>[0], "body" | "headers" | "path" | "query">,
+>(
+  queryKey: QueryKey<Options>,
+  page: K,
+) => {
+  const params = { ...queryKey[0] };
+  if (page.body) {
+    params.body = {
+      ...(queryKey[0].body as any),
+      ...(page.body as any),
+    };
+  }
+  if (page.headers) {
+    params.headers = {
+      ...queryKey[0].headers,
+      ...page.headers,
+    };
+  }
+  if (page.path) {
+    params.path = {
+      ...(queryKey[0].path as any),
+      ...(page.path as any),
+    };
+  }
+  if (page.query) {
+    params.query = {
+      ...(queryKey[0].query as any),
+      ...(page.query as any),
+    };
+  }
+  return params as unknown as typeof page;
+};
+
+export const productsControllerFindAllInfiniteQueryKey = (
+  options: Options<ProductsControllerFindAllData>,
+): QueryKey<Options<ProductsControllerFindAllData>> =>
+  createQueryKey("productsControllerFindAll", options, true);
+
+export const productsControllerFindAllInfiniteOptions = (
+  options: Options<ProductsControllerFindAllData>,
+) =>
+  infiniteQueryOptions<
+    unknown,
+    DefaultError,
+    InfiniteData<unknown>,
+    QueryKey<Options<ProductsControllerFindAllData>>,
+    | number
+    | Pick<
+        QueryKey<Options<ProductsControllerFindAllData>>[0],
+        "body" | "headers" | "path" | "query"
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ProductsControllerFindAllData>>[0],
+          "body" | "headers" | "path" | "query"
+        > =
+          typeof pageParam === "object"
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await productsControllerFindAll({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: productsControllerFindAllInfiniteQueryKey(options),
+    },
+  );
+
+export const productsControllerCreateMutation = (
+  options?: Partial<Options<ProductsControllerCreateData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerCreateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerCreateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerCreate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerDeleteMutation = (
+  options?: Partial<Options<ProductsControllerDeleteData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerDeleteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerDeleteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerDelete({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerFindByIdQueryKey = (
+  options: Options<ProductsControllerFindByIdData>,
+) => createQueryKey("productsControllerFindById", options);
+
+export const productsControllerFindByIdOptions = (
+  options: Options<ProductsControllerFindByIdData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof productsControllerFindByIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await productsControllerFindById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: productsControllerFindByIdQueryKey(options),
+  });
+
+export const productsControllerUpdateMutation = (
+  options?: Partial<Options<ProductsControllerUpdateData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerUpdateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerUpdateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerUpdate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerAddVariationMutation = (
+  options?: Partial<Options<ProductsControllerAddVariationData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerAddVariationData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerAddVariationData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerAddVariation({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerDeleteVariationMutation = (
+  options?: Partial<Options<ProductsControllerDeleteVariationData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerDeleteVariationData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerDeleteVariationData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerDeleteVariation({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerUpdateVariationMutation = (
+  options?: Partial<Options<ProductsControllerUpdateVariationData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerUpdateVariationData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerUpdateVariationData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerUpdateVariation({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerPublishMutation = (
+  options?: Partial<Options<ProductsControllerPublishData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerPublishData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerPublishData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerPublish({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerUnpublishMutation = (
+  options?: Partial<Options<ProductsControllerUnpublishData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerUnpublishData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerUnpublishData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerUnpublish({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerAddImageMutation = (
+  options?: Partial<Options<ProductsControllerAddImageData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerAddImageData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerAddImageData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerAddImage({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const productsControllerDeleteImageMutation = (
+  options?: Partial<Options<ProductsControllerDeleteImageData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<ProductsControllerDeleteImageData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<ProductsControllerDeleteImageData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await productsControllerDeleteImage({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};

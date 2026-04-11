@@ -36,6 +36,30 @@ import type {
   HealthControllerCheckData,
   HealthControllerCheckErrors,
   HealthControllerCheckResponses,
+  ProductsControllerAddImageData,
+  ProductsControllerAddImageResponses,
+  ProductsControllerAddVariationData,
+  ProductsControllerAddVariationResponses,
+  ProductsControllerCreateData,
+  ProductsControllerCreateResponses,
+  ProductsControllerDeleteData,
+  ProductsControllerDeleteImageData,
+  ProductsControllerDeleteImageResponses,
+  ProductsControllerDeleteResponses,
+  ProductsControllerDeleteVariationData,
+  ProductsControllerDeleteVariationResponses,
+  ProductsControllerFindAllData,
+  ProductsControllerFindAllResponses,
+  ProductsControllerFindByIdData,
+  ProductsControllerFindByIdResponses,
+  ProductsControllerPublishData,
+  ProductsControllerPublishResponses,
+  ProductsControllerUnpublishData,
+  ProductsControllerUnpublishResponses,
+  ProductsControllerUpdateData,
+  ProductsControllerUpdateResponses,
+  ProductsControllerUpdateVariationData,
+  ProductsControllerUpdateVariationResponses,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponses,
   UsersControllerGetMeData,
@@ -345,3 +369,160 @@ export const categoriesControllerFindAll = <
     unknown,
     ThrowOnError
   >({ url: "/categories", ...options });
+
+export const productsControllerFindAll = <ThrowOnError extends boolean = false>(
+  options: Options<ProductsControllerFindAllData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    ProductsControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products", ...options });
+
+export const productsControllerCreate = <ThrowOnError extends boolean = false>(
+  options: Options<ProductsControllerCreateData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ProductsControllerCreateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/admin/products",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const productsControllerDelete = <ThrowOnError extends boolean = false>(
+  options: Options<ProductsControllerDeleteData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    ProductsControllerDeleteResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products/{id}", ...options });
+
+export const productsControllerFindById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerFindByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    ProductsControllerFindByIdResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products/{id}", ...options });
+
+export const productsControllerUpdate = <ThrowOnError extends boolean = false>(
+  options: Options<ProductsControllerUpdateData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    ProductsControllerUpdateResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/admin/products/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const productsControllerAddVariation = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerAddVariationData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ProductsControllerAddVariationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/admin/products/{id}/variations",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const productsControllerDeleteVariation = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerDeleteVariationData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    ProductsControllerDeleteVariationResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products/variations/{variationId}", ...options });
+
+export const productsControllerUpdateVariation = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerUpdateVariationData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    ProductsControllerUpdateVariationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/admin/products/variations/{variationId}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const productsControllerPublish = <ThrowOnError extends boolean = false>(
+  options: Options<ProductsControllerPublishData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ProductsControllerPublishResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products/{id}/publish", ...options });
+
+export const productsControllerUnpublish = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerUnpublishData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ProductsControllerUnpublishResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products/{id}/unpublish", ...options });
+
+export const productsControllerAddImage = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerAddImageData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ProductsControllerAddImageResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/admin/products/{id}/images",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const productsControllerDeleteImage = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<ProductsControllerDeleteImageData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    ProductsControllerDeleteImageResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/admin/products/images/{imageId}", ...options });

@@ -110,6 +110,26 @@ export type UpdateCategoryDto = {
   } | null;
 };
 
+export type CreateProductDto = {
+  [key: string]: unknown;
+};
+
+export type UpdateProductDto = {
+  [key: string]: unknown;
+};
+
+export type AddVariationDto = {
+  [key: string]: unknown;
+};
+
+export type UpdateVariationDto = {
+  [key: string]: unknown;
+};
+
+export type AddImageDto = {
+  [key: string]: unknown;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -386,5 +406,160 @@ export type CategoriesControllerFindAllData = {
 };
 
 export type CategoriesControllerFindAllResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query: {
+    page: number;
+    limit: number;
+  };
+  url: "/admin/products";
+};
+
+export type ProductsControllerFindAllResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerCreateData = {
+  body: CreateProductDto;
+  path?: never;
+  query?: never;
+  url: "/admin/products";
+};
+
+export type ProductsControllerCreateResponses = {
+  201: unknown;
+};
+
+export type ProductsControllerDeleteData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}";
+};
+
+export type ProductsControllerDeleteResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerFindByIdData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}";
+};
+
+export type ProductsControllerFindByIdResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerUpdateData = {
+  body: UpdateProductDto;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}";
+};
+
+export type ProductsControllerUpdateResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerAddVariationData = {
+  body: AddVariationDto;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}/variations";
+};
+
+export type ProductsControllerAddVariationResponses = {
+  201: unknown;
+};
+
+export type ProductsControllerDeleteVariationData = {
+  body?: never;
+  path: {
+    variationId: number;
+  };
+  query?: never;
+  url: "/admin/products/variations/{variationId}";
+};
+
+export type ProductsControllerDeleteVariationResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerUpdateVariationData = {
+  body: UpdateVariationDto;
+  path: {
+    variationId: number;
+  };
+  query?: never;
+  url: "/admin/products/variations/{variationId}";
+};
+
+export type ProductsControllerUpdateVariationResponses = {
+  200: unknown;
+};
+
+export type ProductsControllerPublishData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}/publish";
+};
+
+export type ProductsControllerPublishResponses = {
+  201: unknown;
+};
+
+export type ProductsControllerUnpublishData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}/unpublish";
+};
+
+export type ProductsControllerUnpublishResponses = {
+  201: unknown;
+};
+
+export type ProductsControllerAddImageData = {
+  body: AddImageDto;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/products/{id}/images";
+};
+
+export type ProductsControllerAddImageResponses = {
+  201: unknown;
+};
+
+export type ProductsControllerDeleteImageData = {
+  body?: never;
+  path: {
+    imageId: number;
+  };
+  query?: never;
+  url: "/admin/products/images/{imageId}";
+};
+
+export type ProductsControllerDeleteImageResponses = {
   200: unknown;
 };
