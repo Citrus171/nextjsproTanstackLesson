@@ -65,7 +65,7 @@ describe('Public Products E2E', () => {
         }),
       );
 
-      const product = await productRepo.save(
+      await productRepo.save(
         productRepo.create({
           name: 'テスト商品',
           description: 'テスト説明',
