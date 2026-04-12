@@ -168,6 +168,50 @@ docs: README更新
    ✅ 全チェック通過 → PR マージ可能
    ❌ チェック失敗 → 修正・再プッシュ（PR が自動更新）
 
+7.5. **PR レビューコメント対応**（必要な場合）
+   
+   Copilot PR Reviewer や人的レビューからのコメントがある場合：
+   
+   - **コメント分析**
+     ```
+     各コメントを以下のいずれかに分類：
+     🔴 Critical: 機能・データ整合性・セキュリティの問題
+     🟡 Important: 型安全性・エラーハンドリング・UX改善
+     🟡 Nice-to-have: スタイル統一・軽微な改善
+     ```
+   
+   - **対応判定**
+     ```
+     全コメント対応 vs 優先度選別かを判定：
+     - Critical は必須対応
+     - Important は高優先度
+     - Nice-to-have は判定次第
+     ```
+   
+   - **実装 + テスト実行**
+     ```bash
+     # 対応項目を実装
+     npm run test       # ユニットテスト実行
+     npm run test:cov   # カバレッジ確認
+     npm run lint       # ESLint確認
+     ```
+     
+     ✅ テスト・lint・coverage 全通過を確認
+   
+   - **コミット＆プッシュ**
+     ```bash
+     git add .
+     git commit -m "fix: [対応内容の要約]"
+     git push origin feat/issue8/product-management
+     ```
+   
+   - **コメントスレッドにリプライ**
+     ```bash
+     gh pr comment 29 --body "対応内容を記載"
+     ```
+     
+     対応結果をスレッドで共有（ページ表示で反映確認）
+
 8. **PR マージ**（GitHub Web UI）
    ```bash
    gh pr merge feat/issue8/product-management --merge
