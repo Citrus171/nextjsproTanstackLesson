@@ -39,6 +39,7 @@ nestjspro/
         │   │   │   ├── JWTペイロードに type:"user" と sub が含まれること
         │   │   │   ├── 存在しないメールアドレスはUnauthorizedExceptionを投げる
         │   │   │   ├── パスワード不一致はUnauthorizedExceptionを投げる
+        │   │   │   ├── 論理削除済み会員はUnauthorizedExceptionを投げること ✓
         │   │   │   └── メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
         │   │   └── adminLogin
         │   │       ├── 正しい認証情報でアクセストークンを返す
@@ -189,7 +190,8 @@ nestjspro/
         │   │   │   └── ConflictException時はsaveを呼ばない
         │   │   ├── findByEmail
         │   │   │   ├── 存在するメールアドレスのユーザーを返す
-        │   │   │   └── 存在しないメールアドレスはnullを返す
+        │   │   │   ├── 存在しないメールアドレスはnullを返す
+        │   │   │   └── 論理削除済みユーザーはnullを返す（TypeORMが@DeleteDateColumnで自動除外） ✓
         │   │   ├── findById
         │   │   │   ├── 存在するIDのユーザーを返す
         │   │   │   └── 存在しないIDはNotFoundExceptionを投げる

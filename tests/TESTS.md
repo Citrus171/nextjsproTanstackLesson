@@ -157,6 +157,7 @@
 - [ ] JWTペイロードに type:"user" と sub が含まれること
 - [ ] 存在しないメールアドレスはUnauthorizedExceptionを投げる
 - [ ] パスワード不一致はUnauthorizedExceptionを投げる
+- [x] 論理削除済み会員はUnauthorizedExceptionを投げること
 - [ ] メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
 
 **adminLogin**
@@ -427,6 +428,7 @@
 **findByEmail**
 - [ ] 存在するメールアドレスのユーザーを返す
 - [ ] 存在しないメールアドレスはnullを返す
+- [x] 論理削除済みユーザーはnullを返す（TypeORMが@DeleteDateColumnで自動除外）
 
 **findById**
 - [ ] 存在するIDのユーザーを返す

@@ -123,6 +123,15 @@ describe('AuthService', () => {
       );
     });
 
+    it('論理削除済み会員はUnauthorizedExceptionを投げること', async () => {
+      // TypeORM の @DeleteDateColumn により findByEmail は null を返す
+      usersService.findByEmail.mockResolvedValue(null);
+
+      await expect(
+        service.login('deleted@example.com', 'password'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
     it('メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）', async () => {
       usersService.findByEmail.mockResolvedValue(null);
       const err1 = await service.login('no@example.com', 'pass').catch((e: UnauthorizedException) => e);

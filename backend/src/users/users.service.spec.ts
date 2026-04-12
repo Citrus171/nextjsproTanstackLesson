@@ -99,6 +99,17 @@ describe('UsersService', () => {
       const result = await service.findByEmail('notfound@example.com');
       expect(result).toBeNull();
     });
+
+    it('論理削除済みユーザーはnullを返す（TypeORMが@DeleteDateColumnで自動除外）', async () => {
+      // TypeORM は @DeleteDateColumn を持つエンティティの findOneBy に
+      // 自動で WHERE deletedAt IS NULL を付加するため、削除済みユーザーは null になる
+      repo.findOneBy.mockResolvedValue(null);
+
+      const result = await service.findByEmail('deleted@example.com');
+
+      expect(repo.findOneBy).toHaveBeenCalledWith({ email: 'deleted@example.com' });
+      expect(result).toBeNull();
+    });
   });
 
   // ── findById ──────────────────────────────────────────────
