@@ -5,6 +5,12 @@ interface JwtPayload {
   type?: string;
 }
 
+interface AdminJwtPayload extends JwtPayload {
+  sub: number;
+  role: "super" | "general";
+  type: "admin";
+}
+
 function decodeJwtPayload(token: string): JwtPayload | null {
   const parts = token.split(".");
   if (parts.length !== 3) return null;
@@ -57,4 +63,18 @@ export function isAdminAuthenticated(): boolean {
 
   const payload = decodeJwtPayload(token);
   return payload?.type === "admin";
+}
+
+export function decodeAdminToken(token: string): AdminJwtPayload {
+  const parts = token.split(".");
+  if (parts.length !== 3) throw new Error("Invalid token");
+
+  try {
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const json = atob(padded);
+    return JSON.parse(json) as AdminJwtPayload;
+  } catch {
+    throw new Error("Failed to decode token");
+  }
 }
