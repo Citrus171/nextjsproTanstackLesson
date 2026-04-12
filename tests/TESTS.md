@@ -676,6 +676,13 @@
 
 ---
 
+### admin members page `frontend/src/routes/-_admin.admin.members.test.tsx`
+
+- [x] 会員一覧が表示されること
+- [x] 詳細表示と削除操作が動作すること
+
+---
+
 ### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`
 
 - [ ] ロゴが表示されること

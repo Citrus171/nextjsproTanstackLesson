@@ -1,12 +1,12 @@
 import { NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import type { Repository } from "typeorm";
 import { AdminMembersService } from "./admin-members.service";
 import { UserEntity } from "../users/entities/user.entity";
 import { OrderEntity } from "../orders/entities/order.entity";
 
-type MockRepository<T = any> = Partial<Record<string, jest.Mock>>;
+type MockRepository<T extends object> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const makeUser = (overrides: Partial<UserEntity> = {}): UserEntity =>
   Object.assign(new UserEntity(), {
@@ -39,7 +39,7 @@ const makeOrder = (overrides: Partial<OrderEntity> = {}): OrderEntity =>
     ...overrides,
   });
 
-const mockRepository = <T>(): MockRepository<T> => ({
+const mockRepository = <T extends object>(): MockRepository<T> => ({
   findAndCount: jest.fn(),
   findOneBy: jest.fn(),
   save: jest.fn(),

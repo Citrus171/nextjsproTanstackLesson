@@ -22,17 +22,7 @@ const storeSettingsResponseSchema = z.object({
 });
 
 const positiveIntegerField = (message: string) =>
-  z.preprocess(
-    (value) =>
-      typeof value === "number" && Number.isNaN(value) ? undefined : value,
-    z.coerce
-      .number({
-        required_error: message,
-        invalid_type_error: message,
-      })
-      .int("整数で入力してください")
-      .min(1, message),
-  );
+  z.number({ error: message }).int("整数で入力してください").min(1, message);
 
 const updateFormSchema = z.object({
   invoiceNumber: z.string().nullable().optional(),

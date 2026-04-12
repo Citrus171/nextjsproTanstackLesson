@@ -22,6 +22,9 @@ import {
   adminCategoriesControllerFindAll,
   adminCategoriesControllerRemove,
   adminCategoriesControllerUpdate,
+  adminMembersControllerDelete,
+  adminMembersControllerFindAll,
+  adminMembersControllerFindById,
   authControllerLogin,
   authControllerRegister,
   cartsControllerAddToCart,
@@ -67,6 +70,12 @@ import type {
   AdminCategoriesControllerRemoveData,
   AdminCategoriesControllerRemoveResponse,
   AdminCategoriesControllerUpdateData,
+  AdminMembersControllerDeleteData,
+  AdminMembersControllerDeleteResponse,
+  AdminMembersControllerFindAllData,
+  AdminMembersControllerFindAllResponse,
+  AdminMembersControllerFindByIdData,
+  AdminMembersControllerFindByIdResponse,
   AuthControllerLoginData,
   AuthControllerRegisterData,
   CartsControllerAddToCartData,
@@ -1274,3 +1283,77 @@ export const paymentsControllerHandleWebhookMutation = (
   };
   return mutationOptions;
 };
+
+export const adminMembersControllerFindAllQueryKey = (
+  options?: Options<AdminMembersControllerFindAllData>,
+) => createQueryKey("adminMembersControllerFindAll", options);
+
+export const adminMembersControllerFindAllOptions = (
+  options?: Options<AdminMembersControllerFindAllData>,
+) =>
+  queryOptions<
+    AdminMembersControllerFindAllResponse,
+    DefaultError,
+    AdminMembersControllerFindAllResponse,
+    ReturnType<typeof adminMembersControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminMembersControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminMembersControllerFindAllQueryKey(options),
+  });
+
+export const adminMembersControllerDeleteMutation = (
+  options?: Partial<Options<AdminMembersControllerDeleteData>>,
+): UseMutationOptions<
+  AdminMembersControllerDeleteResponse,
+  DefaultError,
+  Options<AdminMembersControllerDeleteData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AdminMembersControllerDeleteResponse,
+    DefaultError,
+    Options<AdminMembersControllerDeleteData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminMembersControllerDelete({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const adminMembersControllerFindByIdQueryKey = (
+  options: Options<AdminMembersControllerFindByIdData>,
+) => createQueryKey("adminMembersControllerFindById", options);
+
+export const adminMembersControllerFindByIdOptions = (
+  options: Options<AdminMembersControllerFindByIdData>,
+) =>
+  queryOptions<
+    AdminMembersControllerFindByIdResponse,
+    DefaultError,
+    AdminMembersControllerFindByIdResponse,
+    ReturnType<typeof adminMembersControllerFindByIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminMembersControllerFindById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminMembersControllerFindByIdQueryKey(options),
+  });

@@ -1657,8 +1657,9 @@
         "type": "object",
         "properties": {
           "invoiceNumber": {
-            "type": "object",
-            "description": "インボイスT番号"
+            "type": "string",
+            "description": "インボイスT番号",
+            "nullable": true
           },
           "shippingFixedFee": {
             "type": "number",
@@ -1672,9 +1673,84 @@
           }
         }
       },
+      "ProductEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number"
+          },
+          "categoryId": {
+            "type": "number",
+            "nullable": true
+          },
+          "isPublished": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "price",
+          "isPublished",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "ProductVariationEntity": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "productId": {
+            "type": "number"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductEntity"
+          },
+          "size": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "stock": {
+            "type": "number"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "size",
+          "color",
+          "price",
+          "stock"
+        ]
       },
       "CartEntity": {
         "type": "object",
