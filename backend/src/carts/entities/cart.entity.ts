@@ -30,4 +30,11 @@ export class CartEntity {
 
   @Column({ type: 'datetime' })
   expiresAt: Date;
+
+  @Column({
+    type: 'enum',
+    enum: ['reserved', 'purchased', 'expired'],
+    default: 'reserved',
+  })
+  status: 'reserved' | 'purchased' | 'expired';
 }

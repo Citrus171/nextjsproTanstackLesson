@@ -1111,6 +1111,120 @@
           }
         ]
       }
+    },
+    "/cart": {
+      "get": {
+        "operationId": "CartsController_getCart",
+        "summary": "カート取得",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "CartsController_addToCart",
+        "summary": "カート追加",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/cart/{id}": {
+      "put": {
+        "operationId": "CartsController_updateItem",
+        "summary": "カートアイテム数量変更",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CartsController_removeItem",
+        "summary": "カートアイテム削除",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -1388,6 +1502,14 @@
             "example": 5000
           }
         }
+      },
+      "AddToCartDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateCartItemDto": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

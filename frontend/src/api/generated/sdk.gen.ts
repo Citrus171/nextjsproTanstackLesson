@@ -31,6 +31,14 @@ import type {
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
+  CartsControllerAddToCartData,
+  CartsControllerAddToCartResponses,
+  CartsControllerGetCartData,
+  CartsControllerGetCartResponses,
+  CartsControllerRemoveItemData,
+  CartsControllerRemoveItemResponses,
+  CartsControllerUpdateItemData,
+  CartsControllerUpdateItemResponses,
   CategoriesControllerFindAllData,
   CategoriesControllerFindAllResponses,
   HealthControllerCheckData,
@@ -590,6 +598,68 @@ export const storeSettingsControllerUpdateSettings = <
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/store-settings",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * カート取得
+ */
+export const cartsControllerGetCart = <ThrowOnError extends boolean = false>(
+  options?: Options<CartsControllerGetCartData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    CartsControllerGetCartResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/cart", ...options });
+
+/**
+ * カート追加
+ */
+export const cartsControllerAddToCart = <ThrowOnError extends boolean = false>(
+  options: Options<CartsControllerAddToCartData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    CartsControllerAddToCartResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/cart",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * カートアイテム削除
+ */
+export const cartsControllerRemoveItem = <ThrowOnError extends boolean = false>(
+  options: Options<CartsControllerRemoveItemData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    CartsControllerRemoveItemResponses,
+    unknown,
+    ThrowOnError
+  >({ url: "/cart/{id}", ...options });
+
+/**
+ * カートアイテム数量変更
+ */
+export const cartsControllerUpdateItem = <ThrowOnError extends boolean = false>(
+  options: Options<CartsControllerUpdateItemData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    CartsControllerUpdateItemResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/cart/{id}",
     ...options,
     headers: {
       "Content-Type": "application/json",

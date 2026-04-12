@@ -658,5 +658,68 @@
 
 ### RootLayout（Toast統合） `frontend/src/components/layouts/RootLayout.test.tsx`
 
-- [ ] childrenが描画されること
+- [x] childrenが描画されること
+
+---
+
+## Issue#11 カート機能
+
+### CartsService `backend/src/carts/carts.service.spec.ts`
+
+**getCart**
+- [x] セッションIDに対応するカートアイテムを返すこと
+- [x] カートが空の場合は空配列を返すこと
+
+**addToCart**
+- [x] 在庫があるバリエーションをカートに追加できること
+- [x] 在庫をquantity分減算すること
+- [x] 同一セッション・同一バリエーション再追加時はquantityを加算すること
+- [x] 在庫不足時はConflictExceptionを投げること
+- [x] 存在しないバリエーションはNotFoundExceptionを投げること
+
+**updateItem**
+- [x] 数量を増加した場合に在庫を差分だけ減算すること
+- [x] 数量を減少した場合に在庫を差分だけ加算すること
+- [x] 増加後に在庫不足ならConflictExceptionを投げること
+- [x] 他セッションのカートアイテムはForbiddenExceptionを投げること
+- [x] 存在しないカートアイテムはNotFoundExceptionを投げること
+
+**removeItem**
+- [x] 削除時に在庫をquantityだけ加算すること
+- [x] 他セッションのアイテムはForbiddenExceptionを投げること
+
+**releaseExpiredCarts**
+- [x] 期限切れカートの在庫を返却すること
+- [x] 期限切れカートのstatusをexpiredに更新すること
+- [x] 期限切れでないカートは処理しないこと
+
+---
+
+### CartsController `backend/src/carts/carts.controller.spec.ts`
+
+- [x] getCartがCartsServiceのgetCartメソッドを呼ぶこと
+- [x] addToCartがCartsServiceのaddToCartメソッドを呼ぶこと
+- [x] updateItemがCartsServiceのupdateItemメソッドを呼ぶこと
+- [x] removeItemがCartsServiceのremoveItemメソッドを呼ぶこと
+
+---
+
+### Cart Page `frontend/src/routes/-_authenticated.cart.test.tsx`
+
+- [x] カートアイテムが一覧表示されること
+- [x] 空カート時にメッセージが表示されること
+- [x] 削除ボタンクリックでremoveItemが呼ばれること
+
+---
+
+## レイアウト・共有コンポーネント
+
+### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`
+
+- [x] ロゴが表示されること
+- [x] 商品一覧リンクが表示されること
+- [x] カートリンクが表示されること
+- [x] ログインリンクが表示されること
+- [x] フッターにコピーライトが表示されること
+- [x] childrenが描画されること
 - [ ] toast()を呼ぶとトースト通知が表示されること
