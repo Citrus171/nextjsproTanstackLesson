@@ -5,6 +5,7 @@ import {
   UseGuards,
   Request,
   Headers,
+  HttpCode,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,6 +23,7 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post('checkout')
+  @HttpCode(200)
   @UseGuards(UserJwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Stripe Checkout Sessionを作成してURLを返す' })
@@ -34,6 +36,7 @@ export class PaymentsController {
   }
 
   @Post('webhook')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Stripe Webhookエンドポイント（署名検証済み）' })
   async handleWebhook(
     @Request() req: any,
