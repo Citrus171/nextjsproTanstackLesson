@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { CartEntity } from './entities/cart.entity';
@@ -57,7 +57,6 @@ describe('CartsService', () => {
 
   describe('getCart', () => {
     it('セッションIDに対応するカートアイテムを返すこと', async () => {
-      const sessionId = '1';
       const cartItems = [
         {
           id: 1,
@@ -92,7 +91,6 @@ describe('CartsService', () => {
   describe('addToCart', () => {
     it('在庫があるバリエーションをカートに追加できること', async () => {
       const userId = 1;
-      const sessionId = '1';
       const variationId = 100;
       const quantity = 2;
 
@@ -168,7 +166,6 @@ describe('CartsService', () => {
 
     it('同一セッション・同一バリエーション再追加時はquantityを加算すること', async () => {
       const userId = 1;
-      const sessionId = '1';
       const variationId = 100;
       const quantity = 2;
 

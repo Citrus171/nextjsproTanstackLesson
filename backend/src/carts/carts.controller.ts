@@ -8,7 +8,6 @@ import {
   Param,
   UseGuards,
   ParseIntPipe,
-  HttpStatus,
   Request,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -41,7 +40,7 @@ export class CartsController {
   @ApiOperation({ summary: 'カートアイテム数量変更' })
   async updateItem(
     @Request() req: any,
-    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND })) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCartItemDto,
   ): Promise<void> {
     return this.cartsService.updateItem(req.user.id, id, dto);
@@ -51,7 +50,7 @@ export class CartsController {
   @ApiOperation({ summary: 'カートアイテム削除' })
   async removeItem(
     @Request() req: any,
-    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND })) id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
     return this.cartsService.removeItem(req.user.id, id);
   }

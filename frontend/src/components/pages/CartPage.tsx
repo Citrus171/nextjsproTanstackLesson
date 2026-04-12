@@ -61,7 +61,7 @@ export function CartPage() {
 
       setCarts((prev) => prev.filter((item) => item.id !== cartId));
       toast.success("削除しました");
-    } catch (err) {
+    } catch {
       toast.error("削除に失敗しました");
     }
   };
