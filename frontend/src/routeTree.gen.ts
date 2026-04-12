@@ -17,6 +17,8 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AuthenticatedCheckoutIndexRouteImport } from './routes/_authenticated/checkout/index'
+import { Route as AuthenticatedCheckoutCompleteRouteImport } from './routes/_authenticated/checkout/complete'
 import { Route as AdminAdminSettingsRouteImport } from './routes/_admin.admin.settings'
 import { Route as AdminAdminCategoriesRouteImport } from './routes/_admin.admin.categories'
 import { Route as AdminAdminAdminsRouteImport } from './routes/_admin.admin.admins'
@@ -59,6 +61,18 @@ const AdminAdminRoute = AdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AdminRoute,
 } as any)
+const AuthenticatedCheckoutIndexRoute =
+  AuthenticatedCheckoutIndexRouteImport.update({
+    id: '/checkout/',
+    path: '/checkout/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCheckoutCompleteRoute =
+  AuthenticatedCheckoutCompleteRouteImport.update({
+    id: '/checkout/complete',
+    path: '/checkout/complete',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AdminAdminSettingsRoute = AdminAdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -85,6 +99,8 @@ export interface FileRoutesByFullPath {
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
   '/admin/settings': typeof AdminAdminSettingsRoute
+  '/checkout/complete': typeof AuthenticatedCheckoutCompleteRoute
+  '/checkout/': typeof AuthenticatedCheckoutIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
@@ -96,6 +112,8 @@ export interface FileRoutesByTo {
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
   '/admin/settings': typeof AdminAdminSettingsRoute
+  '/checkout/complete': typeof AuthenticatedCheckoutCompleteRoute
+  '/checkout': typeof AuthenticatedCheckoutIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -110,6 +128,8 @@ export interface FileRoutesById {
   '/_admin/admin/admins': typeof AdminAdminAdminsRoute
   '/_admin/admin/categories': typeof AdminAdminCategoriesRoute
   '/_admin/admin/settings': typeof AdminAdminSettingsRoute
+  '/_authenticated/checkout/complete': typeof AuthenticatedCheckoutCompleteRoute
+  '/_authenticated/checkout/': typeof AuthenticatedCheckoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,6 +143,8 @@ export interface FileRouteTypes {
     | '/admin/admins'
     | '/admin/categories'
     | '/admin/settings'
+    | '/checkout/complete'
+    | '/checkout/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -134,6 +156,8 @@ export interface FileRouteTypes {
     | '/admin/admins'
     | '/admin/categories'
     | '/admin/settings'
+    | '/checkout/complete'
+    | '/checkout'
   id:
     | '__root__'
     | '/_admin'
@@ -147,6 +171,8 @@ export interface FileRouteTypes {
     | '/_admin/admin/admins'
     | '/_admin/admin/categories'
     | '/_admin/admin/settings'
+    | '/_authenticated/checkout/complete'
+    | '/_authenticated/checkout/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -215,6 +241,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_authenticated/checkout/': {
+      id: '/_authenticated/checkout/'
+      path: '/checkout'
+      fullPath: '/checkout/'
+      preLoaderRoute: typeof AuthenticatedCheckoutIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/checkout/complete': {
+      id: '/_authenticated/checkout/complete'
+      path: '/checkout/complete'
+      fullPath: '/checkout/complete'
+      preLoaderRoute: typeof AuthenticatedCheckoutCompleteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_admin/admin/settings': {
       id: '/_admin/admin/settings'
       path: '/settings'
@@ -268,11 +308,15 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface AuthenticatedRouteChildren {
   AuthenticatedCartRoute: typeof AuthenticatedCartRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCheckoutCompleteRoute: typeof AuthenticatedCheckoutCompleteRoute
+  AuthenticatedCheckoutIndexRoute: typeof AuthenticatedCheckoutIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCartRoute: AuthenticatedCartRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCheckoutCompleteRoute: AuthenticatedCheckoutCompleteRoute,
+  AuthenticatedCheckoutIndexRoute: AuthenticatedCheckoutIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

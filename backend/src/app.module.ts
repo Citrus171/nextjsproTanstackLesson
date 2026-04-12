@@ -10,6 +10,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { StoreSettingsModule } from './store-settings/store-settings.module';
 import { CartsModule } from './carts/carts.module';
+import { PaymentsModule } from './payments/payments.module';
 import { AdminUserEntity } from './admin-users/entities/admin-user.entity';
 import { CategoryEntity } from './categories/entities/category.entity';
 import { ProductEntity } from './products/entities/product.entity';
@@ -19,6 +20,7 @@ import { CartEntity } from './carts/entities/cart.entity';
 import { OrderEntity } from './orders/entities/order.entity';
 import { OrderItemEntity } from './orders/entities/order-item.entity';
 import { StoreSettingsEntity } from './store-settings/entities/store-settings.entity';
+import { StripeEventEntity } from './payments/entities/stripe-event.entity';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import { StoreSettingsEntity } from './store-settings/entities/store-settings.en
         OrderEntity,
         OrderItemEntity,
         StoreSettingsEntity,
+        StripeEventEntity,
       ],
       synchronize: false,
       migrations: ['dist/migrations/*.js'],
@@ -61,6 +64,7 @@ import { StoreSettingsEntity } from './store-settings/entities/store-settings.en
     ProductsModule,
     StoreSettingsModule,
     CartsModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}

@@ -6,7 +6,7 @@ import {
   cartsControllerUpdateItem,
 } from "@/api/generated/sdk.gen";
 import { getToken } from "@/lib/auth";
-import { CartEntity } from "@/api/generated/types.gen";
+import type { CartEntity } from "@/api/generated/types.gen";
 
 export function CartPage() {
   const [carts, setCarts] = useState<CartEntity[]>([]);

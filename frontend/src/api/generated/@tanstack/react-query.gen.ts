@@ -31,6 +31,8 @@ import {
   categoriesControllerFindAll,
   healthControllerCheck,
   type Options,
+  paymentsControllerCreateCheckoutSession,
+  paymentsControllerHandleWebhook,
   productsControllerAddImage,
   productsControllerAddVariation,
   productsControllerCreate,
@@ -77,6 +79,9 @@ import type {
   HealthControllerCheckData,
   HealthControllerCheckError,
   HealthControllerCheckResponse,
+  PaymentsControllerCreateCheckoutSessionData,
+  PaymentsControllerCreateCheckoutSessionResponse,
+  PaymentsControllerHandleWebhookData,
   ProductsControllerAddImageData,
   ProductsControllerAddVariationData,
   ProductsControllerCreateData,
@@ -1206,6 +1211,60 @@ export const cartsControllerUpdateItemMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await cartsControllerUpdateItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Stripe Checkout Sessionを作成してURLを返す
+ */
+export const paymentsControllerCreateCheckoutSessionMutation = (
+  options?: Partial<Options<PaymentsControllerCreateCheckoutSessionData>>,
+): UseMutationOptions<
+  PaymentsControllerCreateCheckoutSessionResponse,
+  DefaultError,
+  Options<PaymentsControllerCreateCheckoutSessionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PaymentsControllerCreateCheckoutSessionResponse,
+    DefaultError,
+    Options<PaymentsControllerCreateCheckoutSessionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await paymentsControllerCreateCheckoutSession({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Stripe Webhookエンドポイント（署名検証済み）
+ */
+export const paymentsControllerHandleWebhookMutation = (
+  options?: Partial<Options<PaymentsControllerHandleWebhookData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<PaymentsControllerHandleWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<PaymentsControllerHandleWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await paymentsControllerHandleWebhook({
         ...options,
         ...fnOptions,
         throwOnError: true,
