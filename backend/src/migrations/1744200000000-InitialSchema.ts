@@ -139,6 +139,10 @@ export class InitialSchema1744200000000 implements MigrationInterface {
         PRIMARY KEY (\`id\`)
       ) ENGINE=InnoDB
     `);
+
+    await queryRunner.query(
+      'INSERT INTO `store_settings` (`shippingFixedFee`, `shippingFreeThreshold`) VALUES (800, 5000)',
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

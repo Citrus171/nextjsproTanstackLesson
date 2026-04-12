@@ -366,6 +366,45 @@ nestjspro/
         │           ├── ordersへのリレーション（orderId FK）が存在すること
         │           └── product_variationsへのリレーション（variationId FK）が存在すること
         └── store-settings/
+            ├── store-settings.service.spec.ts
+            │   ├── getSettings
+            │   │   ├── 店舗設定が存在するとき、その設定を返すこと ✓
+            │   │   └── 店舗設定が存在しないとき、エラーを投げること ✓
+            │   └── updateSettings
+            │       ├── invoiceNumberを更新できること ✓
+            │       ├── invoiceNumberをnullに更新できること ✓
+            │       ├── shippingFixedFeeを更新できること ✓
+            │       ├── shippingFreeThresholdを更新できること ✓
+            │       ├── shippingFixedFeeが0以下の場合エラーを投げること ✓
+            │       ├── shippingFixedFeeが負数の場合エラーを投げること ✓
+            │       ├── shippingFreeThresholdが0以下の場合エラーを投げること ✓
+            │       ├── shippingFreeThresholdが負数の場合エラーを投げること ✓
+            │       ├── 複数フィールドを同時に更新できること ✓
+            │       ├── 大きな数値（超大値）も受け入れること ✓
+            │       └── 1円の設定も受け入れること（境界値） ✓
+            ├── store-settings.controller.spec.ts
+            │   ├── getSettings
+            │   │   ├── 店舗設定を返すこと ✓
+            │   │   └── invoiceNumberがnullの場合も返すこと ✓
+            │   └── updateSettings
+            │       ├── invoiceNumberを更新できること ✓
+            │       ├── shippingFixedFeeを更新できること ✓
+            │       ├── shippingFreeThresholdを更新できること ✓
+            │       ├── バリデーション失敗時、サービスがエラーを投げること ✓
+            │       └── 複数フィールドを同時に更新できること ✓
+            ├── store-settings.e2e-spec.ts
+            │   ├── GET /admin/store-settings
+            │   │   ├── super管理者がアクセスできること ✓
+            │   │   ├── 一般管理者がアクセスできること ✓
+            │   │   ├── トークンなしでアクセスできないこと ✓
+            │   │   └── 無効なトークンでアクセスできないこと ✓
+            │   └── PUT /admin/store-settings
+            │       ├── super管理者が更新できること ✓
+            │       ├── 一般管理者は更新できないこと ✓
+            │       ├── トークンなしでアクセスできないこと ✓
+            │       ├── 無効なトークンでアクセスできないこと ✓
+            │       ├── バリデーション失敗（配送料0円） ✓
+            │       └── バリデーション失敗（無料閾値負数） ✓
             └── entities/
                 └── store-settings.entity.spec.ts
                     ├── テーブル名がstore_settingsであること

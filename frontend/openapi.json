@@ -1049,6 +1049,54 @@
           "Public - Products"
         ]
       }
+    },
+    "/admin/store-settings": {
+      "get": {
+        "operationId": "StoreSettingsController_getSettings",
+        "summary": "店舗設定を取得",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin/store-settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "StoreSettingsController_updateSettings",
+        "summary": "店舗設定を更新（super管理者のみ）",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStoreSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin/store-settings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -1269,6 +1317,10 @@
         "properties": {}
       },
       "AddImageDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateStoreSettingsDto": {
         "type": "object",
         "properties": {}
       }

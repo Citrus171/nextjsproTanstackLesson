@@ -41,6 +41,8 @@ import {
   productsControllerUpdateVariation,
   publicProductsControllerFindAll,
   publicProductsControllerFindById,
+  storeSettingsControllerGetSettings,
+  storeSettingsControllerUpdateSettings,
   usersControllerChangePassword,
   usersControllerGetMe,
 } from "../sdk.gen";
@@ -79,6 +81,8 @@ import type {
   ProductsControllerUpdateVariationData,
   PublicProductsControllerFindAllData,
   PublicProductsControllerFindByIdData,
+  StoreSettingsControllerGetSettingsData,
+  StoreSettingsControllerUpdateSettingsData,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponse,
   UsersControllerGetMeData,
@@ -1035,3 +1039,58 @@ export const publicProductsControllerFindByIdOptions = (
     },
     queryKey: publicProductsControllerFindByIdQueryKey(options),
   });
+
+export const storeSettingsControllerGetSettingsQueryKey = (
+  options?: Options<StoreSettingsControllerGetSettingsData>,
+) => createQueryKey("storeSettingsControllerGetSettings", options);
+
+/**
+ * 店舗設定を取得
+ */
+export const storeSettingsControllerGetSettingsOptions = (
+  options?: Options<StoreSettingsControllerGetSettingsData>,
+) =>
+  queryOptions<
+    unknown,
+    DefaultError,
+    unknown,
+    ReturnType<typeof storeSettingsControllerGetSettingsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await storeSettingsControllerGetSettings({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: storeSettingsControllerGetSettingsQueryKey(options),
+  });
+
+/**
+ * 店舗設定を更新（super管理者のみ）
+ */
+export const storeSettingsControllerUpdateSettingsMutation = (
+  options?: Partial<Options<StoreSettingsControllerUpdateSettingsData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<StoreSettingsControllerUpdateSettingsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<StoreSettingsControllerUpdateSettingsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await storeSettingsControllerUpdateSettings({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};

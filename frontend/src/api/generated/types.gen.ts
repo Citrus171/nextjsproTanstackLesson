@@ -130,6 +130,10 @@ export type AddImageDto = {
   [key: string]: unknown;
 };
 
+export type UpdateStoreSettingsDto = {
+  [key: string]: unknown;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -591,5 +595,27 @@ export type PublicProductsControllerFindByIdData = {
 };
 
 export type PublicProductsControllerFindByIdResponses = {
+  200: unknown;
+};
+
+export type StoreSettingsControllerGetSettingsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/admin/store-settings";
+};
+
+export type StoreSettingsControllerGetSettingsResponses = {
+  200: unknown;
+};
+
+export type StoreSettingsControllerUpdateSettingsData = {
+  body: UpdateStoreSettingsDto;
+  path?: never;
+  query?: never;
+  url: "/admin/store-settings";
+};
+
+export type StoreSettingsControllerUpdateSettingsResponses = {
   200: unknown;
 };
