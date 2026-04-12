@@ -26,7 +26,7 @@ import { ProductVariationEntity } from './entities/product-variation.entity';
 import { ProductImageEntity } from './entities/product-image.entity';
 
 @ApiTags('Admin - Products')
-@ApiBearerAuth('JWT')
+@ApiBearerAuth()
 @UseGuards(AdminJwtAuthGuard, RolesGuard)
 @Controller('admin/products')
 export class ProductsController {

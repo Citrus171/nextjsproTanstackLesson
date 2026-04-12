@@ -397,7 +397,11 @@ export const productsControllerFindAll = <ThrowOnError extends boolean = false>(
     ProductsControllerFindAllResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products",
+    ...options,
+  });
 
 export const productsControllerCreate = <ThrowOnError extends boolean = false>(
   options: Options<ProductsControllerCreateData, ThrowOnError>,
@@ -407,6 +411,7 @@ export const productsControllerCreate = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/products",
     ...options,
     headers: {
@@ -422,7 +427,11 @@ export const productsControllerDelete = <ThrowOnError extends boolean = false>(
     ProductsControllerDeleteResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products/{id}", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products/{id}",
+    ...options,
+  });
 
 export const productsControllerFindById = <
   ThrowOnError extends boolean = false,
@@ -433,7 +442,11 @@ export const productsControllerFindById = <
     ProductsControllerFindByIdResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products/{id}", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products/{id}",
+    ...options,
+  });
 
 export const productsControllerUpdate = <ThrowOnError extends boolean = false>(
   options: Options<ProductsControllerUpdateData, ThrowOnError>,
@@ -443,6 +456,7 @@ export const productsControllerUpdate = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/products/{id}",
     ...options,
     headers: {
@@ -461,6 +475,7 @@ export const productsControllerAddVariation = <
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/products/{id}/variations",
     ...options,
     headers: {
@@ -478,7 +493,11 @@ export const productsControllerDeleteVariation = <
     ProductsControllerDeleteVariationResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products/variations/{variationId}", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products/variations/{variationId}",
+    ...options,
+  });
 
 export const productsControllerUpdateVariation = <
   ThrowOnError extends boolean = false,
@@ -490,6 +509,7 @@ export const productsControllerUpdateVariation = <
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/products/variations/{variationId}",
     ...options,
     headers: {
@@ -505,7 +525,11 @@ export const productsControllerPublish = <ThrowOnError extends boolean = false>(
     ProductsControllerPublishResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products/{id}/publish", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products/{id}/publish",
+    ...options,
+  });
 
 export const productsControllerUnpublish = <
   ThrowOnError extends boolean = false,
@@ -516,7 +540,11 @@ export const productsControllerUnpublish = <
     ProductsControllerUnpublishResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products/{id}/unpublish", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products/{id}/unpublish",
+    ...options,
+  });
 
 export const productsControllerAddImage = <
   ThrowOnError extends boolean = false,
@@ -528,6 +556,7 @@ export const productsControllerAddImage = <
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/products/{id}/images",
     ...options,
     headers: {
@@ -545,7 +574,11 @@ export const productsControllerDeleteImage = <
     ProductsControllerDeleteImageResponses,
     unknown,
     ThrowOnError
-  >({ url: "/admin/products/images/{imageId}", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/products/images/{imageId}",
+    ...options,
+  });
 
 export const publicProductsControllerFindAll = <
   ThrowOnError extends boolean = false,
@@ -619,7 +652,11 @@ export const cartsControllerGetCart = <ThrowOnError extends boolean = false>(
     CartsControllerGetCartResponses,
     unknown,
     ThrowOnError
-  >({ url: "/cart", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/cart",
+    ...options,
+  });
 
 /**
  * カート追加
@@ -632,6 +669,7 @@ export const cartsControllerAddToCart = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/cart",
     ...options,
     headers: {
@@ -650,7 +688,11 @@ export const cartsControllerRemoveItem = <ThrowOnError extends boolean = false>(
     CartsControllerRemoveItemResponses,
     unknown,
     ThrowOnError
-  >({ url: "/cart/{id}", ...options });
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/cart/{id}",
+    ...options,
+  });
 
 /**
  * カートアイテム数量変更
@@ -663,6 +705,7 @@ export const cartsControllerUpdateItem = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/cart/{id}",
     ...options,
     headers: {
@@ -684,6 +727,7 @@ export const paymentsControllerCreateCheckoutSession = <
     unknown,
     ThrowOnError
   >({
+    security: [{ scheme: "bearer", type: "http" }],
     url: "/payments/checkout",
     ...options,
     headers: {

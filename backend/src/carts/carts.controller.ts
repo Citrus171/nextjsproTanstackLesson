@@ -20,7 +20,7 @@ import { CartEntity } from './entities/cart.entity';
 @ApiTags('cart')
 @Controller('cart')
 @UseGuards(UserJwtAuthGuard)
-@ApiBearerAuth('JWT')
+@ApiBearerAuth()
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 

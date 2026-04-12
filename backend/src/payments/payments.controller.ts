@@ -23,7 +23,7 @@ export class PaymentsController {
 
   @Post('checkout')
   @UseGuards(UserJwtAuthGuard)
-  @ApiBearerAuth('JWT')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Stripe Checkout Sessionを作成してURLを返す' })
   @ApiOkResponse({ schema: { properties: { url: { type: 'string' } } } })
   async createCheckoutSession(
