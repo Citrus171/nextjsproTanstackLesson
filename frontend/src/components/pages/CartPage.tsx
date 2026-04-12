@@ -86,7 +86,7 @@ export function CartPage() {
         ),
       );
       toast.success("更新しました");
-    } catch (err) {
+    } catch {
       toast.error("更新に失敗しました");
     }
   };
