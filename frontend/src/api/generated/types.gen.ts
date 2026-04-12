@@ -172,6 +172,21 @@ export type UpdateStoreSettingsDto = {
   shippingFreeThreshold?: number;
 };
 
+export type ProductVariationEntity = {
+  [key: string]: unknown;
+};
+
+export type CartEntity = {
+  id: number;
+  sessionId: string;
+  variationId: number;
+  variation: ProductVariationEntity;
+  quantity: number;
+  reservedAt: string;
+  expiresAt: string;
+  status: "reserved" | "purchased" | "expired";
+};
+
 export type AddToCartDto = {
   [key: string]: unknown;
 };
@@ -680,8 +695,11 @@ export type CartsControllerGetCartData = {
 };
 
 export type CartsControllerGetCartResponses = {
-  200: unknown;
+  200: Array<CartEntity>;
 };
+
+export type CartsControllerGetCartResponse =
+  CartsControllerGetCartResponses[keyof CartsControllerGetCartResponses];
 
 export type CartsControllerAddToCartData = {
   body: AddToCartDto;
@@ -691,8 +709,11 @@ export type CartsControllerAddToCartData = {
 };
 
 export type CartsControllerAddToCartResponses = {
-  201: unknown;
+  200: CartEntity;
 };
+
+export type CartsControllerAddToCartResponse =
+  CartsControllerAddToCartResponses[keyof CartsControllerAddToCartResponses];
 
 export type CartsControllerRemoveItemData = {
   body?: never;

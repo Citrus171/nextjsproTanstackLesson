@@ -68,7 +68,9 @@ import type {
   AuthControllerLoginData,
   AuthControllerRegisterData,
   CartsControllerAddToCartData,
+  CartsControllerAddToCartResponse,
   CartsControllerGetCartData,
+  CartsControllerGetCartResponse,
   CartsControllerRemoveItemData,
   CartsControllerUpdateItemData,
   CategoriesControllerFindAllData,
@@ -1116,9 +1118,9 @@ export const cartsControllerGetCartOptions = (
   options?: Options<CartsControllerGetCartData>,
 ) =>
   queryOptions<
-    unknown,
+    CartsControllerGetCartResponse,
     DefaultError,
-    unknown,
+    CartsControllerGetCartResponse,
     ReturnType<typeof cartsControllerGetCartQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -1139,12 +1141,12 @@ export const cartsControllerGetCartOptions = (
 export const cartsControllerAddToCartMutation = (
   options?: Partial<Options<CartsControllerAddToCartData>>,
 ): UseMutationOptions<
-  unknown,
+  CartsControllerAddToCartResponse,
   DefaultError,
   Options<CartsControllerAddToCartData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    CartsControllerAddToCartResponse,
     DefaultError,
     Options<CartsControllerAddToCartData>
   > = {
