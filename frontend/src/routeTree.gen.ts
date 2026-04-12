@@ -20,6 +20,7 @@ import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as AuthenticatedCheckoutIndexRouteImport } from './routes/_authenticated/checkout/index'
 import { Route as AuthenticatedCheckoutCompleteRouteImport } from './routes/_authenticated/checkout/complete'
 import { Route as AdminAdminSettingsRouteImport } from './routes/_admin.admin.settings'
+import { Route as AdminAdminMembersRouteImport } from './routes/_admin.admin.members'
 import { Route as AdminAdminCategoriesRouteImport } from './routes/_admin.admin.categories'
 import { Route as AdminAdminAdminsRouteImport } from './routes/_admin.admin.admins'
 
@@ -78,6 +79,11 @@ const AdminAdminSettingsRoute = AdminAdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminMembersRoute = AdminAdminMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminCategoriesRoute = AdminAdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/members': typeof AdminAdminMembersRoute
   '/admin/settings': typeof AdminAdminSettingsRoute
   '/checkout/complete': typeof AuthenticatedCheckoutCompleteRoute
   '/checkout/': typeof AuthenticatedCheckoutIndexRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/members': typeof AdminAdminMembersRoute
   '/admin/settings': typeof AdminAdminSettingsRoute
   '/checkout/complete': typeof AuthenticatedCheckoutCompleteRoute
   '/checkout': typeof AuthenticatedCheckoutIndexRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_admin/admin/admins': typeof AdminAdminAdminsRoute
   '/_admin/admin/categories': typeof AdminAdminCategoriesRoute
+  '/_admin/admin/members': typeof AdminAdminMembersRoute
   '/_admin/admin/settings': typeof AdminAdminSettingsRoute
   '/_authenticated/checkout/complete': typeof AuthenticatedCheckoutCompleteRoute
   '/_authenticated/checkout/': typeof AuthenticatedCheckoutIndexRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
+    | '/admin/members'
     | '/admin/settings'
     | '/checkout/complete'
     | '/checkout/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
+    | '/admin/members'
     | '/admin/settings'
     | '/checkout/complete'
     | '/checkout'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_admin/admin/admins'
     | '/_admin/admin/categories'
+    | '/_admin/admin/members'
     | '/_admin/admin/settings'
     | '/_authenticated/checkout/complete'
     | '/_authenticated/checkout/'
@@ -262,6 +274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminSettingsRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/members': {
+      id: '/_admin/admin/members'
+      path: '/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminAdminMembersRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/categories': {
       id: '/_admin/admin/categories'
       path: '/categories'
@@ -282,12 +301,14 @@ declare module '@tanstack/react-router' {
 interface AdminAdminRouteChildren {
   AdminAdminAdminsRoute: typeof AdminAdminAdminsRoute
   AdminAdminCategoriesRoute: typeof AdminAdminCategoriesRoute
+  AdminAdminMembersRoute: typeof AdminAdminMembersRoute
   AdminAdminSettingsRoute: typeof AdminAdminSettingsRoute
 }
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminAdminsRoute: AdminAdminAdminsRoute,
   AdminAdminCategoriesRoute: AdminAdminCategoriesRoute,
+  AdminAdminMembersRoute: AdminAdminMembersRoute,
   AdminAdminSettingsRoute: AdminAdminSettingsRoute,
 }
 

@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { z } from "zod";
 import { adminCategoriesControllerFindAll } from "@/api/generated/sdk.gen";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { getAdminToken } from "@/lib/auth";
 
-const categorySchema = z.object({
+type Category = {
+  id: number;
+  name: string;
+  parentId: number | null;
+  children: Category[];
+  createdAt: string;
+};
+
+const categorySchema: z.ZodType<Category> = z.object({
   id: z.number(),
   name: z.string(),
   parentId: z.number().nullable(),
@@ -13,8 +21,6 @@ const categorySchema = z.object({
 });
 
 const categoriesSchema = z.array(categorySchema);
-
-type Category = z.infer<typeof categorySchema>;
 
 export function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -87,7 +93,7 @@ export function AdminCategoriesPage() {
   );
 }
 
-function renderCategories(categories: Category[], level = 0): React.ReactNode {
+function renderCategories(categories: Category[], level = 0): ReactElement[] {
   return categories.flatMap((category) => [
     <tr key={`parent-${category.id}`} className="border-b last:border-0">
       <td className="px-4 py-2">{category.id}</td>

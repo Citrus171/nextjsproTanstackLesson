@@ -39,6 +39,7 @@ nestjspro/
         │   │   │   ├── JWTペイロードに type:"user" と sub が含まれること
         │   │   │   ├── 存在しないメールアドレスはUnauthorizedExceptionを投げる
         │   │   │   ├── パスワード不一致はUnauthorizedExceptionを投げる
+        │   │   │   ├── 論理削除済み会員はUnauthorizedExceptionを投げること ✓
         │   │   │   └── メールアドレス/パスワード不一致のエラーメッセージは同一（列挙攻撃対策）
         │   │   └── adminLogin
         │   │       ├── 正しい認証情報でアクセストークンを返す
@@ -145,6 +146,35 @@ nestjspro/
         │           ├── nameカラムが存在すること
         │           ├── roleカラムがenum('super','general')で存在すること
         │           └── deletedAtカラムが存在すること（論理削除）
+        ├── admin-members/
+        │   ├── admin-members.service.spec.ts
+        │   │   ├── findAll
+        │   │   │   └── ページネーション付きで会員一覧を返すこと ✓
+        │   │   ├── findById
+        │   │   │   ├── 存在するユーザーIDの詳細を返すこと ✓
+        │   │   │   └── 存在しないユーザーIDでNotFoundExceptionを投げること ✓
+        │   │   ├── findOrdersByUserId
+        │   │   │   └── userIdに紐づく注文を取得すること ✓
+        │   │   └── softDelete
+        │   │       ├── 存在するIDを論理削除すること ✓
+        │   │       └── 存在しないIDではfalseを返すこと ✓
+        │   ├── admin-members.controller.spec.ts
+        │   │   ├── findAll
+        │   │   │   └── page/limit付きで会員一覧を返すこと ✓
+        │   │   ├── findById
+        │   │   │   └── 管理者会員詳細を返すこと ✓
+        │   │   └── delete
+        │   │       └── 存在するIDを削除するとvoidを返すこと ✓
+        │   └── admin-members.e2e-spec.ts
+        │       ├── GET /admin/members
+        │       │   ├── ページネーション付き会員一覧を返すこと ✓
+        │       │   └── passwordがレスポンスに含まれないこと ✓
+        │       ├── GET /admin/members/:id
+        │       │   ├── 注文履歴を含む会員詳細を返すこと ✓
+        │       │   └── passwordがレスポンスに含まれないこと ✓
+        │       └── DELETE /admin/members/:id
+        │           ├── general管理者は403になること ✓
+        │           └── super管理者は204で削除できること ✓
         ├── users/
         │   ├── users.controller.spec.ts
         │   │   ├── getMe
@@ -160,7 +190,8 @@ nestjspro/
         │   │   │   └── ConflictException時はsaveを呼ばない
         │   │   ├── findByEmail
         │   │   │   ├── 存在するメールアドレスのユーザーを返す
-        │   │   │   └── 存在しないメールアドレスはnullを返す
+        │   │   │   ├── 存在しないメールアドレスはnullを返す
+        │   │   │   └── 論理削除済みユーザーはnullを返す（TypeORMが@DeleteDateColumnで自動除外） ✓
         │   │   ├── findById
         │   │   │   ├── 存在するIDのユーザーを返す
         │   │   │   └── 存在しないIDはNotFoundExceptionを投げる
@@ -507,7 +538,15 @@ nestjspro/
         │   ├── 設定取得失敗時、エラーメッセージを表示すること
         │   ├── super管理者がフォームを送信すると、設定が更新されること
         │   ├── PUT失敗時、エラーメッセージを表示すること
-        │   └── 配送料に0を入力すると、バリデーションエラーを表示すること
+        │   ├── 配送料に0を入力すると、バリデーションエラーを表示すること
+        │   ├── JWTトークンのデコードに失敗した場合、エラーメッセージを表示すること ✓
+        │   └── 更新APIのレスポンス形式が不正な場合、エラーメッセージを表示すること ✓
+        ├── -_admin.admin.members.test.tsx ✓
+        │   ├── 会員一覧が表示されること ✓
+        │   ├── 詳細表示と削除操作が動作すること ✓
+        │   ├── 会員一覧の取得に失敗したとき、エラーメッセージが表示されること ✓
+        │   ├── 会員詳細の取得に失敗したとき、エラーメッセージが表示されること ✓
+        │   └── 会員削除に失敗したとき、エラーメッセージが表示されること ✓
         ├── -admin.login.test.tsx
         │   ├── 表示時、管理者ログインフォームが表示されること
         │   ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること

@@ -27,6 +27,12 @@ import type {
   AdminCategoriesControllerRemoveResponses,
   AdminCategoriesControllerUpdateData,
   AdminCategoriesControllerUpdateResponses,
+  AdminMembersControllerDeleteData,
+  AdminMembersControllerDeleteResponses,
+  AdminMembersControllerFindAllData,
+  AdminMembersControllerFindAllResponses,
+  AdminMembersControllerFindByIdData,
+  AdminMembersControllerFindByIdResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
@@ -749,3 +755,48 @@ export const paymentsControllerHandleWebhook = <
     unknown,
     ThrowOnError
   >({ url: "/payments/webhook", ...options });
+
+export const adminMembersControllerFindAll = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminMembersControllerFindAllData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminMembersControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/members",
+    ...options,
+  });
+
+export const adminMembersControllerDelete = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminMembersControllerDeleteData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    AdminMembersControllerDeleteResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/members/{id}",
+    ...options,
+  });
+
+export const adminMembersControllerFindById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminMembersControllerFindByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    AdminMembersControllerFindByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/members/{id}",
+    ...options,
+  });

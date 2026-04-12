@@ -159,9 +159,7 @@ export type UpdateStoreSettingsDto = {
   /**
    * インボイスT番号
    */
-  invoiceNumber?: {
-    [key: string]: unknown;
-  };
+  invoiceNumber?: string | null;
   /**
    * 配送料（1円以上）
    */
@@ -172,8 +170,26 @@ export type UpdateStoreSettingsDto = {
   shippingFreeThreshold?: number;
 };
 
+export type ProductEntity = {
+  id: number;
+  name: string;
+  description?: string | null;
+  price: number;
+  categoryId?: number | null;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type ProductVariationEntity = {
-  [key: string]: unknown;
+  id: number;
+  productId: number;
+  product?: ProductEntity;
+  size: string;
+  color: string;
+  price: number;
+  stock: number;
+  imageUrl?: string | null;
 };
 
 export type CartEntity = {
@@ -201,6 +217,44 @@ export type CreateCheckoutSessionDto = {
   city: string;
   address1: string;
   address2?: string;
+};
+
+export type AdminMemberListItemDto = {
+  id: number;
+  name: string;
+  email: string;
+  createdAt: string;
+  deletedAt: string | null;
+};
+
+export type AdminMemberListDto = {
+  items: Array<AdminMemberListItemDto>;
+  page: number;
+  limit: number;
+  total: number;
+};
+
+export type OrderSummaryDto = {
+  id: number;
+  status:
+    | "pending"
+    | "paid"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded";
+  totalAmount: number;
+  createdAt: string;
+};
+
+export type AdminMemberDetailDto = {
+  id: number;
+  name: string;
+  email: string;
+  address: string | null;
+  createdAt: string;
+  deletedAt: string | null;
+  orders: Array<OrderSummaryDto>;
 };
 
 export type UsersControllerGetMeData = {
@@ -778,3 +832,52 @@ export type PaymentsControllerHandleWebhookData = {
 export type PaymentsControllerHandleWebhookResponses = {
   200: unknown;
 };
+
+export type AdminMembersControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query?: {
+    limit?: number;
+    page?: number;
+  };
+  url: "/admin/members";
+};
+
+export type AdminMembersControllerFindAllResponses = {
+  200: AdminMemberListDto;
+};
+
+export type AdminMembersControllerFindAllResponse =
+  AdminMembersControllerFindAllResponses[keyof AdminMembersControllerFindAllResponses];
+
+export type AdminMembersControllerDeleteData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/members/{id}";
+};
+
+export type AdminMembersControllerDeleteResponses = {
+  204: void;
+};
+
+export type AdminMembersControllerDeleteResponse =
+  AdminMembersControllerDeleteResponses[keyof AdminMembersControllerDeleteResponses];
+
+export type AdminMembersControllerFindByIdData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/members/{id}";
+};
+
+export type AdminMembersControllerFindByIdResponses = {
+  200: AdminMemberDetailDto;
+};
+
+export type AdminMembersControllerFindByIdResponse =
+  AdminMembersControllerFindByIdResponses[keyof AdminMembersControllerFindByIdResponses];

@@ -1307,6 +1307,112 @@
           "payments"
         ]
       }
+    },
+    "/admin/members": {
+      "get": {
+        "operationId": "AdminMembersController_findAll",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMemberListDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin/members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/members/{id}": {
+      "get": {
+        "operationId": "AdminMembersController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMemberDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "admin/members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "AdminMembersController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin/members"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -1570,8 +1676,9 @@
         "type": "object",
         "properties": {
           "invoiceNumber": {
-            "type": "object",
-            "description": "インボイスT番号"
+            "type": "string",
+            "description": "インボイスT番号",
+            "nullable": true
           },
           "shippingFixedFee": {
             "type": "number",
@@ -1585,9 +1692,84 @@
           }
         }
       },
+      "ProductEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number"
+          },
+          "categoryId": {
+            "type": "number",
+            "nullable": true
+          },
+          "isPublished": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "price",
+          "isPublished",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "ProductVariationEntity": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "productId": {
+            "type": "number"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductEntity"
+          },
+          "size": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "stock": {
+            "type": "number"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "size",
+          "color",
+          "price",
+          "stock"
+        ]
       },
       "CartEntity": {
         "type": "object",
@@ -1672,6 +1854,136 @@
           "prefecture",
           "city",
           "address1"
+        ]
+      },
+      "AdminMemberListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "createdAt",
+          "deletedAt"
+        ]
+      },
+      "AdminMemberListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminMemberListItemDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "OrderSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "shipped",
+              "delivered",
+              "cancelled",
+              "refunded"
+            ]
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "totalAmount",
+          "createdAt"
+        ]
+      },
+      "AdminMemberDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderSummaryDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "address",
+          "createdAt",
+          "deletedAt",
+          "orders"
         ]
       }
     }

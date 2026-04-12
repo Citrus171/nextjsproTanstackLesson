@@ -2,7 +2,7 @@ import { IsOptional, IsString, IsInt, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateStoreSettingsDto {
-  @ApiPropertyOptional({ description: 'インボイスT番号' })
+  @ApiPropertyOptional({ description: 'インボイスT番号', type: String, nullable: true })
   @IsOptional()
   @IsString()
   invoiceNumber?: string | null;
