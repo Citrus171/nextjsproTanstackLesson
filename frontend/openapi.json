@@ -1111,6 +1111,137 @@
           }
         ]
       }
+    },
+    "/cart": {
+      "get": {
+        "operationId": "CartsController_getCart",
+        "summary": "カート取得",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CartEntity"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "CartsController_addToCart",
+        "summary": "カート追加",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/cart/{id}": {
+      "put": {
+        "operationId": "CartsController_updateItem",
+        "summary": "カートアイテム数量変更",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CartsController_removeItem",
+        "summary": "カートアイテム削除",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "cart"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -1388,6 +1519,64 @@
             "example": 5000
           }
         }
+      },
+      "ProductVariationEntity": {
+        "type": "object",
+        "properties": {}
+      },
+      "CartEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "variationId": {
+            "type": "number"
+          },
+          "variation": {
+            "$ref": "#/components/schemas/ProductVariationEntity"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "reservedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "purchased",
+              "expired"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "sessionId",
+          "variationId",
+          "variation",
+          "quantity",
+          "reservedAt",
+          "expiresAt",
+          "status"
+        ]
+      },
+      "AddToCartDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateCartItemDto": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

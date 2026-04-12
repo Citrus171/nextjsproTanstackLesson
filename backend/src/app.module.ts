@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
 import { UsersModule } from './users/users.module';
 import { UserEntity } from './users/entities/user.entity';
@@ -8,6 +9,7 @@ import { HealthModule } from './health/health.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { StoreSettingsModule } from './store-settings/store-settings.module';
+import { CartsModule } from './carts/carts.module';
 import { AdminUserEntity } from './admin-users/entities/admin-user.entity';
 import { CategoryEntity } from './categories/entities/category.entity';
 import { ProductEntity } from './products/entities/product.entity';
@@ -51,12 +53,14 @@ import { StoreSettingsEntity } from './store-settings/entities/store-settings.en
       synchronize: false,
       migrations: ['dist/migrations/*.js'],
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     HealthModule,
     CategoriesModule,
     ProductsModule,
     StoreSettingsModule,
+    CartsModule,
   ],
 })
 export class AppModule {}

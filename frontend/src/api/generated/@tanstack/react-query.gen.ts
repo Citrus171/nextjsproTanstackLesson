@@ -24,6 +24,10 @@ import {
   adminCategoriesControllerUpdate,
   authControllerLogin,
   authControllerRegister,
+  cartsControllerAddToCart,
+  cartsControllerGetCart,
+  cartsControllerRemoveItem,
+  cartsControllerUpdateItem,
   categoriesControllerFindAll,
   healthControllerCheck,
   type Options,
@@ -63,6 +67,12 @@ import type {
   AdminCategoriesControllerUpdateData,
   AuthControllerLoginData,
   AuthControllerRegisterData,
+  CartsControllerAddToCartData,
+  CartsControllerAddToCartResponse,
+  CartsControllerGetCartData,
+  CartsControllerGetCartResponse,
+  CartsControllerRemoveItemData,
+  CartsControllerUpdateItemData,
   CategoriesControllerFindAllData,
   HealthControllerCheckData,
   HealthControllerCheckError,
@@ -1087,6 +1097,115 @@ export const storeSettingsControllerUpdateSettingsMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await storeSettingsControllerUpdateSettings({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const cartsControllerGetCartQueryKey = (
+  options?: Options<CartsControllerGetCartData>,
+) => createQueryKey("cartsControllerGetCart", options);
+
+/**
+ * カート取得
+ */
+export const cartsControllerGetCartOptions = (
+  options?: Options<CartsControllerGetCartData>,
+) =>
+  queryOptions<
+    CartsControllerGetCartResponse,
+    DefaultError,
+    CartsControllerGetCartResponse,
+    ReturnType<typeof cartsControllerGetCartQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await cartsControllerGetCart({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: cartsControllerGetCartQueryKey(options),
+  });
+
+/**
+ * カート追加
+ */
+export const cartsControllerAddToCartMutation = (
+  options?: Partial<Options<CartsControllerAddToCartData>>,
+): UseMutationOptions<
+  CartsControllerAddToCartResponse,
+  DefaultError,
+  Options<CartsControllerAddToCartData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CartsControllerAddToCartResponse,
+    DefaultError,
+    Options<CartsControllerAddToCartData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cartsControllerAddToCart({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * カートアイテム削除
+ */
+export const cartsControllerRemoveItemMutation = (
+  options?: Partial<Options<CartsControllerRemoveItemData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<CartsControllerRemoveItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<CartsControllerRemoveItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cartsControllerRemoveItem({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * カートアイテム数量変更
+ */
+export const cartsControllerUpdateItemMutation = (
+  options?: Partial<Options<CartsControllerUpdateItemData>>,
+): UseMutationOptions<
+  unknown,
+  DefaultError,
+  Options<CartsControllerUpdateItemData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    DefaultError,
+    Options<CartsControllerUpdateItemData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cartsControllerUpdateItem({
         ...options,
         ...fnOptions,
         throwOnError: true,

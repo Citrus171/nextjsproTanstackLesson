@@ -411,6 +411,35 @@ nestjspro/
                     ├── invoiceNumberカラムがnullableで存在すること
                     ├── shippingFixedFeeカラムがINT型で存在すること
                     └── shippingFreeThresholdカラムがINT型で存在すること
+            └── carts/
+                ├── carts.service.spec.ts
+                │   ├── getCart
+                │   │   ├── セッションIDに対応するカートアイテムを返すこと ✓
+                │   │   └── カートが空の場合は空配列を返すこと ✓
+                │   ├── addToCart
+                │   │   ├── 在庫があるバリエーションをカートに追加できること ✓
+                │   │   ├── 在庫をquantity分減算すること ✓
+                │   │   ├── 同一セッション・同一バリエーション再追加時はquantityを加算すること ✓
+                │   │   ├── 在庫不足時はConflictExceptionを投げること ✓
+                │   │   └── 存在しないバリエーションはNotFoundExceptionを投げること ✓
+                │   ├── updateItem
+                │   │   ├── 数量を増加した場合に在庫を差分だけ減算すること ✓
+                │   │   ├── 数量を減少した場合に在庫を差分だけ加算すること ✓
+                │   │   ├── 増加後に在庫不足ならConflictExceptionを投げること ✓
+                │   │   ├── 他セッションのカートアイテムはForbiddenExceptionを投げること ✓
+                │   │   └── 存在しないカートアイテムはNotFoundExceptionを投げること ✓
+                │   ├── removeItem
+                │   │   ├── 削除時に在庫をquantityだけ加算すること ✓
+                │   │   └── 他セッションのアイテムはForbiddenExceptionを投げること ✓
+                │   └── releaseExpiredCarts
+                │       ├── 期限切れカートの在庫を返却すること ✓
+                │       ├── 期限切れカートのstatusをexpiredに更新すること ✓
+                │       └── 期限切れでないカートは処理しないこと ✓
+                └── carts.controller.spec.ts
+                    ├── getCartがCartsServiceのgetCartメソッドを呼ぶこと ✓
+                    ├── addToCartがCartsServiceのaddToCartメソッドを呼ぶこと ✓
+                    ├── updateItemがCartsServiceのupdateItemメソッドを呼ぶこと ✓
+                    └── removeItemがCartsServiceのremoveItemメソッドを呼ぶこと ✓
 └── frontend/
     └── src/
         ├── lib/
@@ -445,11 +474,15 @@ nestjspro/
         │   ├── super管理者がフォームを送信すると、設定が更新されること
         │   ├── PUT失敗時、エラーメッセージを表示すること
         │   └── 配送料に0を入力すると、バリデーションエラーを表示すること
-        │   └── -admin.login.test.tsx
-        │       ├── 表示時、管理者ログインフォームが表示されること
-        │       ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること
-        │       ├── 認証に失敗した時、エラーメッセージを表示すること
-        │       └── レスポンス形式が不正な時、エラーメッセージを表示すること
+        ├── -admin.login.test.tsx
+        │   ├── 表示時、管理者ログインフォームが表示されること
+        │   ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること
+        │   ├── 認証に失敗した時、エラーメッセージを表示すること
+        │   └── レスポンス形式が不正な時、エラーメッセージを表示すること
+        └── -_authenticated.cart.test.tsx
+            ├── カートアイテムが一覧表示されること ✓
+            ├── 空カート時にメッセージが表示されること ✓
+            └── 削除ボタンクリックでremoveItemが呼ばれること ✓
         └── components/
             └── layouts/
                 ├── MemberLayout.test.tsx

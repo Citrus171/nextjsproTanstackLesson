@@ -172,6 +172,29 @@ export type UpdateStoreSettingsDto = {
   shippingFreeThreshold?: number;
 };
 
+export type ProductVariationEntity = {
+  [key: string]: unknown;
+};
+
+export type CartEntity = {
+  id: number;
+  sessionId: string;
+  variationId: number;
+  variation: ProductVariationEntity;
+  quantity: number;
+  reservedAt: string;
+  expiresAt: string;
+  status: "reserved" | "purchased" | "expired";
+};
+
+export type AddToCartDto = {
+  [key: string]: unknown;
+};
+
+export type UpdateCartItemDto = {
+  [key: string]: unknown;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -663,3 +686,57 @@ export type StoreSettingsControllerUpdateSettingsResponses = {
 
 export type StoreSettingsControllerUpdateSettingsResponse =
   StoreSettingsControllerUpdateSettingsResponses[keyof StoreSettingsControllerUpdateSettingsResponses];
+
+export type CartsControllerGetCartData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/cart";
+};
+
+export type CartsControllerGetCartResponses = {
+  200: Array<CartEntity>;
+};
+
+export type CartsControllerGetCartResponse =
+  CartsControllerGetCartResponses[keyof CartsControllerGetCartResponses];
+
+export type CartsControllerAddToCartData = {
+  body: AddToCartDto;
+  path?: never;
+  query?: never;
+  url: "/cart";
+};
+
+export type CartsControllerAddToCartResponses = {
+  200: CartEntity;
+};
+
+export type CartsControllerAddToCartResponse =
+  CartsControllerAddToCartResponses[keyof CartsControllerAddToCartResponses];
+
+export type CartsControllerRemoveItemData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/cart/{id}";
+};
+
+export type CartsControllerRemoveItemResponses = {
+  200: unknown;
+};
+
+export type CartsControllerUpdateItemData = {
+  body: UpdateCartItemDto;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/cart/{id}";
+};
+
+export type CartsControllerUpdateItemResponses = {
+  200: unknown;
+};
