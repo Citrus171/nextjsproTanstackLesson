@@ -776,5 +776,5 @@ export type PaymentsControllerHandleWebhookData = {
 };
 
 export type PaymentsControllerHandleWebhookResponses = {
-  201: unknown;
+  200: unknown;
 };

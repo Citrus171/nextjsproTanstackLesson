@@ -619,7 +619,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       },
@@ -653,7 +653,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -681,7 +681,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       },
@@ -717,7 +717,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       },
@@ -743,7 +743,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -781,7 +781,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -819,7 +819,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       },
@@ -845,7 +845,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -873,7 +873,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -901,7 +901,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -939,7 +939,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -967,7 +967,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -1137,7 +1137,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       },
@@ -1172,7 +1172,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -1211,7 +1211,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       },
@@ -1238,7 +1238,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -1279,7 +1279,7 @@
         ],
         "security": [
           {
-            "JWT": []
+            "bearer": []
           }
         ]
       }
@@ -1299,7 +1299,7 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         },
