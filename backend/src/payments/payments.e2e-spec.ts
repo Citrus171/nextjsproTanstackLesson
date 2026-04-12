@@ -98,7 +98,6 @@ describe('Payments E2E', () => {
   // userId=3: カートあり + pending注文あり（webhookテスト用）
   let userWithCartToken: string;
   let userWithoutCartToken: string;
-  let variationId: number;
   let webhookOrderId: number;
   const shippingAddress = {
     zip: '150-0001',
@@ -160,8 +159,6 @@ describe('Payments E2E', () => {
         stock: 10,
       }),
     );
-    variationId = variation.id;
-
     // 店舗設定作成
     const settings = new StoreSettingsEntity();
     settings.shippingFixedFee = 800;
