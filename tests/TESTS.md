@@ -712,6 +712,60 @@
 
 ---
 
+---
+
+## Issue#12 チェックアウト・Stripe決済
+
+### PaymentsService `backend/src/payments/payments.service.spec.ts`
+
+**createCheckoutSession**
+- [x] カートが空の場合はBadRequestExceptionを投げること
+- [x] カート合計が閾値未満の場合は固定配送料を加算すること
+- [x] カート合計が閾値以上の場合は配送料が無料になること
+- [x] Stripe Checkout SessionのURLを返すこと
+- [x] pendingステータスで注文レコードを作成すること
+- [x] 購入時点の価格スナップショットをorder_itemsに保存すること
+
+**handleWebhook**
+- [x] 無効なStripe署名の場合はBadRequestExceptionを投げること
+- [x] checkout.session.completed以外のイベントは無視して200を返すこと
+- [x] 処理済みのevent_idは二重処理しないこと
+- [x] checkout.session.completed受信後に注文ステータスをpaidにすること
+- [x] checkout.session.completed受信後にカートをpurchasedに更新すること
+- [x] 処理後にstripe_eventsにevent_idをINSERTすること
+
+---
+
+### PaymentsController `backend/src/payments/payments.controller.spec.ts`
+
+**createCheckoutSession**
+- [x] checkout URLを返すこと
+- [x] カートが空の場合はBadRequestExceptionが伝播すること
+
+**handleWebhook**
+- [x] Stripe-Signatureヘッダーをサービスに渡すこと
+- [x] 署名検証失敗時はBadRequestExceptionが伝播すること
+
+---
+
+### CheckoutPage `frontend/src/routes/-_authenticated.checkout.test.tsx`
+
+- [x] 配送先フォームが表示されること
+- [x] フォーム送信でcheckout APIが呼ばれStripeにリダイレクトすること
+- [x] 必須フィールドが空の場合はバリデーションエラーが表示されること
+- [x] API エラー時にエラートーストが表示されること
+- [x] 送信中はボタンが「処理中...」になること
+
+---
+
+### CheckoutCompletePage `frontend/src/routes/-_authenticated.checkout.complete.test.tsx`
+
+- [x] 注文完了メッセージが表示されること
+- [x] 確認メール送信の案内が表示されること
+- [x] トップページへのリンクが表示されること
+
+---
+
 ## レイアウト・共有コンポーネント
 
 ### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`

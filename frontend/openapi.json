@@ -1242,6 +1242,81 @@
           }
         ]
       }
+    },
+    "/payments/checkout": {
+      "post": {
+        "operationId": "PaymentsController_createCheckoutSession",
+        "summary": "Stripe Checkout Sessionを作成してURLを返す",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "payments"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/payments/webhook": {
+      "post": {
+        "operationId": "PaymentsController_handleWebhook",
+        "summary": "Stripe Webhookエンドポイント（署名検証済み）",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Buffer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "payments"
+        ]
+      }
     }
   },
   "info": {
@@ -1575,6 +1650,41 @@
         "properties": {}
       },
       "UpdateCartItemDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateCheckoutSessionDto": {
+        "type": "object",
+        "properties": {
+          "zip": {
+            "type": "string",
+            "example": "123-4567"
+          },
+          "prefecture": {
+            "type": "string",
+            "example": "東京都"
+          },
+          "city": {
+            "type": "string",
+            "example": "渋谷区"
+          },
+          "address1": {
+            "type": "string",
+            "example": "渋谷1-1-1"
+          },
+          "address2": {
+            "type": "string",
+            "example": "マンション101"
+          }
+        },
+        "required": [
+          "zip",
+          "prefecture",
+          "city",
+          "address1"
+        ]
+      },
+      "Buffer": {
         "type": "object",
         "properties": {}
       }

@@ -440,6 +440,29 @@ nestjspro/
                     ├── addToCartがCartsServiceのaddToCartメソッドを呼ぶこと ✓
                     ├── updateItemがCartsServiceのupdateItemメソッドを呼ぶこと ✓
                     └── removeItemがCartsServiceのremoveItemメソッドを呼ぶこと ✓
+        ├── payments/
+        │   ├── payments.service.spec.ts
+        │   │   ├── createCheckoutSession
+        │   │   │   ├── カートが空の場合はBadRequestExceptionを投げること ✓
+        │   │   │   ├── カート合計が閾値未満の場合は固定配送料を加算すること ✓
+        │   │   │   ├── カート合計が閾値以上の場合は配送料が無料になること ✓
+        │   │   │   ├── Stripe Checkout SessionのURLを返すこと ✓
+        │   │   │   ├── pendingステータスで注文レコードを作成すること ✓
+        │   │   │   └── 購入時点の価格スナップショットをorder_itemsに保存すること ✓
+        │   │   └── handleWebhook
+        │   │       ├── 無効なStripe署名の場合はBadRequestExceptionを投げること ✓
+        │   │       ├── checkout.session.completed以外のイベントは無視して200を返すこと ✓
+        │   │       ├── 処理済みのevent_idは二重処理しないこと ✓
+        │   │       ├── checkout.session.completed受信後に注文ステータスをpaidにすること ✓
+        │   │       ├── checkout.session.completed受信後にカートをpurchasedに更新すること ✓
+        │   │       └── 処理後にstripe_eventsにevent_idをINSERTすること ✓
+        │   └── payments.controller.spec.ts
+        │       ├── createCheckoutSession
+        │       │   ├── checkout URLを返すこと ✓
+        │       │   └── カートが空の場合はBadRequestExceptionが伝播すること ✓
+        │       └── handleWebhook
+        │           ├── Stripe-Signatureヘッダーをサービスに渡すこと ✓
+        │           └── 署名検証失敗時はBadRequestExceptionが伝播すること ✓
 └── frontend/
     └── src/
         ├── lib/
@@ -479,10 +502,20 @@ nestjspro/
         │   ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること
         │   ├── 認証に失敗した時、エラーメッセージを表示すること
         │   └── レスポンス形式が不正な時、エラーメッセージを表示すること
-        └── -_authenticated.cart.test.tsx
-            ├── カートアイテムが一覧表示されること ✓
-            ├── 空カート時にメッセージが表示されること ✓
-            └── 削除ボタンクリックでremoveItemが呼ばれること ✓
+        ├── -_authenticated.cart.test.tsx
+        │   ├── カートアイテムが一覧表示されること ✓
+        │   ├── 空カート時にメッセージが表示されること ✓
+        │   └── 削除ボタンクリックでremoveItemが呼ばれること ✓
+        ├── -_authenticated.checkout.test.tsx
+        │   ├── 配送先フォームが表示されること ✓
+        │   ├── フォーム送信でcheckout APIが呼ばれStripeにリダイレクトすること ✓
+        │   ├── 必須フィールドが空の場合はバリデーションエラーが表示されること ✓
+        │   ├── API エラー時にエラートーストが表示されること ✓
+        │   └── 送信中はボタンが「処理中...」になること ✓
+        ├── -_authenticated.checkout.complete.test.tsx
+        │   ├── 注文完了メッセージが表示されること ✓
+        │   ├── 確認メール送信の案内が表示されること ✓
+        │   └── トップページへのリンクが表示されること ✓
         └── components/
             └── layouts/
                 ├── MemberLayout.test.tsx

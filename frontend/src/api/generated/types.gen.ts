@@ -195,6 +195,18 @@ export type UpdateCartItemDto = {
   [key: string]: unknown;
 };
 
+export type CreateCheckoutSessionDto = {
+  zip: string;
+  prefecture: string;
+  city: string;
+  address1: string;
+  address2?: string;
+};
+
+export type Buffer = {
+  [key: string]: unknown;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -739,4 +751,34 @@ export type CartsControllerUpdateItemData = {
 
 export type CartsControllerUpdateItemResponses = {
   200: unknown;
+};
+
+export type PaymentsControllerCreateCheckoutSessionData = {
+  body: CreateCheckoutSessionDto;
+  path?: never;
+  query?: never;
+  url: "/payments/checkout";
+};
+
+export type PaymentsControllerCreateCheckoutSessionResponses = {
+  200: {
+    url?: string;
+  };
+};
+
+export type PaymentsControllerCreateCheckoutSessionResponse =
+  PaymentsControllerCreateCheckoutSessionResponses[keyof PaymentsControllerCreateCheckoutSessionResponses];
+
+export type PaymentsControllerHandleWebhookData = {
+  body: Buffer;
+  headers: {
+    "stripe-signature": string;
+  };
+  path?: never;
+  query?: never;
+  url: "/payments/webhook";
+};
+
+export type PaymentsControllerHandleWebhookResponses = {
+  201: unknown;
 };

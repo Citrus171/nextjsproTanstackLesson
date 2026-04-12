@@ -44,6 +44,10 @@ import type {
   HealthControllerCheckData,
   HealthControllerCheckErrors,
   HealthControllerCheckResponses,
+  PaymentsControllerCreateCheckoutSessionData,
+  PaymentsControllerCreateCheckoutSessionResponses,
+  PaymentsControllerHandleWebhookData,
+  PaymentsControllerHandleWebhookResponses,
   ProductsControllerAddImageData,
   ProductsControllerAddImageResponses,
   ProductsControllerAddVariationData,
@@ -660,6 +664,48 @@ export const cartsControllerUpdateItem = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     url: "/cart/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Stripe Checkout Sessionを作成してURLを返す
+ */
+export const paymentsControllerCreateCheckoutSession = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PaymentsControllerCreateCheckoutSessionData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PaymentsControllerCreateCheckoutSessionResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/payments/checkout",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Stripe Webhookエンドポイント（署名検証済み）
+ */
+export const paymentsControllerHandleWebhook = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PaymentsControllerHandleWebhookData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PaymentsControllerHandleWebhookResponses,
+    unknown,
+    ThrowOnError
+  >({
+    url: "/payments/webhook",
     ...options,
     headers: {
       "Content-Type": "application/json",
