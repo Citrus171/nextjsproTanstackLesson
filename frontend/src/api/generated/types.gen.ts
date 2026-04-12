@@ -130,6 +130,48 @@ export type AddImageDto = {
   [key: string]: unknown;
 };
 
+export type StoreSettingsResponseDto = {
+  /**
+   * 設定ID
+   */
+  id: number;
+  /**
+   * インボイスT番号
+   */
+  invoiceNumber: {
+    [key: string]: unknown;
+  } | null;
+  /**
+   * 配送料（1円以上）
+   */
+  shippingFixedFee: number;
+  /**
+   * 送料無料となる購入金額の閾値
+   */
+  shippingFreeThreshold: number;
+  /**
+   * 最終更新日時
+   */
+  updatedAt: string;
+};
+
+export type UpdateStoreSettingsDto = {
+  /**
+   * インボイスT番号
+   */
+  invoiceNumber?: {
+    [key: string]: unknown;
+  };
+  /**
+   * 配送料（1円以上）
+   */
+  shippingFixedFee?: number;
+  /**
+   * 送料無料となる購入金額の閾値
+   */
+  shippingFreeThreshold?: number;
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -593,3 +635,31 @@ export type PublicProductsControllerFindByIdData = {
 export type PublicProductsControllerFindByIdResponses = {
   200: unknown;
 };
+
+export type StoreSettingsControllerGetSettingsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/admin/store-settings";
+};
+
+export type StoreSettingsControllerGetSettingsResponses = {
+  200: StoreSettingsResponseDto;
+};
+
+export type StoreSettingsControllerGetSettingsResponse =
+  StoreSettingsControllerGetSettingsResponses[keyof StoreSettingsControllerGetSettingsResponses];
+
+export type StoreSettingsControllerUpdateSettingsData = {
+  body: UpdateStoreSettingsDto;
+  path?: never;
+  query?: never;
+  url: "/admin/store-settings";
+};
+
+export type StoreSettingsControllerUpdateSettingsResponses = {
+  200: StoreSettingsResponseDto;
+};
+
+export type StoreSettingsControllerUpdateSettingsResponse =
+  StoreSettingsControllerUpdateSettingsResponses[keyof StoreSettingsControllerUpdateSettingsResponses];

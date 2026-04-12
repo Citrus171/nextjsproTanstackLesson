@@ -510,6 +510,60 @@
 
 ---
 
+### StoreSettingsService `backend/src/store-settings/store-settings.service.spec.ts`
+
+**getSettings**
+- [x] 店舗設定が存在するとき、その設定を返すこと
+- [x] 店舗設定が存在しないとき、エラーを投げること
+
+**updateSettings**
+- [x] invoiceNumberを更新できること
+- [x] invoiceNumberをnullに更新できること
+- [x] shippingFixedFeeを更新できること
+- [x] shippingFreeThresholdを更新できること
+- [x] shippingFixedFeeが0以下の場合エラーを投げること
+- [x] shippingFixedFeeが負数の場合エラーを投げること
+- [x] shippingFreeThresholdが0以下の場合エラーを投げること
+- [x] shippingFreeThresholdが負数の場合エラーを投げること
+- [x] 複数フィールドを同時に更新できること
+- [x] 大きな数値（超大値）も受け入れること
+- [x] 1円の設定も受け入れること（境界値）
+
+---
+
+### StoreSettingsController `backend/src/store-settings/store-settings.controller.spec.ts`
+
+**getSettings**
+- [x] 店舗設定を返すこと
+- [x] invoiceNumberがnullの場合も返すこと
+
+**updateSettings**
+- [x] invoiceNumberを更新できること
+- [x] shippingFixedFeeを更新できること
+- [x] shippingFreeThresholdを更新できること
+- [x] バリデーション失敗時、サービスがエラーを投げること
+- [x] 複数フィールドを同時に更新できること
+
+---
+
+### StoreSettings E2E `backend/src/store-settings/store-settings.e2e-spec.ts`
+
+**GET /admin/store-settings**
+- [x] super管理者がアクセスできること
+- [x] 一般管理者がアクセスできること
+- [x] トークンなしでアクセスできないこと
+- [x] 無効なトークンでアクセスできないこと
+
+**PUT /admin/store-settings**
+- [x] super管理者が更新できること
+- [x] 一般管理者は更新できないこと
+- [x] トークンなしでアクセスできないこと
+- [x] 無効なトークンでアクセスできないこと
+- [x] バリデーション失敗（配送料0円）
+- [x] バリデーション失敗（無料閾値負数）
+
+---
+
 ### StoreSettingsEntity `backend/src/store-settings/entities/store-settings.entity.spec.ts`
 
 - [ ] テーブル名がstore_settingsであること

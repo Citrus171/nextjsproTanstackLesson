@@ -64,6 +64,10 @@ import type {
   PublicProductsControllerFindAllResponses,
   PublicProductsControllerFindByIdData,
   PublicProductsControllerFindByIdResponses,
+  StoreSettingsControllerGetSettingsData,
+  StoreSettingsControllerGetSettingsResponses,
+  StoreSettingsControllerUpdateSettingsData,
+  StoreSettingsControllerUpdateSettingsResponses,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponses,
   UsersControllerGetMeData,
@@ -552,3 +556,43 @@ export const publicProductsControllerFindById = <
     unknown,
     ThrowOnError
   >({ url: "/products/{id}", ...options });
+
+/**
+ * 店舗設定を取得
+ */
+export const storeSettingsControllerGetSettings = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<StoreSettingsControllerGetSettingsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    StoreSettingsControllerGetSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/store-settings",
+    ...options,
+  });
+
+/**
+ * 店舗設定を更新（super管理者のみ）
+ */
+export const storeSettingsControllerUpdateSettings = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<StoreSettingsControllerUpdateSettingsData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    StoreSettingsControllerUpdateSettingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/store-settings",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
