@@ -1,18 +1,14 @@
-import {
-  Injectable,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Injectable, BadRequestException, Logger } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, DataSource, QueryFailedError } from "typeorm";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const StripeLib = require('stripe');
-import { CartEntity } from '../carts/entities/cart.entity';
-import { OrderEntity } from '../orders/entities/order.entity';
-import { OrderItemEntity } from '../orders/entities/order-item.entity';
-import { StoreSettingsEntity } from '../store-settings/entities/store-settings.entity';
-import { StripeEventEntity } from './entities/stripe-event.entity';
-import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
+const StripeLib = require("stripe");
+import { CartEntity } from "../carts/entities/cart.entity";
+import { OrderEntity } from "../orders/entities/order.entity";
+import { OrderItemEntity } from "../orders/entities/order-item.entity";
+import { StoreSettingsEntity } from "../store-settings/entities/store-settings.entity";
+import { StripeEventEntity } from "./entities/stripe-event.entity";
+import { CreateCheckoutSessionDto } from "./dto/create-checkout-session.dto";
 
 @Injectable()
 export class PaymentsService {
@@ -34,8 +30,8 @@ export class PaymentsService {
     private readonly dataSource: DataSource,
   ) {
     this.stripe = new StripeLib(
-      process.env.STRIPE_SECRET_KEY ?? 'sk_test_dummy',
-      { apiVersion: '2026-03-25.dahlia' },
+      process.env.STRIPE_SECRET_KEY ?? "sk_test_dummy",
+      { apiVersion: "2026-03-25.dahlia" },
     );
   }
 
@@ -47,34 +43,45 @@ export class PaymentsService {
 
     // カート取得
     const cartItems = await this.cartRepository.find({
-      where: { sessionId, status: 'reserved' },
+      where: { sessionId, status: "reserved" },
       relations: { variation: { product: true } },
     });
 
     if (cartItems.length === 0) {
-      throw new BadRequestException('カートが空です');
+      throw new BadRequestException("カートが空です");
     }
 
     // 店舗設定取得（配送料計算用）
     const settings = await this.storeSettingsRepository.findOneBy({ id: 1 });
     if (!settings) {
-      throw new BadRequestException('店舗設定が見つかりません');
+      throw new BadRequestException("店舗設定が見つかりません");
     }
 
     // 合計金額・配送料計算
     const subtotal = cartItems.reduce(
-      (sum: number, item: CartEntity & { variation: { price: number; product: { id: number; name: string }; size: string; color: string } }) =>
-        sum + item.variation.price * item.quantity,
+      (
+        sum: number,
+        item: CartEntity & {
+          variation: {
+            price: number;
+            product: { id: number; name: string };
+            size: string;
+            color: string;
+          };
+        },
+      ) => sum + item.variation.price * item.quantity,
       0,
     );
     const shippingFee =
-      subtotal >= settings.shippingFreeThreshold ? 0 : settings.shippingFixedFee;
+      subtotal >= settings.shippingFreeThreshold
+        ? 0
+        : settings.shippingFixedFee;
     const totalAmount = subtotal + shippingFee;
 
     // 注文レコードを pending で作成
     const order = await this.orderRepository.save({
       userId,
-      status: 'pending' as const,
+      status: "pending" as const,
       shippingAddress: {
         zip: dto.zip,
         prefecture: dto.prefecture,
@@ -105,7 +112,7 @@ export class PaymentsService {
     // Stripe Checkout Session 作成
     const lineItems = cartItems.map((item: any) => ({
       price_data: {
-        currency: 'jpy',
+        currency: "jpy",
         product_data: {
           name: `${item.variation.product.name} (${item.variation.size}/${item.variation.color})`,
         },
@@ -117,22 +124,29 @@ export class PaymentsService {
     if (shippingFee > 0) {
       lineItems.push({
         price_data: {
-          currency: 'jpy',
-          product_data: { name: '配送料' },
+          currency: "jpy",
+          product_data: { name: "配送料" },
           unit_amount: shippingFee,
         },
         quantity: 1,
       });
     }
 
-    const session = await this.stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL ?? 'http://localhost:5173'}/checkout/complete`,
-      cancel_url: `${process.env.FRONTEND_URL ?? 'http://localhost:5173'}/checkout`,
-      metadata: { orderId: String(order.id) },
-    });
+    let session: { id: string; url?: string };
+
+    try {
+      session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: lineItems,
+        mode: "payment",
+        success_url: `${process.env.FRONTEND_URL ?? "http://localhost:5173"}/checkout/complete`,
+        cancel_url: `${process.env.FRONTEND_URL ?? "http://localhost:5173"}/checkout`,
+        metadata: { orderId: String(order.id) },
+      });
+    } catch (error) {
+      await this.orderRepository.delete({ id: order.id });
+      throw error;
+    }
 
     // order に stripeSessionId を保存
     await this.orderRepository.update(
@@ -144,25 +158,36 @@ export class PaymentsService {
   }
 
   async handleWebhook(signature: string, rawBody: Buffer): Promise<void> {
-    let event: { id: string; type: string; data: { object: { id: string; metadata?: { orderId?: string } } } };
+    let event: {
+      id: string;
+      type: string;
+      data: { object: { id: string; metadata?: { orderId?: string } } };
+    };
 
     try {
       event = this.stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET ?? 'whsec_dummy',
+        process.env.STRIPE_WEBHOOK_SECRET ?? "whsec_dummy",
       );
     } catch {
-      throw new BadRequestException('Webhook署名の検証に失敗しました');
+      throw new BadRequestException("Webhook署名の検証に失敗しました");
     }
 
     // checkout.session.completed 以外は無視
-    if (event.type !== 'checkout.session.completed') {
+    if (event.type !== "checkout.session.completed") {
       return;
     }
 
     const session = event.data.object;
     const orderId = Number(session.metadata?.orderId);
+
+    if (!Number.isInteger(orderId) || orderId <= 0) {
+      this.logger.error(
+        `Invalid orderId in Stripe session metadata: ${session.metadata?.orderId ?? "undefined"}`,
+      );
+      throw new BadRequestException("WebhookのorderIdが不正です");
+    }
 
     // 冪等性チェック
     const alreadyProcessed = await this.stripeEventRepository.findOne({
@@ -174,6 +199,21 @@ export class PaymentsService {
 
     // トランザクション内で処理
     await this.dataSource.transaction(async (manager) => {
+      try {
+        await manager.save(StripeEventEntity, {
+          eventId: event.id,
+          processedAt: new Date(),
+        });
+      } catch (error) {
+        if (
+          error instanceof QueryFailedError &&
+          /unique|duplicate/i.test(String(error.message))
+        ) {
+          return;
+        }
+        throw error;
+      }
+
       const order = await manager.findOne(OrderEntity, {
         where: { id: orderId },
       });
@@ -184,20 +224,14 @@ export class PaymentsService {
       }
 
       // 注文ステータスを paid に更新
-      await manager.update(OrderEntity, { id: order.id }, { status: 'paid' });
+      await manager.update(OrderEntity, { id: order.id }, { status: "paid" });
 
       // カートを purchased に更新
       await manager.update(
         CartEntity,
-        { sessionId: String(order.userId), status: 'reserved' },
-        { status: 'purchased' },
+        { sessionId: String(order.userId), status: "reserved" },
+        { status: "purchased" },
       );
-
-      // stripe_events にINSERT（冪等管理）
-      await manager.save(StripeEventEntity, {
-        eventId: event.id,
-        processedAt: new Date(),
-      });
     });
   }
 }

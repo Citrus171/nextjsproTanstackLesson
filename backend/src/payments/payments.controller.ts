@@ -36,9 +36,12 @@ export class PaymentsController {
   @Post('webhook')
   @ApiOperation({ summary: 'Stripe Webhookエンドポイント（署名検証済み）' })
   async handleWebhook(
-    @Body() rawBody: Buffer,
+    @Request() req: any,
     @Headers('stripe-signature') signature: string,
   ): Promise<void> {
-    return this.paymentsService.handleWebhook(signature, rawBody);
+    return this.paymentsService.handleWebhook(
+      signature,
+      req.rawBody as Buffer,
+    );
   }
 }

@@ -1,10 +1,20 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { CheckoutCompletePage } from "@/components/pages/CheckoutCompletePage";
+
+const originalLocation = window.location;
 
 // TanStack Router の Link をモック
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => (
+  Link: ({
+    to,
+    children,
+    className,
+  }: {
+    to: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <a href={to} className={className}>
       {children}
     </a>
@@ -12,6 +22,13 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 describe("CheckoutCompletePage", () => {
+  afterEach(() => {
+    cleanup();
+    Object.defineProperty(window, "location", {
+      value: originalLocation,
+    });
+  });
+
   it("注文完了メッセージが表示されること", () => {
     render(<CheckoutCompletePage />);
 

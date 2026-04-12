@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as sonner from "sonner";
 import { CheckoutPage } from "@/components/pages/CheckoutPage";
 
@@ -26,6 +26,12 @@ describe("CheckoutPage", () => {
     Object.defineProperty(window, "location", {
       value: { ...originalLocation, href: "" },
       writable: true,
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, "location", {
+      value: originalLocation,
     });
   });
 
@@ -131,10 +137,12 @@ describe("CheckoutPage", () => {
     await user.type(screen.getByPlaceholderText("渋谷区"), "渋谷区");
     await user.type(screen.getByPlaceholderText("渋谷1-1-1"), "渋谷1-1-1");
 
-    user.click(screen.getByRole("button", { name: "Stripeで決済する" }));
+    await user.click(screen.getByRole("button", { name: "Stripeで決済する" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "処理中..." })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "処理中..." }),
+      ).toBeInTheDocument();
     });
 
     // 解決してクリーンアップ
