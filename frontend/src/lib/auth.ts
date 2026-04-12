@@ -73,7 +73,19 @@ export function decodeAdminToken(token: string): AdminJwtPayload {
     const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
     const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
     const json = atob(padded);
-    return JSON.parse(json) as AdminJwtPayload;
+    const payload = JSON.parse(json);
+
+    // Validate required fields
+    if (
+      typeof payload !== "object" ||
+      typeof payload.sub !== "number" ||
+      (payload.role !== "super" && payload.role !== "general") ||
+      payload.type !== "admin"
+    ) {
+      throw new Error("Invalid JWT payload structure");
+    }
+
+    return payload as AdminJwtPayload;
   } catch {
     throw new Error("Failed to decode token");
   }

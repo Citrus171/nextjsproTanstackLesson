@@ -21,10 +21,27 @@ const storeSettingsResponseSchema = z.object({
   updatedAt: z.string(),
 });
 
+const positiveIntegerField = (message: string) =>
+  z.preprocess(
+    (value) =>
+      typeof value === "number" && Number.isNaN(value) ? undefined : value,
+    z.coerce
+      .number({
+        required_error: message,
+        invalid_type_error: message,
+      })
+      .int("整数で入力してください")
+      .min(1, message),
+  );
+
 const updateFormSchema = z.object({
   invoiceNumber: z.string().nullable().optional(),
-  shippingFixedFee: z.number().min(1, "配送料は1円以上である必要があります"),
-  shippingFreeThreshold: z.number().min(1, "無料配送閾値は1円以上である必要があります"),
+  shippingFixedFee: positiveIntegerField(
+    "配送料は1円以上である必要があります",
+  ),
+  shippingFreeThreshold: positiveIntegerField(
+    "無料配送閾値は1円以上である必要があります",
+  ),
 });
 
 type UpdateFormValues = z.infer<typeof updateFormSchema>;
@@ -40,6 +57,7 @@ export function AdminStoreSettingsPage() {
     formState: { errors, isSubmitting },
     setError,
     setValue,
+    clearErrors,
   } = useForm<UpdateFormValues>({
     resolver: zodResolver(updateFormSchema),
   });
@@ -79,8 +97,17 @@ export function AdminStoreSettingsPage() {
       // Check admin role
       const token = getAdminToken();
       if (token) {
-        const decoded = decodeAdminToken(token);
-        setIsSuperAdmin(decoded.role === "super");
+        try {
+          const decoded = decodeAdminToken(token);
+          setIsSuperAdmin(decoded.role === "super");
+        } catch {
+          setIsSuperAdmin(false);
+          setErrorMessage((current) =>
+            current ?? "認証情報が無効です。再度ログインしてください",
+          );
+          setLoading(false);
+          return;
+        }
       }
 
       setLoading(false);
@@ -94,8 +121,17 @@ export function AdminStoreSettingsPage() {
   }, [setValue]);
 
   const onSubmit = async (data: UpdateFormValues) => {
+    // Normalize invoiceNumber: empty string → null
+    const normalizedInvoiceNumber =
+      typeof data.invoiceNumber === "string"
+        ? data.invoiceNumber.trim() || null
+        : data.invoiceNumber;
+
     const { data: res, error } = await storeSettingsControllerUpdateSettings({
-      body: data,
+      body: {
+        ...data,
+        invoiceNumber: normalizedInvoiceNumber,
+      },
       auth: getAdminToken() ?? undefined,
       throwOnError: false,
     });
@@ -115,6 +151,7 @@ export function AdminStoreSettingsPage() {
       return;
     }
 
+    clearErrors("root");
     toast.success("店舗設定を更新しました");
   };
 
@@ -157,6 +194,7 @@ export function AdminStoreSettingsPage() {
                 id="shippingFixedFee"
                 type="number"
                 min="1"
+                step="1"
                 disabled={!isSuperAdmin}
                 {...register("shippingFixedFee", { valueAsNumber: true })}
               />
@@ -175,6 +213,7 @@ export function AdminStoreSettingsPage() {
                 id="shippingFreeThreshold"
                 type="number"
                 min="1"
+                step="1"
                 disabled={!isSuperAdmin}
                 {...register("shippingFreeThreshold", {
                   valueAsNumber: true,
