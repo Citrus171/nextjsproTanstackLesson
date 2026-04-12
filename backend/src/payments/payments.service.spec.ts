@@ -8,7 +8,6 @@ import { OrderEntity } from '../orders/entities/order.entity';
 import { OrderItemEntity } from '../orders/entities/order-item.entity';
 import { StoreSettingsEntity } from '../store-settings/entities/store-settings.entity';
 import { StripeEventEntity } from './entities/stripe-event.entity';
-import { ProductVariationEntity } from '../products/entities/product-variation.entity';
 
 // Stripe モック
 const mockStripeCheckoutCreate = jest.fn();
