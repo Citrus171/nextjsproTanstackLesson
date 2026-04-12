@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { OrderSummaryDto } from './order-summary.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import { OrderSummaryDto } from "./order-summary.dto";
 
 export class AdminMemberDetailDto {
   @ApiProperty()

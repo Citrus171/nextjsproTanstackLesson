@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { AdminMemberListItemDto } from './admin-member-list-item.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import { AdminMemberListItemDto } from "./admin-member-list-item.dto";
 
 export class AdminMemberListDto {
   @ApiProperty({ type: [AdminMemberListItemDto] })

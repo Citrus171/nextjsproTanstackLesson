@@ -1,11 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { OrderStatus } from '../../orders/entities/order.entity';
+import { ApiProperty } from "@nestjs/swagger";
+import { OrderStatus } from "../../orders/entities/order.entity";
 
 export class OrderSummaryDto {
   @ApiProperty()
   id: number;
 
-  @ApiProperty({ enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled', 'refunded'] })
+  @ApiProperty({
+    enum: ["pending", "paid", "shipped", "delivered", "cancelled", "refunded"],
+  })
   status: OrderStatus;
 
   @ApiProperty()

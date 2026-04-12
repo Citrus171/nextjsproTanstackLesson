@@ -1,12 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from '../users/entities/user.entity';
-import { OrderEntity } from '../orders/entities/order.entity';
-import { AdminMemberDetailDto } from './dto/admin-member-detail.dto';
-import { AdminMemberListDto } from './dto/admin-member-list.dto';
-import { AdminMemberListItemDto } from './dto/admin-member-list-item.dto';
-import { OrderSummaryDto } from './dto/order-summary.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { UserEntity } from "../users/entities/user.entity";
+import { OrderEntity } from "../orders/entities/order.entity";
+import { AdminMemberDetailDto } from "./dto/admin-member-detail.dto";
+import { AdminMemberListDto } from "./dto/admin-member-list.dto";
+import { AdminMemberListItemDto } from "./dto/admin-member-list-item.dto";
+import { OrderSummaryDto } from "./dto/order-summary.dto";
 
 @Injectable()
 export class AdminMembersService {
@@ -23,7 +23,7 @@ export class AdminMembersService {
     const [users, total] = await this.userRepository.findAndCount({
       skip,
       take,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
     });
 
     const items = users.map((user) => this.toListItemDto(user));
@@ -38,7 +38,7 @@ export class AdminMembersService {
   async findById(id: number): Promise<AdminMemberDetailDto> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException('ユーザーが見つかりません');
+      throw new NotFoundException("ユーザーが見つかりません");
     }
 
     const orders = await this.findOrdersByUserId(id);
@@ -48,7 +48,7 @@ export class AdminMembersService {
   async findOrdersByUserId(userId: number): Promise<OrderEntity[]> {
     return this.orderRepository.find({
       where: { userId },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
     });
   }
 
@@ -73,7 +73,10 @@ export class AdminMembersService {
     };
   }
 
-  private toDetailDto(user: UserEntity, orders: OrderEntity[]): AdminMemberDetailDto {
+  private toDetailDto(
+    user: UserEntity,
+    orders: OrderEntity[],
+  ): AdminMemberDetailDto {
     return {
       id: user.id,
       name: user.name,
