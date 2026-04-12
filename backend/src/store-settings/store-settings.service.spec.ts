@@ -7,6 +7,7 @@ describe('StoreSettingsService', () => {
   let service: StoreSettingsService;
   let mockRepository: {
     findOne: jest.Mock;
+    findOneBy: jest.Mock;
     save: jest.Mock;
   };
 
@@ -21,6 +22,7 @@ describe('StoreSettingsService', () => {
   beforeEach(async () => {
     mockRepository = {
       findOne: jest.fn(),
+      findOneBy: jest.fn(),
       save: jest.fn(),
     };
 
@@ -39,16 +41,16 @@ describe('StoreSettingsService', () => {
 
   describe('getSettings', () => {
     it('店舗設定が存在するとき、その設定を返す', async () => {
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
 
       const result = await service.getSettings();
 
       expect(result).toEqual(mockStoreSettings);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: {} });
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
     });
 
     it('店舗設定が存在しないとき、エラーを投げる', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
+      mockRepository.findOneBy.mockResolvedValue(null);
 
       await expect(service.getSettings()).rejects.toThrow(
         'Store settings not found',
@@ -60,7 +62,7 @@ describe('StoreSettingsService', () => {
     it('invoiceNumberを更新できる', async () => {
       const updateDto = { invoiceNumber: 'T9876543210987' };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);
@@ -71,7 +73,7 @@ describe('StoreSettingsService', () => {
     it('invoiceNumberをnullに更新できる', async () => {
       const updateDto = { invoiceNumber: null };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);
@@ -82,7 +84,7 @@ describe('StoreSettingsService', () => {
     it('shippingFixedFeeを更新できる', async () => {
       const updateDto = { shippingFixedFee: 1000 };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);
@@ -93,7 +95,7 @@ describe('StoreSettingsService', () => {
     it('shippingFreeThresholdを更新できる', async () => {
       const updateDto = { shippingFreeThreshold: 10000 };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);
@@ -132,7 +134,7 @@ describe('StoreSettingsService', () => {
         shippingFreeThreshold: 7000,
       };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);
@@ -145,7 +147,7 @@ describe('StoreSettingsService', () => {
     it('大きな数値（超大値）も受け入れる', async () => {
       const updateDto = { shippingFixedFee: 999999 };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);
@@ -156,7 +158,7 @@ describe('StoreSettingsService', () => {
     it('1円の設定も受け入れる（境界値）', async () => {
       const updateDto = { shippingFixedFee: 1 };
       const updated = { ...mockStoreSettings, ...updateDto };
-      mockRepository.findOne.mockResolvedValue(mockStoreSettings);
+      mockRepository.findOneBy.mockResolvedValue(mockStoreSettings);
       mockRepository.save.mockResolvedValue(updated);
 
       const result = await service.updateSettings(updateDto);

@@ -6,7 +6,12 @@ import {
   UseGuards,
   HttpCode,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth.guard';
 import { SuperAdminGuard } from '../auth/guards/super-admin.guard';
 import { StoreSettingsService } from './store-settings.service';
@@ -22,6 +27,7 @@ export class StoreSettingsController {
   @UseGuards(AdminJwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '店舗設定を取得' })
+  @ApiOkResponse({ type: StoreSettingsResponseDto })
   async getSettings(): Promise<StoreSettingsResponseDto> {
     return this.storeSettingsService.getSettings();
   }
@@ -31,6 +37,7 @@ export class StoreSettingsController {
   @UseGuards(AdminJwtAuthGuard, SuperAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '店舗設定を更新（super管理者のみ）' })
+  @ApiOkResponse({ type: StoreSettingsResponseDto })
   async updateSettings(
     @Body() dto: UpdateStoreSettingsDto,
   ): Promise<StoreSettingsResponseDto> {

@@ -12,7 +12,7 @@ export class StoreSettingsService {
   ) {}
 
   async getSettings(): Promise<StoreSettingsEntity> {
-    const settings = await this.repository.findOne({ where: {} });
+    const settings = await this.repository.findOneBy({ id: 1 });
     if (!settings) {
       throw new Error('Store settings not found');
     }
@@ -40,7 +40,7 @@ export class StoreSettingsService {
     }
 
     // 既存の設定を取得
-    const existing = await this.repository.findOne({ where: {} });
+    const existing = await this.repository.findOneBy({ id: 1 });
 
     // 更新対象を作成
     const toUpdate = Object.assign(existing || new StoreSettingsEntity(), dto);

@@ -1057,7 +1057,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1085,7 +1092,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1320,9 +1334,60 @@
         "type": "object",
         "properties": {}
       },
+      "StoreSettingsResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "設定ID"
+          },
+          "invoiceNumber": {
+            "type": "object",
+            "description": "インボイスT番号",
+            "nullable": true
+          },
+          "shippingFixedFee": {
+            "type": "number",
+            "description": "配送料（1円以上）",
+            "example": 800
+          },
+          "shippingFreeThreshold": {
+            "type": "number",
+            "description": "送料無料となる購入金額の閾値",
+            "example": 5000
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "最終更新日時"
+          }
+        },
+        "required": [
+          "id",
+          "invoiceNumber",
+          "shippingFixedFee",
+          "shippingFreeThreshold",
+          "updatedAt"
+        ]
+      },
       "UpdateStoreSettingsDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "invoiceNumber": {
+            "type": "object",
+            "description": "インボイスT番号"
+          },
+          "shippingFixedFee": {
+            "type": "number",
+            "description": "配送料（1円以上）",
+            "example": 800
+          },
+          "shippingFreeThreshold": {
+            "type": "number",
+            "description": "送料無料となる購入金額の閾値",
+            "example": 5000
+          }
+        }
       }
     }
   }

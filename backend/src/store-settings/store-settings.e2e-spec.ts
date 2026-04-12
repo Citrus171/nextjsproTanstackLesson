@@ -8,6 +8,7 @@ import { StoreSettingsEntity } from './entities/store-settings.entity';
 import { AuthModule } from '../auth/auth.module';
 import { AdminUsersService } from '../admin-users/admin-users.service';
 import { StoreSettingsModule } from './store-settings.module';
+import { Repository } from 'typeorm';
 
 async function createTestApp(): Promise<INestApplication> {
   const module: TestingModule = await Test.createTestingModule({
@@ -38,6 +39,7 @@ describe('StoreSettings E2E', () => {
   let app: INestApplication;
   let jwtService: JwtService;
   let adminUsersService: AdminUsersService;
+  let storeSettingsRepository: Repository<StoreSettingsEntity>;
   let superAdminToken: string;
   let generalAdminToken: string;
 
@@ -46,6 +48,7 @@ describe('StoreSettings E2E', () => {
 
     jwtService = app.get<JwtService>(JwtService);
     adminUsersService = app.get<AdminUsersService>(AdminUsersService);
+    storeSettingsRepository = app.get('StoreSettingsEntityRepository');
 
     // テスト用の管理者ユーザーを作成
     const superAdmin = await adminUsersService.create(
@@ -62,18 +65,24 @@ describe('StoreSettings E2E', () => {
       'general',
     );
 
-    // JWT トークンを生成
+    // JWT トークンを生成（sub フィールドで署名）
     superAdminToken = jwtService.sign({
-      id: superAdmin.id,
+      sub: superAdmin.id,
       role: 'super',
       type: 'admin',
     });
 
     generalAdminToken = jwtService.sign({
-      id: generalAdmin.id,
+      sub: generalAdmin.id,
       role: 'general',
       type: 'admin',
     });
+
+    // 初期レコード投入
+    const storeSettings = new StoreSettingsEntity();
+    storeSettings.shippingFixedFee = 800;
+    storeSettings.shippingFreeThreshold = 5000;
+    await storeSettingsRepository.save(storeSettings);
   });
 
   afterAll(async () => {

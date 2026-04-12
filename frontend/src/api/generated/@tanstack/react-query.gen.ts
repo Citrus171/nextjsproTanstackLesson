@@ -82,7 +82,9 @@ import type {
   PublicProductsControllerFindAllData,
   PublicProductsControllerFindByIdData,
   StoreSettingsControllerGetSettingsData,
+  StoreSettingsControllerGetSettingsResponse,
   StoreSettingsControllerUpdateSettingsData,
+  StoreSettingsControllerUpdateSettingsResponse,
   UsersControllerChangePasswordData,
   UsersControllerChangePasswordResponse,
   UsersControllerGetMeData,
@@ -1051,9 +1053,9 @@ export const storeSettingsControllerGetSettingsOptions = (
   options?: Options<StoreSettingsControllerGetSettingsData>,
 ) =>
   queryOptions<
-    unknown,
+    StoreSettingsControllerGetSettingsResponse,
     DefaultError,
-    unknown,
+    StoreSettingsControllerGetSettingsResponse,
     ReturnType<typeof storeSettingsControllerGetSettingsQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -1074,12 +1076,12 @@ export const storeSettingsControllerGetSettingsOptions = (
 export const storeSettingsControllerUpdateSettingsMutation = (
   options?: Partial<Options<StoreSettingsControllerUpdateSettingsData>>,
 ): UseMutationOptions<
-  unknown,
+  StoreSettingsControllerUpdateSettingsResponse,
   DefaultError,
   Options<StoreSettingsControllerUpdateSettingsData>
 > => {
   const mutationOptions: UseMutationOptions<
-    unknown,
+    StoreSettingsControllerUpdateSettingsResponse,
     DefaultError,
     Options<StoreSettingsControllerUpdateSettingsData>
   > = {
