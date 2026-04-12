@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { CartEntity } from './entities/cart.entity';
 import { ProductVariationEntity } from '../products/entities/product-variation.entity';
@@ -128,7 +128,7 @@ describe('CartsService', () => {
       expect(mockManager.insert).toHaveBeenCalled();
     });
 
-    it('在庫不足時はConflictExceptionを投げること', async () => {
+    it('在庫不足時はBadRequestExceptionを投げること', async () => {
       const userId = 1;
       const variationId = 100;
       const quantity = 10;
@@ -145,7 +145,7 @@ describe('CartsService', () => {
 
       await expect(
         service.addToCart(userId, { variationId, quantity }),
-      ).rejects.toThrow(ConflictException);
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('存在しないバリエーションはNotFoundExceptionを投げること', async () => {
@@ -283,7 +283,7 @@ describe('CartsService', () => {
       );
     });
 
-    it('増加後に在庫不足ならConflictExceptionを投げること', async () => {
+    it('増加後に在庫不足ならBadRequestExceptionを投げること', async () => {
       const userId = 1;
       const cartItemId = 1;
       const newQuantity = 10;
@@ -309,7 +309,7 @@ describe('CartsService', () => {
 
       await expect(
         service.updateItem(userId, cartItemId, { quantity: newQuantity }),
-      ).rejects.toThrow(ConflictException);
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('他セッションのカートアイテムはForbiddenExceptionを投げること', async () => {

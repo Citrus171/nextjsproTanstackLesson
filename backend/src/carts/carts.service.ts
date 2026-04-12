@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Repository, DataSource, LessThan } from 'typeorm';
@@ -41,7 +41,7 @@ export class CartsService {
       }
 
       if (variation.stock < quantity) {
-        throw new ConflictException('在庫が不足しています');
+        throw new BadRequestException('在庫が不足しています');
       }
 
       // 同一セッション・同一バリエーションの既存カートを確認
@@ -116,7 +116,7 @@ export class CartsService {
       }
 
       if (quantityDiff > 0 && variation.stock < quantityDiff) {
-        throw new ConflictException('在庫が不足しています');
+        throw new BadRequestException('在庫が不足しています');
       }
 
       // 在庫を調整
@@ -170,7 +170,7 @@ export class CartsService {
     });
   }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_30_MINUTES)
   async releaseExpiredCarts(): Promise<void> {
     return this.dataSource.transaction(async (manager) => {
       const now = new Date();
