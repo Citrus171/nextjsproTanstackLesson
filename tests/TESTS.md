@@ -621,6 +621,16 @@
 
 ---
 
+### admin store settings page `frontend/src/routes/-_admin.admin.settings.test.tsx`
+
+- [x] 設定取得成功時、現在の設定値をフォームに表示すること
+- [x] 設定取得失敗時、エラーメッセージを表示すること
+- [x] super管理者がフォームを送信すると、設定が更新されること
+- [x] PUT失敗時、エラーメッセージを表示すること
+- [x] 配送料に0を入力すると、バリデーションエラーを表示すること
+
+---
+
 ### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`
 
 - [ ] ロゴが表示されること

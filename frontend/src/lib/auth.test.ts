@@ -8,6 +8,7 @@ import {
   setToken,
   isAdminAuthenticated,
   isAuthenticated,
+  decodeAdminToken,
 } from "./auth";
 
 const TOKEN_KEY = "access_token";
@@ -117,5 +118,40 @@ describe("isAdminAuthenticated", () => {
   it("JWT形式でないトークンの時、falseを返すこと", () => {
     localStorage.setItem(ADMIN_TOKEN_KEY, "invalid-token");
     expect(isAdminAuthenticated()).toBe(false);
+  });
+});
+
+describe("decodeAdminToken", () => {
+  it("有効な管理者JWTをデコードすること", () => {
+    const jwt = makeJwt({ sub: 1, type: "admin", role: "super" });
+    const decoded = decodeAdminToken(jwt);
+    expect(decoded.sub).toBe(1);
+    expect(decoded.type).toBe("admin");
+    expect(decoded.role).toBe("super");
+  });
+
+  it("generalロールのJWTもデコードすること", () => {
+    const jwt = makeJwt({ sub: 2, type: "admin", role: "general" });
+    const decoded = decodeAdminToken(jwt);
+    expect(decoded.role).toBe("general");
+  });
+
+  it("JWT形式が不正な時、エラーを投げること", () => {
+    expect(() => decodeAdminToken("invalid-token")).toThrow();
+  });
+
+  it("sub が number でない時、エラーを投げること", () => {
+    const jwt = makeJwt({ sub: "1", type: "admin", role: "super" });
+    expect(() => decodeAdminToken(jwt)).toThrow();
+  });
+
+  it("role が super でも general でもない時、エラーを投げること", () => {
+    const jwt = makeJwt({ sub: 1, type: "admin", role: "invalid" });
+    expect(() => decodeAdminToken(jwt)).toThrow();
+  });
+
+  it("type が admin でない時、エラーを投げること", () => {
+    const jwt = makeJwt({ sub: 1, type: "user", role: "super" });
+    expect(() => decodeAdminToken(jwt)).toThrow();
   });
 });

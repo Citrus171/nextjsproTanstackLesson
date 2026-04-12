@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AdminAdminSettingsRouteImport } from './routes/_admin.admin.settings'
 import { Route as AdminAdminCategoriesRouteImport } from './routes/_admin.admin.categories'
 import { Route as AdminAdminAdminsRouteImport } from './routes/_admin.admin.admins'
 
@@ -52,6 +53,11 @@ const AdminAdminRoute = AdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminSettingsRoute = AdminAdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminCategoriesRoute = AdminAdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/settings': typeof AdminAdminSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/settings': typeof AdminAdminSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_admin/admin/admins': typeof AdminAdminAdminsRoute
   '/_admin/admin/categories': typeof AdminAdminCategoriesRoute
+  '/_admin/admin/settings': typeof AdminAdminSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
+    | '/admin/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
+    | '/admin/settings'
   id:
     | '__root__'
     | '/_admin'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_admin/admin/admins'
     | '/_admin/admin/categories'
+    | '/_admin/admin/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/settings': {
+      id: '/_admin/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminAdminSettingsRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/categories': {
       id: '/_admin/admin/categories'
       path: '/categories'
@@ -204,11 +223,13 @@ declare module '@tanstack/react-router' {
 interface AdminAdminRouteChildren {
   AdminAdminAdminsRoute: typeof AdminAdminAdminsRoute
   AdminAdminCategoriesRoute: typeof AdminAdminCategoriesRoute
+  AdminAdminSettingsRoute: typeof AdminAdminSettingsRoute
 }
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminAdminsRoute: AdminAdminAdminsRoute,
   AdminAdminCategoriesRoute: AdminAdminCategoriesRoute,
+  AdminAdminSettingsRoute: AdminAdminSettingsRoute,
 }
 
 const AdminAdminRouteWithChildren = AdminAdminRoute._addFileChildren(
