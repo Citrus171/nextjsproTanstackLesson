@@ -145,6 +145,35 @@ nestjspro/
         │           ├── nameカラムが存在すること
         │           ├── roleカラムがenum('super','general')で存在すること
         │           └── deletedAtカラムが存在すること（論理削除）
+        ├── admin-members/
+        │   ├── admin-members.service.spec.ts
+        │   │   ├── findAll
+        │   │   │   └── ページネーション付きで会員一覧を返すこと ✓
+        │   │   ├── findById
+        │   │   │   ├── 存在するユーザーIDの詳細を返すこと ✓
+        │   │   │   └── 存在しないユーザーIDでNotFoundExceptionを投げること ✓
+        │   │   ├── findOrdersByUserId
+        │   │   │   └── userIdに紐づく注文を取得すること ✓
+        │   │   └── softDelete
+        │   │       ├── 存在するIDを論理削除すること ✓
+        │   │       └── 存在しないIDではfalseを返すこと ✓
+        │   ├── admin-members.controller.spec.ts
+        │   │   ├── findAll
+        │   │   │   └── page/limit付きで会員一覧を返すこと ✓
+        │   │   ├── findById
+        │   │   │   └── 管理者会員詳細を返すこと ✓
+        │   │   └── delete
+        │   │       └── 存在するIDを削除するとvoidを返すこと ✓
+        │   └── admin-members.e2e-spec.ts
+        │       ├── GET /admin/members
+        │       │   ├── ページネーション付き会員一覧を返すこと ✓
+        │       │   └── passwordがレスポンスに含まれないこと ✓
+        │       ├── GET /admin/members/:id
+        │       │   ├── 注文履歴を含む会員詳細を返すこと ✓
+        │       │   └── passwordがレスポンスに含まれないこと ✓
+        │       └── DELETE /admin/members/:id
+        │           ├── general管理者は403になること ✓
+        │           └── super管理者は204で削除できること ✓
         ├── users/
         │   ├── users.controller.spec.ts
         │   │   ├── getMe

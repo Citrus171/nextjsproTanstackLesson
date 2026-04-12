@@ -73,7 +73,52 @@
 - [x] nameとroleの両方更新
 
 ---
+### AdminMembersService `backend/src/admin-members/admin-members.service.spec.ts`
 
+**findAll**
+- [x] ページネーション付きで会員一覧を返すこと
+
+**findById**
+- [x] 存在するユーザーIDの詳細を返すこと
+- [x] 存在しないユーザーIDでNotFoundExceptionを投げること
+
+**findOrdersByUserId**
+- [x] userIdに紐づく注文を取得すること
+
+**softDelete**
+- [x] 存在するIDを論理削除すること
+- [x] 存在しないIDではfalseを返すこと
+
+---
+
+### AdminMembersController `backend/src/admin-members/admin-members.controller.spec.ts`
+
+**findAll**
+- [x] page/limit付きで会員一覧を返すこと
+
+**findById**
+- [x] 管理者会員詳細を返すこと
+
+**delete**
+- [x] 存在するIDを削除するとvoidを返すこと
+
+---
+
+### AdminMembers E2E `backend/src/admin-members/admin-members.e2e-spec.ts`
+
+**GET /admin/members**
+- [x] ページネーション付き会員一覧を返すこと
+- [x] passwordがレスポンスに含まれないこと
+
+**GET /admin/members/:id**
+- [x] 注文履歴を含む会員詳細を返すこと
+- [x] passwordがレスポンスに含まれないこと
+
+**DELETE /admin/members/:id**
+- [x] general管理者は403になること
+- [x] super管理者は204で削除できること
+
+---
 ### AdminJwtStrategy `backend/src/auth/strategies/admin-jwt.strategy.spec.ts`
 
 **validate**
