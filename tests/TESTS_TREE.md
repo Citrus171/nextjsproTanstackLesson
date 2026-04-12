@@ -456,13 +456,24 @@ nestjspro/
         │   │       ├── checkout.session.completed受信後に注文ステータスをpaidにすること ✓
         │   │       ├── checkout.session.completed受信後にカートをpurchasedに更新すること ✓
         │   │       └── 処理後にstripe_eventsにevent_idをINSERTすること ✓
-        │   └── payments.controller.spec.ts
-        │       ├── createCheckoutSession
-        │       │   ├── checkout URLを返すこと ✓
-        │       │   └── カートが空の場合はBadRequestExceptionが伝播すること ✓
-        │       └── handleWebhook
-        │           ├── Stripe-Signatureヘッダーをサービスに渡すこと ✓
-        │           └── 署名検証失敗時はBadRequestExceptionが伝播すること ✓
+        │   ├── payments.controller.spec.ts
+        │   │   ├── createCheckoutSession
+        │   │   │   ├── checkout URLを返すこと ✓
+        │   │   │   └── カートが空の場合はBadRequestExceptionが伝播すること ✓
+        │   │   └── handleWebhook
+        │   │       ├── Stripe-Signatureヘッダーをサービスに渡すこと ✓
+        │   │       └── 署名検証失敗時はBadRequestExceptionが伝播すること ✓
+        │   └── payments.e2e-spec.ts
+        │       ├── POST /payments/checkout
+        │       │   ├── JWTなしで401を返すこと ✓
+        │       │   ├── カートが空のユーザーがリクエストすると400を返すこと ✓
+        │       │   └── カートに商品があるユーザーがリクエストするとStripe checkout URLを返すこと ✓
+        │       └── POST /payments/webhook
+        │           ├── 無効なStripe署名の場合400を返すこと ✓
+        │           ├── checkout.session.completed以外のイベントは無視して200を返すこと ✓
+        │           ├── checkout.session.completedで注文ステータスがpaidに更新されること ✓
+        │           ├── checkout.session.completedでカートがpurchasedに更新されること ✓
+        │           └── 同一イベントIDを2回受信しても二重処理しないこと（冪等性） ✓
 └── frontend/
     └── src/
         ├── lib/

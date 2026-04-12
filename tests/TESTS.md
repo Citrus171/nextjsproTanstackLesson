@@ -766,6 +766,22 @@
 
 ---
 
+### Payments E2E `backend/src/payments/payments.e2e-spec.ts`
+
+**POST /payments/checkout**
+- [x] JWTなしで401を返すこと
+- [x] カートが空のユーザーがリクエストすると400を返すこと
+- [x] カートに商品があるユーザーがリクエストするとStripe checkout URLを返すこと
+
+**POST /payments/webhook**
+- [x] 無効なStripe署名の場合400を返すこと
+- [x] checkout.session.completed以外のイベントは無視して200を返すこと
+- [x] checkout.session.completedで注文ステータスがpaidに更新されること
+- [x] checkout.session.completedでカートがpurchasedに更新されること
+- [x] 同一イベントIDを2回受信しても二重処理しないこと（冪等性）
+
+---
+
 ## レイアウト・共有コンポーネント
 
 ### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`

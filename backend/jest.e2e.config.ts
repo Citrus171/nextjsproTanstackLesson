@@ -8,6 +8,7 @@ const config: Config = {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
   testEnvironment: 'node',
+  forceExit: true,
 };
 
 export default config;
