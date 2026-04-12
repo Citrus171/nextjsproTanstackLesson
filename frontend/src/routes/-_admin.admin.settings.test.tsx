@@ -6,6 +6,13 @@ import { AdminStoreSettingsPage } from "@/components/pages/AdminStoreSettingsPag
 const mockGetSettings = vi.fn();
 const mockUpdateSettings = vi.fn();
 
+const mockGetAdminToken = vi.hoisted(() =>
+  vi.fn().mockReturnValue("test-token"),
+);
+const mockDecodeAdminToken = vi.hoisted(() =>
+  vi.fn().mockReturnValue({ sub: 1, role: "super", type: "admin" }),
+);
+
 vi.mock("@/api/generated/sdk.gen", () => ({
   storeSettingsControllerGetSettings: (...args: unknown[]) =>
     mockGetSettings(...args),
@@ -14,12 +21,8 @@ vi.mock("@/api/generated/sdk.gen", () => ({
 }));
 
 vi.mock("@/lib/auth", () => ({
-  getAdminToken: () => "test-token",
-  decodeAdminToken: () => ({
-    sub: 1,
-    role: "super",
-    type: "admin",
-  }),
+  getAdminToken: mockGetAdminToken,
+  decodeAdminToken: mockDecodeAdminToken,
 }));
 
 vi.mock("sonner", () => ({
@@ -32,6 +35,8 @@ vi.mock("sonner", () => ({
 describe("AdminStoreSettingsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetAdminToken.mockReturnValue("test-token");
+    mockDecodeAdminToken.mockReturnValue({ sub: 1, role: "super", type: "admin" });
   });
 
   it("設定取得成功時、現在の設定値をフォームに表示すること", async () => {
@@ -196,5 +201,63 @@ describe("AdminStoreSettingsPage", () => {
     });
 
     expect(mockUpdateSettings).not.toHaveBeenCalled();
+  });
+
+  it("JWTトークンのデコードに失敗した場合、エラーメッセージを表示すること", async () => {
+    mockGetSettings.mockResolvedValue({
+      data: {
+        id: 1,
+        invoiceNumber: "T1234567890123",
+        shippingFixedFee: 800,
+        shippingFreeThreshold: 5000,
+        updatedAt: "2026-04-12T00:00:00Z",
+      },
+      error: undefined,
+    });
+    mockDecodeAdminToken.mockImplementationOnce(() => {
+      throw new Error("Invalid token");
+    });
+
+    render(<AdminStoreSettingsPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("認証情報が無効です。再度ログインしてください"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("更新APIのレスポンス形式が不正な場合、エラーメッセージを表示すること", async () => {
+    const user = userEvent.setup();
+
+    mockGetSettings.mockResolvedValue({
+      data: {
+        id: 1,
+        invoiceNumber: "T1234567890123",
+        shippingFixedFee: 800,
+        shippingFreeThreshold: 5000,
+        updatedAt: "2026-04-12T00:00:00Z",
+      },
+      error: undefined,
+    });
+    mockUpdateSettings.mockResolvedValue({
+      data: { invalid: "response" },
+      error: undefined,
+    });
+
+    render(<AdminStoreSettingsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("配送料（1円以上）")).toHaveValue(800);
+    });
+
+    const fixedFeeInput = screen.getByLabelText("配送料（1円以上）");
+    await user.clear(fixedFeeInput);
+    await user.type(fixedFeeInput, "1000");
+    await user.click(screen.getByRole("button", { name: "更新" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("更新に失敗しました")).toBeInTheDocument();
+    });
   });
 });

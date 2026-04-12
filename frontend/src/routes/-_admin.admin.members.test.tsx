@@ -127,4 +127,90 @@ describe("AdminMembersPage", () => {
       expect.objectContaining({ method: "DELETE" }),
     );
   });
+
+  it("会員一覧の取得に失敗したとき、エラーメッセージが表示されること", async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 500 });
+
+    render(<AdminMembersPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("会員一覧の取得に失敗しました"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("会員詳細の取得に失敗したとき、エラーメッセージが表示されること", async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: 1,
+              name: "一般会員",
+              email: "user@example.com",
+              createdAt: "2026-04-12T00:00:00Z",
+              deletedAt: null,
+            },
+          ],
+          page: 1,
+          limit: 20,
+          total: 1,
+        }),
+      })
+      .mockResolvedValueOnce({ ok: false, status: 404 });
+
+    const user = userEvent.setup();
+    render(<AdminMembersPage />);
+
+    await waitFor(() =>
+      expect(screen.getByText("user@example.com")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByRole("button", { name: "詳細" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("会員詳細の取得に失敗しました"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("会員削除に失敗したとき、エラーメッセージが表示されること", async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: 1,
+              name: "一般会員",
+              email: "user@example.com",
+              createdAt: "2026-04-12T00:00:00Z",
+              deletedAt: null,
+            },
+          ],
+          page: 1,
+          limit: 20,
+          total: 1,
+        }),
+      })
+      .mockResolvedValueOnce({ ok: false, status: 500 });
+
+    const user = userEvent.setup();
+    render(<AdminMembersPage />);
+
+    await waitFor(() =>
+      expect(screen.getByText("user@example.com")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByRole("button", { name: "削除" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("会員の削除に失敗しました"),
+      ).toBeInTheDocument();
+    });
+  });
 });
