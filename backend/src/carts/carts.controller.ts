@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
   Request,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CartsService } from './carts.service';
 import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth.guard';
 import { AddToCartDto } from './dto/add-to-cart.dto';
@@ -26,12 +26,14 @@ export class CartsController {
 
   @Get()
   @ApiOperation({ summary: 'カート取得' })
+  @ApiOkResponse({ type: [CartEntity] })
   async getCart(@Request() req: any): Promise<CartEntity[]> {
     return this.cartsService.getCart(req.user.id);
   }
 
   @Post()
   @ApiOperation({ summary: 'カート追加' })
+  @ApiOkResponse({ type: CartEntity })
   async addToCart(@Request() req: any, @Body() dto: AddToCartDto): Promise<CartEntity | null> {
     return this.cartsService.addToCart(req.user.id, dto);
   }

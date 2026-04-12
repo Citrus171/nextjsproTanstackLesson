@@ -21,7 +21,7 @@ export class CartsService {
     const sessionId = String(userId);
     return this.cartRepository.find({
       where: { sessionId, status: 'reserved' },
-      relations: ['variation'],
+      relations: { variation: { product: true } },
     });
   }
 
@@ -91,8 +91,7 @@ export class CartsService {
 
     return this.dataSource.transaction(async (manager) => {
       const cart = await manager.findOne(CartEntity, {
-        where: { id: cartId },
-        relations: ['variation'],
+        where: { id: cartId, status: 'reserved' },
       });
 
       if (!cart) {
@@ -106,8 +105,16 @@ export class CartsService {
       const oldQuantity = cart.quantity;
       const quantityDiff = newQuantity - oldQuantity;
 
-      // 在庫差分をチェック
-      const variation = cart.variation;
+      // variation を FOR UPDATE でロックし最新在庫を取得
+      const variation = await manager.findOne(ProductVariationEntity, {
+        where: { id: cart.variationId },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!variation) {
+        throw new NotFoundException('商品バリエーションが見つかりません');
+      }
+
       if (quantityDiff > 0 && variation.stock < quantityDiff) {
         throw new ConflictException('在庫が不足しています');
       }
@@ -139,7 +146,7 @@ export class CartsService {
 
     return this.dataSource.transaction(async (manager) => {
       const cart = await manager.findOne(CartEntity, {
-        where: { id: cartId },
+        where: { id: cartId, status: 'reserved' },
       });
 
       if (!cart) {
@@ -172,6 +179,7 @@ export class CartsService {
           status: 'reserved',
           expiresAt: LessThan(now),
         },
+        lock: { mode: 'pessimistic_write' },
       });
 
       for (const cart of expiredCarts) {

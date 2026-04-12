@@ -74,7 +74,7 @@ describe('CartsService', () => {
 
       expect(mockCartRepository.find).toHaveBeenCalledWith({
         where: { sessionId: '1', status: 'reserved' },
-        relations: ['variation'],
+        relations: { variation: { product: true } },
       });
       expect(result).toEqual(cartItems);
     });
@@ -222,12 +222,17 @@ describe('CartsService', () => {
 
       mockDataSource.transaction.mockImplementation((cb: any) => cb(mockManager));
 
-      mockManager.findOne.mockResolvedValue({
+      // 1回目: CartEntity
+      mockManager.findOne.mockResolvedValueOnce({
         id: cartItemId,
         sessionId: '1',
         quantity: 2,
         variationId: 100,
-        variation: { stock: 10 },
+      });
+      // 2回目: ProductVariationEntity (pessimistic_write)
+      mockManager.findOne.mockResolvedValueOnce({
+        id: 100,
+        stock: 10,
       });
 
       await service.updateItem(userId, cartItemId, { quantity: newQuantity });
@@ -254,12 +259,17 @@ describe('CartsService', () => {
 
       mockDataSource.transaction.mockImplementation((cb: any) => cb(mockManager));
 
-      mockManager.findOne.mockResolvedValue({
+      // 1回目: CartEntity
+      mockManager.findOne.mockResolvedValueOnce({
         id: cartItemId,
         sessionId: '1',
         quantity: 5,
         variationId: 100,
-        variation: { stock: 5 },
+      });
+      // 2回目: ProductVariationEntity (pessimistic_write)
+      mockManager.findOne.mockResolvedValueOnce({
+        id: 100,
+        stock: 5,
       });
 
       await service.updateItem(userId, cartItemId, { quantity: newQuantity });
@@ -284,12 +294,17 @@ describe('CartsService', () => {
 
       mockDataSource.transaction.mockImplementation((cb: any) => cb(mockManager));
 
-      mockManager.findOne.mockResolvedValue({
+      // 1回目: CartEntity
+      mockManager.findOne.mockResolvedValueOnce({
         id: cartItemId,
         sessionId: '1',
         quantity: 2,
         variationId: 100,
-        variation: { stock: 5 },
+      });
+      // 2回目: ProductVariationEntity（在庫不足）
+      mockManager.findOne.mockResolvedValueOnce({
+        id: 100,
+        stock: 5,
       });
 
       await expect(
