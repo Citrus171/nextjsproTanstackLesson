@@ -704,11 +704,4 @@ export const paymentsControllerHandleWebhook = <
     PaymentsControllerHandleWebhookResponses,
     unknown,
     ThrowOnError
-  >({
-    url: "/payments/webhook",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  >({ url: "/payments/webhook", ...options });

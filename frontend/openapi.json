@@ -1298,16 +1298,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Buffer"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
             "description": ""
@@ -1683,10 +1673,6 @@
           "city",
           "address1"
         ]
-      },
-      "Buffer": {
-        "type": "object",
-        "properties": {}
       }
     }
   }

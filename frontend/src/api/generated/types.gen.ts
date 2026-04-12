@@ -203,10 +203,6 @@ export type CreateCheckoutSessionDto = {
   address2?: string;
 };
 
-export type Buffer = {
-  [key: string]: unknown;
-};
-
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -770,7 +766,7 @@ export type PaymentsControllerCreateCheckoutSessionResponse =
   PaymentsControllerCreateCheckoutSessionResponses[keyof PaymentsControllerCreateCheckoutSessionResponses];
 
 export type PaymentsControllerHandleWebhookData = {
-  body: Buffer;
+  body?: never;
   headers: {
     "stripe-signature": string;
   };

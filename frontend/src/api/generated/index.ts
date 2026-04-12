@@ -77,7 +77,6 @@ export type {
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
   AuthControllerRegisterResponses,
-  Buffer,
   CartEntity,
   CartsControllerAddToCartData,
   CartsControllerAddToCartResponse,
