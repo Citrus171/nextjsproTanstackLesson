@@ -1311,7 +1311,26 @@
     "/admin/members": {
       "get": {
         "operationId": "AdminMembersController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1854,7 +1873,8 @@
             "type": "string"
           },
           "deletedAt": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         },
@@ -1937,7 +1957,7 @@
             "type": "string"
           },
           "address": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "createdAt": {
@@ -1945,7 +1965,8 @@
             "type": "string"
           },
           "deletedAt": {
-            "type": "object",
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "orders": {

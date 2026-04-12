@@ -1,48 +1,25 @@
 import { useEffect, useState } from "react";
-import { z } from "zod";
+import {
+  adminMembersControllerDelete,
+  adminMembersControllerFindAll,
+  adminMembersControllerFindById,
+} from "@/api/generated/sdk.gen";
+import type {
+  AdminMemberDetailDto,
+  AdminMemberListItemDto,
+} from "@/api/generated/types.gen";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { getAdminToken } from "@/lib/auth";
 
-const orderSchema = z.object({
-  id: z.number(),
-  status: z.string(),
-  totalAmount: z.number(),
-  createdAt: z.string(),
-});
-
-const memberSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string(),
-  createdAt: z.string(),
-  deletedAt: z.string().nullable(),
-});
-
-const memberDetailSchema = memberSchema.extend({
-  address: z.string().nullable(),
-  orders: z.array(orderSchema),
-});
-
-const memberListSchema = z.object({
-  items: z.array(memberSchema),
-  page: z.number(),
-  limit: z.number(),
-  total: z.number(),
-});
-
-type Member = z.infer<typeof memberSchema>;
-type MemberDetail = z.infer<typeof memberDetailSchema>;
-
-function formatDate(value: string | null) {
+function formatDate(value: string | null | undefined) {
   if (!value) return "-";
   return new Date(value).toLocaleString();
 }
 
 export function AdminMembersPage() {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [selectedMember, setSelectedMember] = useState<MemberDetail | null>(
-    null,
-  );
+  const [members, setMembers] = useState<AdminMemberListItemDto[]>([]);
+  const [selectedMember, setSelectedMember] =
+    useState<AdminMemberDetailDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -52,80 +29,50 @@ export function AdminMembersPage() {
   );
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    void fetchMembers();
-  }, []);
-
-  const fetchWithAuth = async (
-    input: RequestInfo,
-    init?: RequestInit,
-  ): Promise<Response> => {
-    const token = getAdminToken();
-    if (!token) {
-      throw new Error("管理者トークンがありません");
-    }
-
-    return fetch(input, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        ...(init?.headers as Record<string, string> | undefined),
-      },
-    });
-  };
-
   const fetchMembers = async () => {
     setLoading(true);
     setErrorMessage(null);
 
-    try {
-      const response = await fetchWithAuth("/admin/members?page=1&limit=20");
-      if (!response.ok) {
-        throw new Error("会員一覧の取得に失敗しました");
-      }
+    const { data, error } = await adminMembersControllerFindAll({
+      auth: getAdminToken() ?? undefined,
+      query: { page: 1, limit: 20 },
+      throwOnError: false,
+    });
 
-      const data = await response.json();
-      const parsed = memberListSchema.safeParse(data);
-      if (!parsed.success) {
-        throw new Error("会員一覧のデータ形式が不正です");
-      }
-
-      setMembers(parsed.data.items);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "会員一覧の取得に失敗しました",
-      );
-    } finally {
+    if (error) {
+      setErrorMessage("会員一覧の取得に失敗しました");
       setLoading(false);
+      return;
     }
+
+    setMembers(data?.items ?? []);
+    setLoading(false);
   };
+
+  useEffect(() => {
+    void fetchMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchMemberDetail = async (id: number) => {
     setDetailLoading(true);
     setDetailErrorMessage(null);
     setSuccessMessage(null);
 
-    try {
-      const response = await fetchWithAuth(`/admin/members/${id}`);
-      if (!response.ok) {
-        throw new Error("会員詳細の取得に失敗しました");
-      }
+    const { data, error } = await adminMembersControllerFindById({
+      auth: getAdminToken() ?? undefined,
+      path: { id },
+      throwOnError: false,
+    });
 
-      const data = await response.json();
-      const parsed = memberDetailSchema.safeParse(data);
-      if (!parsed.success) {
-        throw new Error("会員詳細のデータ形式が不正です");
-      }
-
-      setSelectedMember(parsed.data);
-    } catch (error) {
-      setDetailErrorMessage(
-        error instanceof Error ? error.message : "会員詳細の取得に失敗しました",
-      );
-    } finally {
+    if (error) {
+      setDetailErrorMessage("会員詳細の取得に失敗しました");
       setDetailLoading(false);
+      return;
     }
+
+    setSelectedMember(data ?? null);
+    setDetailLoading(false);
   };
 
   const handleDeleteMember = async (id: number) => {
@@ -134,28 +81,26 @@ export function AdminMembersPage() {
     setDetailErrorMessage(null);
     setSuccessMessage(null);
 
-    try {
-      const response = await fetchWithAuth(`/admin/members/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("会員の削除に失敗しました");
-      }
+    const { error } = await adminMembersControllerDelete({
+      auth: getAdminToken() ?? undefined,
+      path: { id },
+      throwOnError: false,
+    });
 
-      setSuccessMessage("会員を削除しました");
-      await fetchMembers();
-      if (selectedMember?.id === id) {
-        setSelectedMember((prev) =>
-          prev ? { ...prev, deletedAt: new Date().toISOString() } : null,
-        );
-      }
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "会員の削除に失敗しました",
-      );
-    } finally {
+    if (error) {
+      setErrorMessage("会員の削除に失敗しました");
       setDeleteLoading(false);
+      return;
     }
+
+    setSuccessMessage("会員を削除しました");
+    await fetchMembers();
+    if (selectedMember?.id === id) {
+      setSelectedMember((prev) =>
+        prev ? { ...prev, deletedAt: new Date().toISOString() } : null,
+      );
+    }
+    setDeleteLoading(false);
   };
 
   return (

@@ -42,6 +42,7 @@ const makeOrder = (overrides: Partial<OrderEntity> = {}): OrderEntity =>
 const mockRepository = <T extends object>(): MockRepository<T> => ({
   findAndCount: jest.fn(),
   findOneBy: jest.fn(),
+  findOne: jest.fn(),
   save: jest.fn(),
   find: jest.fn(),
 });
@@ -82,6 +83,7 @@ describe("AdminMembersService", () => {
         skip: 10,
         take: 10,
         order: { createdAt: "DESC" },
+        withDeleted: true,
       });
       expect(result).toEqual({
         items: [
@@ -104,12 +106,15 @@ describe("AdminMembersService", () => {
     it("存在するユーザーIDの詳細を返す", async () => {
       const user = makeUser();
       const order = makeOrder();
-      userRepo.findOneBy!.mockResolvedValue(user);
+      userRepo.findOne!.mockResolvedValue(user);
       orderRepo.find!.mockResolvedValue([order]);
 
       const result = await service.findById(1);
 
-      expect(userRepo.findOneBy).toHaveBeenCalledWith({ id: 1 });
+      expect(userRepo.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+        withDeleted: true,
+      });
       expect(orderRepo.find).toHaveBeenCalledWith({
         where: { userId: 1 },
         order: { createdAt: "DESC" },
@@ -133,7 +138,7 @@ describe("AdminMembersService", () => {
     });
 
     it("存在しないユーザーIDではNotFoundExceptionを投げる", async () => {
-      userRepo.findOneBy!.mockResolvedValue(null);
+      userRepo.findOne!.mockResolvedValue(null);
 
       await expect(service.findById(999)).rejects.toThrow(NotFoundException);
     });

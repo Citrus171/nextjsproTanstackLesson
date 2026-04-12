@@ -11,13 +11,13 @@ export class AdminMemberDetailDto {
   @ApiProperty()
   email: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   address: string | null;
 
   @ApiProperty()
   createdAt: Date;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, format: "date-time", nullable: true })
   deletedAt: Date | null;
 
   @ApiProperty({ type: [OrderSummaryDto] })

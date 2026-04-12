@@ -13,6 +13,6 @@ export class AdminMemberListItemDto {
   @ApiProperty()
   createdAt: Date;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, format: "date-time", nullable: true })
   deletedAt: Date | null;
 }

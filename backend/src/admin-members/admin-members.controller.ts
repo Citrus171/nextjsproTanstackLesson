@@ -10,7 +10,12 @@ import {
   DefaultValuePipe,
   NotFoundException,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from "@nestjs/swagger";
 import { AdminMembersService } from "./admin-members.service";
 import { AdminMemberListDto } from "./dto/admin-member-list.dto";
 import { AdminMemberDetailDto } from "./dto/admin-member-detail.dto";
@@ -26,6 +31,8 @@ export class AdminMembersController {
 
   @Get()
   @ApiOkResponse({ type: AdminMemberListDto })
+  @ApiQuery({ name: "page", required: false, type: Number, example: 1 })
+  @ApiQuery({ name: "limit", required: false, type: Number, example: 20 })
   async findAll(
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit = 20,

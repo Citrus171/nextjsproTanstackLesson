@@ -224,9 +224,7 @@ export type AdminMemberListItemDto = {
   name: string;
   email: string;
   createdAt: string;
-  deletedAt: {
-    [key: string]: unknown;
-  } | null;
+  deletedAt: string | null;
 };
 
 export type AdminMemberListDto = {
@@ -253,13 +251,9 @@ export type AdminMemberDetailDto = {
   id: number;
   name: string;
   email: string;
-  address: {
-    [key: string]: unknown;
-  } | null;
+  address: string | null;
   createdAt: string;
-  deletedAt: {
-    [key: string]: unknown;
-  } | null;
+  deletedAt: string | null;
   orders: Array<OrderSummaryDto>;
 };
 
@@ -842,7 +836,10 @@ export type PaymentsControllerHandleWebhookResponses = {
 export type AdminMembersControllerFindAllData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    limit?: number;
+    page?: number;
+  };
   url: "/admin/members";
 };
 

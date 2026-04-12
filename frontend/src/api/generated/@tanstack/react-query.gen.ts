@@ -1309,6 +1309,53 @@ export const adminMembersControllerFindAllOptions = (
     queryKey: adminMembersControllerFindAllQueryKey(options),
   });
 
+export const adminMembersControllerFindAllInfiniteQueryKey = (
+  options?: Options<AdminMembersControllerFindAllData>,
+): QueryKey<Options<AdminMembersControllerFindAllData>> =>
+  createQueryKey("adminMembersControllerFindAll", options, true);
+
+export const adminMembersControllerFindAllInfiniteOptions = (
+  options?: Options<AdminMembersControllerFindAllData>,
+) =>
+  infiniteQueryOptions<
+    AdminMembersControllerFindAllResponse,
+    DefaultError,
+    InfiniteData<AdminMembersControllerFindAllResponse>,
+    QueryKey<Options<AdminMembersControllerFindAllData>>,
+    | number
+    | Pick<
+        QueryKey<Options<AdminMembersControllerFindAllData>>[0],
+        "body" | "headers" | "path" | "query"
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<AdminMembersControllerFindAllData>>[0],
+          "body" | "headers" | "path" | "query"
+        > =
+          typeof pageParam === "object"
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await adminMembersControllerFindAll({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: adminMembersControllerFindAllInfiniteQueryKey(options),
+    },
+  );
+
 export const adminMembersControllerDeleteMutation = (
   options?: Partial<Options<AdminMembersControllerDeleteData>>,
 ): UseMutationOptions<

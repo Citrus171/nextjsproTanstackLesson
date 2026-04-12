@@ -24,6 +24,7 @@ export class AdminMembersService {
       skip,
       take,
       order: { createdAt: "DESC" },
+      withDeleted: true,
     });
 
     const items = users.map((user) => this.toListItemDto(user));
@@ -36,7 +37,10 @@ export class AdminMembersService {
   }
 
   async findById(id: number): Promise<AdminMemberDetailDto> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
     if (!user) {
       throw new NotFoundException("ユーザーが見つかりません");
     }
