@@ -850,6 +850,7 @@
 - [x] pendingでstripeSessionIdがあっても返金しないこと
 - [x] payment_statusがpaidでない場合はcancelledのまま返金しないこと
 - [x] Stripe返金APIが失敗した場合、InternalServerErrorExceptionを投げること
+- [x] sessions.retrieve が失敗した場合、InternalServerErrorExceptionを投げること
 - [x] deliveredの注文はキャンセル不可でBadRequestExceptionを投げること
 - [x] 存在しない注文IDではNotFoundExceptionを投げること
 
@@ -896,6 +897,7 @@
 - [x] キャンセル・返金ボタンで注文をキャンセルでき、詳細が再取得されること
 - [x] 注文一覧の取得に失敗したとき、エラーメッセージが表示されること
 - [x] 注文詳細の取得に失敗したとき、エラーメッセージが表示されること
+- [x] 詳細取得に失敗したとき、前回の詳細が残らないこと
 - [x] ステータス更新に失敗したとき、エラーメッセージが表示されること
 - [x] キャンセルに失敗したとき、エラーメッセージが表示されること
 

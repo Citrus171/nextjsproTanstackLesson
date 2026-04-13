@@ -10,8 +10,6 @@ import { Repository } from "typeorm";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const StripeLib = require("stripe");
 import { OrderEntity, OrderStatus } from "../orders/entities/order.entity";
-import { OrderItemEntity } from "../orders/entities/order-item.entity";
-import { UserEntity } from "../users/entities/user.entity";
 import { AdminOrderListDto } from "./dto/admin-order-list.dto";
 import { AdminOrderDetailDto } from "./dto/admin-order-detail.dto";
 
@@ -33,10 +31,6 @@ export class AdminOrdersService {
   constructor(
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
-    @InjectRepository(OrderItemEntity)
-    private readonly orderItemRepository: Repository<OrderItemEntity>,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
   ) {
     this.stripe = new StripeLib(
       process.env.STRIPE_SECRET_KEY ?? "sk_test_dummy",
@@ -149,25 +143,25 @@ export class AdminOrdersService {
       return;
     }
 
-    const session = await this.stripe.checkout.sessions.retrieve(
-      order.stripeSessionId,
-    );
-
-    // payment_statusがpaidでない場合（未決済）は返金しない
-    if (session.payment_status !== "paid" || !session.payment_intent) {
-      return;
-    }
-
-    const paymentIntentId =
-      typeof session.payment_intent === "string"
-        ? session.payment_intent
-        : (session.payment_intent as { id: string }).id;
-
     try {
+      const session = await this.stripe.checkout.sessions.retrieve(
+        order.stripeSessionId,
+      );
+
+      // payment_statusがpaidでない場合（未決済）は返金しない
+      if (session.payment_status !== "paid" || !session.payment_intent) {
+        return;
+      }
+
+      const paymentIntentId =
+        typeof session.payment_intent === "string"
+          ? session.payment_intent
+          : (session.payment_intent as { id: string }).id;
+
       await this.stripe.refunds.create({ payment_intent: paymentIntentId });
     } catch (error) {
       this.logger.error(
-        `Stripe返金失敗: orderId=${order.id}, paymentIntentId=${paymentIntentId}`,
+        `Stripe返金失敗: orderId=${order.id}, stripeSessionId=${order.stripeSessionId}`,
         error,
       );
       throw new InternalServerErrorException("Stripe返金処理に失敗しました");

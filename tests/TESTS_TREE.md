@@ -493,6 +493,7 @@ nestjspro/
         │   │       ├── pendingでstripeSessionIdがあっても返金しないこと ✓
         │   │       ├── payment_statusがpaidでない場合はcancelledのまま返金しないこと ✓
         │   │       ├── Stripe返金APIが失敗した場合、InternalServerErrorExceptionを投げること ✓
+        │   │       ├── sessions.retrieve が失敗した場合、InternalServerErrorExceptionを投げること ✓
         │   │       ├── deliveredの注文はキャンセル不可でBadRequestExceptionを投げること ✓
         │   │       └── 存在しない注文IDではNotFoundExceptionを投げること ✓
         │   └── admin-orders.controller.spec.ts
@@ -588,6 +589,7 @@ nestjspro/
         │   ├── キャンセル・返金ボタンで注文をキャンセルでき、詳細が再取得されること ✓
         │   ├── 注文一覧の取得に失敗したとき、エラーメッセージが表示されること ✓
         │   ├── 注文詳細の取得に失敗したとき、エラーメッセージが表示されること ✓
+        │   ├── 詳細取得に失敗したとき、前回の詳細が残らないこと ✓
         │   ├── ステータス更新に失敗したとき、エラーメッセージが表示されること ✓
         │   └── キャンセルに失敗したとき、エラーメッセージが表示されること ✓
         ├── -admin.login.test.tsx

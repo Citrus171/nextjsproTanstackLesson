@@ -60,6 +60,7 @@ export function AdminOrdersPage() {
     setDetailLoading(true);
     setDetailErrorMessage(null);
     setSuccessMessage(null);
+    setSelectedOrder(null);
 
     const { data, error } = await adminOrdersControllerFindById({
       auth: getAdminToken() ?? undefined,

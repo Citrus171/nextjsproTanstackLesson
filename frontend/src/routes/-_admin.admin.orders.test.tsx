@@ -195,6 +195,36 @@ describe("AdminOrdersPage", () => {
     });
   });
 
+  it("詳細取得に失敗したとき、前回の詳細が残らないこと", async () => {
+    // 1回目: 詳細取得成功
+    mockFindAll.mockResolvedValue(orderListResponse());
+    mockFindById
+      .mockResolvedValueOnce(orderDetailResponse())
+      .mockResolvedValueOnce({ data: undefined, error: { message: "Not Found" } });
+
+    const user = userEvent.setup();
+    render(<AdminOrdersPage />);
+
+    await waitFor(() =>
+      expect(screen.getByText("yamada@example.com")).toBeInTheDocument(),
+    );
+
+    // 1回目クリック: 詳細が表示される
+    await user.click(screen.getByRole("button", { name: "詳細" }));
+    await waitFor(() =>
+      expect(screen.getByText("テストシャツ")).toBeInTheDocument(),
+    );
+
+    // 2回目クリック: 取得失敗 → 前回の詳細が消えてエラーのみ表示
+    await user.click(screen.getByRole("button", { name: "詳細" }));
+    await waitFor(() =>
+      expect(
+        screen.getByText("注文詳細の取得に失敗しました"),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("テストシャツ")).not.toBeInTheDocument();
+  });
+
   it("ステータス更新に失敗したとき、エラーメッセージが表示されること", async () => {
     mockFindAll.mockResolvedValue(orderListResponse());
     mockFindById.mockResolvedValue(orderDetailResponse());

@@ -81,9 +81,6 @@ jest.mock("stripe", () => {
 describe("AdminOrdersService", () => {
   let service: AdminOrdersService;
   let orderRepo: MockRepo<OrderEntity>;
-  // orderItemRepo と userRepo はDI配線確認のために提供するが、テストから直接参照しない
-  let _orderItemRepo: MockRepo<OrderItemEntity>;
-  let _userRepo: MockRepo<UserEntity>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -95,21 +92,11 @@ describe("AdminOrdersService", () => {
           provide: getRepositoryToken(OrderEntity),
           useValue: mockRepo<OrderEntity>(),
         },
-        {
-          provide: getRepositoryToken(OrderItemEntity),
-          useValue: mockRepo<OrderItemEntity>(),
-        },
-        {
-          provide: getRepositoryToken(UserEntity),
-          useValue: mockRepo<UserEntity>(),
-        },
       ],
     }).compile();
 
     service = module.get<AdminOrdersService>(AdminOrdersService);
     orderRepo = module.get(getRepositoryToken(OrderEntity));
-    _orderItemRepo = module.get(getRepositoryToken(OrderItemEntity));
-    _userRepo = module.get(getRepositoryToken(UserEntity));
   });
 
   // ────────────────────────────────────────────────
@@ -371,6 +358,21 @@ describe("AdminOrdersService", () => {
       await expect(service.cancelOrder(1)).rejects.toThrow(
         InternalServerErrorException,
       );
+    });
+
+    it("sessions.retrieve が失敗した場合、InternalServerErrorExceptionを投げること", async () => {
+      const order = makeOrder({ status: "paid", stripeSessionId: "cs_test_abc" });
+      orderRepo.findOne!.mockResolvedValue(order);
+      orderRepo.save!.mockResolvedValue(order);
+      mockStripe.checkout.sessions.retrieve.mockRejectedValue(
+        new Error("Stripe network error"),
+      );
+
+      await expect(service.cancelOrder(1)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      // refunds.create は呼ばれないこと
+      expect(mockStripe.refunds.create).not.toHaveBeenCalled();
     });
 
     it("deliveredの注文はキャンセル不可でBadRequestExceptionを投げること", async () => {

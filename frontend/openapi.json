@@ -2245,8 +2245,7 @@
             "type": "string"
           },
           "address2": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "required": [

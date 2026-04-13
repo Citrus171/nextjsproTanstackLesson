@@ -289,7 +289,7 @@ export type ShippingAddressDto = {
   prefecture: string;
   city: string;
   address1: string;
-  address2?: string | null;
+  address2?: string;
 };
 
 export type AdminOrderItemDto = {

@@ -15,7 +15,7 @@ export class ShippingAddressDto {
   @ApiProperty()
   address1: string;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ required: false })
   address2?: string;
 }
 
