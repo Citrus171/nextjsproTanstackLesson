@@ -817,6 +817,20 @@
 - [x] checkout.session.completed受信後に注文ステータスをpaidにすること
 - [x] checkout.session.completed受信後にカートをpurchasedに更新すること
 - [x] 処理後にstripe_eventsにevent_idをINSERTすること
+- [x] checkout.session.completed受信後にメール送信が呼ばれること
+- [x] メール送信が失敗してもWebhookが正常完了すること
+- [x] 無効署名の時はメール送信が呼ばれないこと
+- [x] checkout.session.completed以外のイベントはメール送信されないこと
+
+---
+
+### MailService `backend/src/mail/mail.service.spec.ts`
+
+**sendOrderConfirmation**
+- [x] 注文したユーザーのメールアドレスに送信されること
+- [x] 件名に注文番号が含まれること
+- [x] order-confirmation テンプレートが使用されること
+- [x] テンプレートに注文番号・商品一覧・配送料・合計・配送先が渡されること
 
 ---
 

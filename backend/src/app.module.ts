@@ -1,7 +1,9 @@
 import { Module } from "@nestjs/common";
+import { APP_FILTER } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ScheduleModule } from "@nestjs/schedule";
 import { LoggerModule } from "nestjs-pino";
+import { SentryModule, SentryGlobalFilter } from "@sentry/nestjs/setup";
 import { UsersModule } from "./users/users.module";
 import { UserEntity } from "./users/entities/user.entity";
 import { AuthModule } from "./auth/auth.module";
@@ -26,6 +28,7 @@ import { StripeEventEntity } from "./payments/entities/stripe-event.entity";
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.LOG_LEVEL ?? "info",
@@ -72,6 +75,12 @@ import { StripeEventEntity } from "./payments/entities/stripe-event.entity";
     PaymentsModule,
     AdminMembersModule,
     AdminOrdersModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
   ],
 })
 export class AppModule {}

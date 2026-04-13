@@ -524,6 +524,13 @@ nestjspro/
         │       │   └── ステータス更新をサービスに委譲してvoidを返すこと ✓
         │       └── cancelOrder
         │           └── キャンセルをサービスに委譲してvoidを返すこと ✓
+        ├── mail/
+        │   └── mail.service.spec.ts
+        │       └── sendOrderConfirmation
+        │           ├── 注文したユーザーのメールアドレスに送信されること ✓
+        │           ├── 件名に注文番号が含まれること ✓
+        │           ├── order-confirmation テンプレートが使用されること ✓
+        │           └── テンプレートに注文番号・商品一覧・配送料・合計・配送先が渡されること ✓
         ├── payments/
         │   ├── payments.service.spec.ts
         │   │   ├── createCheckoutSession
@@ -539,7 +546,11 @@ nestjspro/
         │   │       ├── 処理済みのevent_idは二重処理しないこと ✓
         │   │       ├── checkout.session.completed受信後に注文ステータスをpaidにすること ✓
         │   │       ├── checkout.session.completed受信後にカートをpurchasedに更新すること ✓
-        │   │       └── 処理後にstripe_eventsにevent_idをINSERTすること ✓
+        │   │       ├── 処理後にstripe_eventsにevent_idをINSERTすること ✓
+        │   │       ├── checkout.session.completed受信後にメール送信が呼ばれること ✓
+        │   │       ├── メール送信が失敗してもWebhookが正常完了すること ✓
+        │   │       ├── 無効署名の時はメール送信が呼ばれないこと ✓
+        │   │       └── checkout.session.completed以外のイベントはメール送信されないこと ✓
         │   ├── payments.controller.spec.ts
         │   │   ├── createCheckoutSession
         │   │   │   ├── checkout URLを返すこと ✓

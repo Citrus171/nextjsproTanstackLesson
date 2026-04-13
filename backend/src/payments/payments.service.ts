@@ -9,6 +9,7 @@ import { OrderItemEntity } from "../orders/entities/order-item.entity";
 import { StoreSettingsEntity } from "../store-settings/entities/store-settings.entity";
 import { StripeEventEntity } from "./entities/stripe-event.entity";
 import { CreateCheckoutSessionDto } from "./dto/create-checkout-session.dto";
+import { MailService, OrderWithRelations } from "../mail/mail.service";
 
 @Injectable()
 export class PaymentsService {
@@ -28,6 +29,7 @@ export class PaymentsService {
     @InjectRepository(StripeEventEntity)
     private readonly stripeEventRepository: Repository<StripeEventEntity>,
     private readonly dataSource: DataSource,
+    private readonly mailService: MailService,
   ) {
     this.stripe = new StripeLib(
       process.env.STRIPE_SECRET_KEY ?? "sk_test_dummy",
@@ -233,5 +235,23 @@ export class PaymentsService {
         { status: "purchased" },
       );
     });
+
+    // トランザクション完了後にメール送信（失敗してもWebhookは200を返す）
+    try {
+      const orderWithRelations = await this.orderRepository.findOne({
+        where: { id: orderId },
+        relations: { user: true, items: true },
+      });
+      if (orderWithRelations) {
+        await this.mailService.sendOrderConfirmation(
+          orderWithRelations as OrderWithRelations,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `注文確認メール送信失敗: orderId=${orderId}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
   }
 }
