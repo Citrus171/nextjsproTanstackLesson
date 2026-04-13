@@ -49,6 +49,7 @@ export class UsersService {
 
   async findOrdersByUserId(userId: number): Promise<OrderEntity[]> {
     return this.orderRepository.find({
+      select: { id: true, status: true, totalAmount: true, createdAt: true },
       where: { userId },
       order: { createdAt: 'DESC' },
     });

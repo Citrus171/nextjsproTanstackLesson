@@ -94,8 +94,10 @@ describe('UsersController', () => {
   // ── PUT /users/me ──────────────────────────────────────────
   describe('updateProfile', () => {
     it('更新済みプロフィールを返すこと（passwordを除く）', async () => {
-      const user = makeUser({ name: '新しい名前', address: '東京都渋谷区' });
-      mockUsersService.updateProfile.mockResolvedValue(user);
+      const currentUser = makeUser();
+      const updatedUser = makeUser({ name: '新しい名前', address: '東京都渋谷区' });
+      mockUsersService.findById.mockResolvedValue(currentUser);
+      mockUsersService.updateProfile.mockResolvedValue(updatedUser);
 
       const result = await controller.updateProfile(
         { id: 1 },
@@ -107,11 +109,24 @@ describe('UsersController', () => {
       expect(result).toMatchObject({ name: '新しい名前', address: '東京都渋谷区' });
     });
 
-    it('address が undefined の時は null として渡すこと', async () => {
-      const user = makeUser({ address: null });
-      mockUsersService.updateProfile.mockResolvedValue(user);
+    it('address が undefined の時は現在の住所を維持すること', async () => {
+      const currentUser = makeUser({ address: '大阪府大阪市' });
+      const updatedUser = makeUser({ address: '大阪府大阪市' });
+      mockUsersService.findById.mockResolvedValue(currentUser);
+      mockUsersService.updateProfile.mockResolvedValue(updatedUser);
 
-      await controller.updateProfile({ id: 1 }, { name: '山田太郎', address: undefined as unknown as null });
+      await controller.updateProfile({ id: 1 }, { name: '山田太郎', address: undefined });
+
+      expect(mockUsersService.updateProfile).toHaveBeenCalledWith(1, '山田太郎', '大阪府大阪市');
+    });
+
+    it('address が null の時は住所を削除すること', async () => {
+      const currentUser = makeUser({ address: '大阪府大阪市' });
+      const updatedUser = makeUser({ address: null });
+      mockUsersService.findById.mockResolvedValue(currentUser);
+      mockUsersService.updateProfile.mockResolvedValue(updatedUser);
+
+      await controller.updateProfile({ id: 1 }, { name: '山田太郎', address: null });
 
       expect(mockUsersService.updateProfile).toHaveBeenCalledWith(1, '山田太郎', null);
     });

@@ -62,6 +62,15 @@ export function MyPage() {
         usersControllerGetOrders({ auth: token, throwOnError: false }),
       ]);
 
+      if (profileRes.error) {
+        const status = (profileRes.error as { status?: number }).status;
+        if (status === 401) {
+          removeToken();
+          void navigate({ to: "/login" });
+          return;
+        }
+      }
+
       if (profileRes.data) {
         setProfile(profileRes.data);
         setName(profileRes.data.name);
@@ -76,7 +85,7 @@ export function MyPage() {
     };
 
     void fetchData();
-  }, []);
+  }, [navigate]);
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

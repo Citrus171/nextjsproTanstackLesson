@@ -28,10 +28,12 @@ export class UsersController {
     @CurrentUser() user: { id: number },
     @Body() body: UpdateUserProfileDto,
   ): Promise<UserProfileDto> {
+    const currentUser = await this.usersService.findById(user.id);
+    const nextAddress = body.address === undefined ? currentUser.address : body.address;
     const { password: _password, ...profile } = await this.usersService.updateProfile(
       user.id,
       body.name,
-      body.address ?? null,
+      nextAddress,
     );
     return profile;
   }

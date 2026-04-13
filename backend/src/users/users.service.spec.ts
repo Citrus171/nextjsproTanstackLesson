@@ -229,6 +229,7 @@ describe('UsersService', () => {
       const result = await service.findOrdersByUserId(1);
 
       expect(orderRepo.find).toHaveBeenCalledWith({
+        select: { id: true, status: true, totalAmount: true, createdAt: true },
         where: { userId: 1 },
         order: { createdAt: 'DESC' },
       });
