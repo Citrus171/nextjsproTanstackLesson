@@ -98,6 +98,12 @@ import type {
   UsersControllerChangePasswordResponses,
   UsersControllerGetMeData,
   UsersControllerGetMeResponses,
+  UsersControllerGetOrdersData,
+  UsersControllerGetOrdersResponses,
+  UsersControllerUpdateProfileData,
+  UsersControllerUpdateProfileResponses,
+  UsersControllerWithdrawData,
+  UsersControllerWithdrawResponses,
 } from "./types.gen";
 
 export type Options<
@@ -118,6 +124,19 @@ export type Options<
   meta?: Record<string, unknown>;
 };
 
+export const usersControllerWithdraw = <ThrowOnError extends boolean = false>(
+  options?: Options<UsersControllerWithdrawData, ThrowOnError>,
+) =>
+  (options?.client ?? client).delete<
+    UsersControllerWithdrawResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/users/me",
+    ...options,
+  });
+
 export const usersControllerGetMe = <ThrowOnError extends boolean = false>(
   options?: Options<UsersControllerGetMeData, ThrowOnError>,
 ) =>
@@ -129,6 +148,25 @@ export const usersControllerGetMe = <ThrowOnError extends boolean = false>(
     security: [{ scheme: "bearer", type: "http" }],
     url: "/users/me",
     ...options,
+  });
+
+export const usersControllerUpdateProfile = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UsersControllerUpdateProfileData, ThrowOnError>,
+) =>
+  (options.client ?? client).put<
+    UsersControllerUpdateProfileResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/users/me",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
   });
 
 export const usersControllerChangePassword = <
@@ -148,6 +186,19 @@ export const usersControllerChangePassword = <
       "Content-Type": "application/json",
       ...options.headers,
     },
+  });
+
+export const usersControllerGetOrders = <ThrowOnError extends boolean = false>(
+  options?: Options<UsersControllerGetOrdersData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    UsersControllerGetOrdersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/users/me/orders",
+    ...options,
   });
 
 export const authControllerRegister = <ThrowOnError extends boolean = false>(

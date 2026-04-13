@@ -49,6 +49,9 @@ export {
   storeSettingsControllerUpdateSettings,
   usersControllerChangePassword,
   usersControllerGetMe,
+  usersControllerGetOrders,
+  usersControllerUpdateProfile,
+  usersControllerWithdraw,
 } from "./sdk.gen";
 export type {
   AddImageDto,
@@ -189,6 +192,7 @@ export type {
   UpdateOrderStatusDto,
   UpdateProductDto,
   UpdateStoreSettingsDto,
+  UpdateUserProfileDto,
   UpdateVariationDto,
   UserProfileDto,
   UsersControllerChangePasswordData,
@@ -197,4 +201,13 @@ export type {
   UsersControllerGetMeData,
   UsersControllerGetMeResponse,
   UsersControllerGetMeResponses,
+  UsersControllerGetOrdersData,
+  UsersControllerGetOrdersResponse,
+  UsersControllerGetOrdersResponses,
+  UsersControllerUpdateProfileData,
+  UsersControllerUpdateProfileResponse,
+  UsersControllerUpdateProfileResponses,
+  UsersControllerWithdrawData,
+  UsersControllerWithdrawResponse,
+  UsersControllerWithdrawResponses,
 } from "./types.gen";

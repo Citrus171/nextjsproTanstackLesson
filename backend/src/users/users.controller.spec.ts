@@ -1,5 +1,6 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { OrderEntity } from '../orders/entities/order.entity';
 import { UserEntity } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -19,7 +20,20 @@ const makeUser = (overrides: Partial<UserEntity> = {}): UserEntity =>
 const mockUsersService = {
   findById: jest.fn(),
   changePassword: jest.fn(),
+  updateProfile: jest.fn(),
+  findOrdersByUserId: jest.fn(),
+  withdraw: jest.fn(),
 };
+
+const makeOrder = (overrides: Partial<OrderEntity> = {}): OrderEntity =>
+  Object.assign(new OrderEntity(), {
+    id: 1,
+    userId: 1,
+    status: 'paid' as const,
+    totalAmount: 5000,
+    createdAt: new Date('2024-06-01'),
+    ...overrides,
+  });
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -74,6 +88,65 @@ describe('UsersController', () => {
       await expect(
         controller.changePassword({ id: 1 }, { currentPassword: 'wrong', newPassword: 'newPass123' }),
       ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  // ── PUT /users/me ──────────────────────────────────────────
+  describe('updateProfile', () => {
+    it('更新済みプロフィールを返すこと（passwordを除く）', async () => {
+      const user = makeUser({ name: '新しい名前', address: '東京都渋谷区' });
+      mockUsersService.updateProfile.mockResolvedValue(user);
+
+      const result = await controller.updateProfile(
+        { id: 1 },
+        { name: '新しい名前', address: '東京都渋谷区' },
+      );
+
+      expect(mockUsersService.updateProfile).toHaveBeenCalledWith(1, '新しい名前', '東京都渋谷区');
+      expect(result).not.toHaveProperty('password');
+      expect(result).toMatchObject({ name: '新しい名前', address: '東京都渋谷区' });
+    });
+
+    it('address が undefined の時は null として渡すこと', async () => {
+      const user = makeUser({ address: null });
+      mockUsersService.updateProfile.mockResolvedValue(user);
+
+      await controller.updateProfile({ id: 1 }, { name: '山田太郎', address: undefined as unknown as null });
+
+      expect(mockUsersService.updateProfile).toHaveBeenCalledWith(1, '山田太郎', null);
+    });
+  });
+
+  // ── GET /users/me/orders ───────────────────────────────────
+  describe('getOrders', () => {
+    it('注文一覧を返すこと', async () => {
+      const orders = [makeOrder({ id: 2 }), makeOrder({ id: 1 })];
+      mockUsersService.findOrdersByUserId.mockResolvedValue(orders);
+
+      const result = await controller.getOrders({ id: 1 });
+
+      expect(mockUsersService.findOrdersByUserId).toHaveBeenCalledWith(1);
+      expect(result).toEqual(orders);
+    });
+
+    it('注文がない場合は空配列を返すこと', async () => {
+      mockUsersService.findOrdersByUserId.mockResolvedValue([]);
+
+      const result = await controller.getOrders({ id: 1 });
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ── DELETE /users/me ───────────────────────────────────────
+  describe('withdraw', () => {
+    it('退会成功時に undefined を返すこと', async () => {
+      mockUsersService.withdraw.mockResolvedValue(undefined);
+
+      const result = await controller.withdraw({ id: 1 });
+
+      expect(mockUsersService.withdraw).toHaveBeenCalledWith(1);
+      expect(result).toBeUndefined();
     });
   });
 });

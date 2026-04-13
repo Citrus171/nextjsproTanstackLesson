@@ -193,7 +193,9 @@
 ### JwtStrategy `backend/src/auth/jwt.strategy.spec.ts`
 
 **validate**
-- [ ] 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
+- [x] 有効なJWTペイロードかつ存在するユーザーの時、idを返すこと
+- [x] type が "user" でない時、UnauthorizedExceptionを投げること
+- [x] 論理削除済みユーザーの時（findByIdがNotFoundExceptionを投げる）、UnauthorizedExceptionを投げること
 
 ---
 
@@ -421,35 +423,57 @@
 ### UsersService `backend/src/users/users.service.spec.ts`
 
 **create**
-- [ ] 新規ユーザーを作成してname・emailを保存しパスワードをハッシュ化する
-- [ ] 既存メールアドレスはConflictExceptionを投げる
-- [ ] ConflictException時はsaveを呼ばない
+- [x] 新規ユーザーを作成してname・emailを保存しパスワードをハッシュ化する
+- [x] 既存メールアドレスはConflictExceptionを投げる
+- [x] ConflictException時はsaveを呼ばない
 
 **findByEmail**
-- [ ] 存在するメールアドレスのユーザーを返す
-- [ ] 存在しないメールアドレスはnullを返す
+- [x] 存在するメールアドレスのユーザーを返す
+- [x] 存在しないメールアドレスはnullを返す
 - [x] 論理削除済みユーザーはnullを返す（TypeORMが@DeleteDateColumnで自動除外）
 
 **findById**
-- [ ] 存在するIDのユーザーを返す
-- [ ] 存在しないIDはNotFoundExceptionを投げる
+- [x] 存在するIDのユーザーを返す
+- [x] 存在しないIDはNotFoundExceptionを投げる
 
 **changePassword**
-- [ ] 正しい現在のパスワードの時、新しいパスワードをハッシュ化して保存する
-- [ ] 現在のパスワードが不一致の時、UnauthorizedExceptionを投げる
-- [ ] パスワード不一致の時はupdateを呼ばない
+- [x] 正しい現在のパスワードの時、新しいパスワードをハッシュ化して保存する
+- [x] 現在のパスワードが不一致の時、UnauthorizedExceptionを投げる
+- [x] パスワード不一致の時はupdateを呼ばない
+
+**updateProfile**
+- [x] name と address を更新して更新済みユーザーを返すこと
+- [x] address に null を渡すと住所が削除されること
+
+**findOrdersByUserId**
+- [x] ユーザーの注文を createdAt DESC 順で返すこと
+- [x] 注文がない場合は空配列を返すこと
+
+**withdraw**
+- [x] softDelete でユーザーを論理削除すること
 
 ---
 
 ### UsersController `backend/src/users/users.controller.spec.ts`
 
 **getMe**
-- [ ] 認証済みユーザーのプロフィールを返すこと（passwordを除く）
-- [ ] ユーザーが存在しない時、NotFoundExceptionが伝播すること
+- [x] 認証済みユーザーのプロフィールを返すこと（passwordを除く）
+- [x] ユーザーが存在しない時、NotFoundExceptionが伝播すること
 
 **changePassword**
-- [ ] 正しい現在のパスワードの時、204を返すこと
-- [ ] 現在のパスワードが不一致の時、UnauthorizedExceptionが伝播すること
+- [x] 正しい現在のパスワードの時、204を返すこと
+- [x] 現在のパスワードが不一致の時、UnauthorizedExceptionが伝播すること
+
+**updateProfile**
+- [x] 更新済みプロフィールを返すこと（passwordを除く）
+- [x] address が undefined の時は null として渡すこと
+
+**getOrders**
+- [x] 注文一覧を返すこと
+- [x] 注文がない場合は空配列を返すこと
+
+**withdraw**
+- [x] 退会成功時に undefined を返すこと
 
 ---
 
@@ -908,10 +932,31 @@
 
 ### MemberLayout `frontend/src/components/layouts/MemberLayout.test.tsx`
 
+**未認証の場合**
 - [x] ロゴが表示されること
 - [x] 商品一覧リンクが表示されること
 - [x] カートリンクが表示されること
 - [x] ログインリンクが表示されること
+- [x] マイページリンクが表示されないこと
 - [x] フッターにコピーライトが表示されること
 - [x] childrenが描画されること
-- [ ] toast()を呼ぶとトースト通知が表示されること
+
+**認証済みの場合**
+- [x] マイページリンクが表示されること
+- [x] マイページリンクのhrefが /my-page であること
+- [x] ログインリンクが表示されないこと
+
+---
+
+### MyPage `frontend/src/components/pages/MyPage.test.tsx`
+
+- [x] プロフィールが表示されること
+- [x] メールアドレス入力欄が disabled であること
+- [x] 注文履歴が表示されること
+- [x] 注文がない場合「まだ注文はありません」が表示されること
+- [x] プロフィール保存成功時に成功メッセージが表示されること
+- [x] プロフィール保存失敗時にエラーメッセージが表示されること
+- [x] 退会ボタンを押すと確認ダイアログが表示されること
+- [x] 退会成功時にトークンを削除してログインページへリダイレクトすること
+- [x] 退会失敗時にエラーメッセージがダイアログ内に表示されること
+- [x] 読み込み中は「読み込み中...」が表示されること

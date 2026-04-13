@@ -72,10 +72,11 @@ nestjspro/
         │   │           ├── 有効なメールアドレスとパスワードの時、エラーがないこと
         │   │           ├── メールアドレス形式が不正な時、emailがエラーになること
         │   │           └── パスワードが空文字の時、passwordがエラーになること
-        │   ├── jwt.strategy.spec.ts
+        │   ├── jwt.strategy.spec.ts ✓
         │   │   └── validate
-        │   │       ├── 有効なJWTペイロードの時、subをidにマッピングしてidを返すこと
-        │   │       └── type が "user" でない時、UnauthorizedExceptionを投げること
+        │   │       ├── 有効なJWTペイロードかつ存在するユーザーの時、idを返すこと ✓
+        │   │       ├── type が "user" でない時、UnauthorizedExceptionを投げること ✓
+        │   │       └── 論理削除済みユーザーの時（findByIdがNotFoundExceptionを投げる）、UnauthorizedExceptionを投げること ✓
         │   └── guards/
         │       └── super-admin.guard.spec.ts
         │           ├── superロールの時、アクセスを許可すること
@@ -176,29 +177,45 @@ nestjspro/
         │           ├── general管理者は403になること ✓
         │           └── super管理者は204で削除できること ✓
         ├── users/
-        │   ├── users.controller.spec.ts
+        │   ├── users.controller.spec.ts ✓
         │   │   ├── getMe
-        │   │   │   ├── 認証済みユーザーのプロフィールを返すこと（passwordを除く）
-        │   │   │   └── ユーザーが存在しない時、NotFoundExceptionが伝播すること
-        │   │   └── changePassword
-        │   │       ├── 正しい現在のパスワードの時、204を返すこと
-        │   │       └── 現在のパスワードが不一致の時、UnauthorizedExceptionが伝播すること
-        │   ├── users.service.spec.ts
+        │   │   │   ├── 認証済みユーザーのプロフィールを返すこと（passwordを除く） ✓
+        │   │   │   └── ユーザーが存在しない時、NotFoundExceptionが伝播すること ✓
+        │   │   ├── changePassword
+        │   │   │   ├── 正しい現在のパスワードの時、204を返すこと ✓
+        │   │   │   └── 現在のパスワードが不一致の時、UnauthorizedExceptionが伝播すること ✓
+        │   │   ├── updateProfile
+        │   │   │   ├── 更新済みプロフィールを返すこと（passwordを除く） ✓
+        │   │   │   └── address が undefined の時は null として渡すこと ✓
+        │   │   ├── getOrders
+        │   │   │   ├── 注文一覧を返すこと ✓
+        │   │   │   └── 注文がない場合は空配列を返すこと ✓
+        │   │   └── withdraw
+        │   │       └── 退会成功時に undefined を返すこと ✓
+        │   ├── users.service.spec.ts ✓
         │   │   ├── create
-        │   │   │   ├── 新規ユーザーを作成してname・emailを保存しパスワードをハッシュ化する
-        │   │   │   ├── 既存メールアドレスはConflictExceptionを投げる
-        │   │   │   └── ConflictException時はsaveを呼ばない
+        │   │   │   ├── 新規ユーザーを作成してname・emailを保存しパスワードをハッシュ化する ✓
+        │   │   │   ├── 既存メールアドレスはConflictExceptionを投げる ✓
+        │   │   │   └── ConflictException時はsaveを呼ばない ✓
         │   │   ├── findByEmail
-        │   │   │   ├── 存在するメールアドレスのユーザーを返す
-        │   │   │   ├── 存在しないメールアドレスはnullを返す
+        │   │   │   ├── 存在するメールアドレスのユーザーを返す ✓
+        │   │   │   ├── 存在しないメールアドレスはnullを返す ✓
         │   │   │   └── 論理削除済みユーザーはnullを返す（TypeORMが@DeleteDateColumnで自動除外） ✓
         │   │   ├── findById
-        │   │   │   ├── 存在するIDのユーザーを返す
-        │   │   │   └── 存在しないIDはNotFoundExceptionを投げる
-        │   │   └── changePassword
-        │   │       ├── 正しい現在のパスワードの時、新しいパスワードをハッシュ化して保存する
-        │   │       ├── 現在のパスワードが不一致の時、UnauthorizedExceptionを投げる
-        │   │       └── パスワード不一致の時はupdateを呼ばない
+        │   │   │   ├── 存在するIDのユーザーを返す ✓
+        │   │   │   └── 存在しないIDはNotFoundExceptionを投げる ✓
+        │   │   ├── changePassword
+        │   │   │   ├── 正しい現在のパスワードの時、新しいパスワードをハッシュ化して保存する ✓
+        │   │   │   ├── 現在のパスワードが不一致の時、UnauthorizedExceptionを投げる ✓
+        │   │   │   └── パスワード不一致の時はupdateを呼ばない ✓
+        │   │   ├── updateProfile
+        │   │   │   ├── name と address を更新して更新済みユーザーを返すこと ✓
+        │   │   │   └── address に null を渡すと住所が削除されること ✓
+        │   │   ├── findOrdersByUserId
+        │   │   │   ├── ユーザーの注文を createdAt DESC 順で返すこと ✓
+        │   │   │   └── 注文がない場合は空配列を返すこと ✓
+        │   │   └── withdraw
+        │   │       └── softDelete でユーザーを論理削除すること ✓
         │   └── entities/
         │       └── user.entity.spec.ts
         │           ├── テーブル名がusersであること
@@ -614,13 +631,31 @@ nestjspro/
         │   └── トップページへのリンクが表示されること ✓
         └── components/
             └── layouts/
-                ├── MemberLayout.test.tsx
-                │   ├── ロゴが表示されること
-                │   ├── 商品一覧リンクが表示されること
-                │   ├── カートリンクが表示されること
-                │   ├── ログインリンクが表示されること
-                │   ├── フッターにコピーライトが表示されること
-                │   └── childrenが描画されること
+                ├── MemberLayout.test.tsx ✓
+                │   ├── 未認証の場合
+                │   │   ├── ロゴが表示されること ✓
+                │   │   ├── 商品一覧リンクが表示されること ✓
+                │   │   ├── カートリンクが表示されること ✓
+                │   │   ├── ログインリンクが表示されること ✓
+                │   │   ├── マイページリンクが表示されないこと ✓
+                │   │   ├── フッターにコピーライトが表示されること ✓
+                │   │   └── childrenが描画されること ✓
+                │   └── 認証済みの場合
+                │       ├── マイページリンクが表示されること ✓
+                │       ├── マイページリンクのhrefが /my-page であること ✓
+                │       └── ログインリンクが表示されないこと ✓
+                ├── pages/
+                │   └── MyPage.test.tsx ✓
+                │       ├── プロフィールが表示されること ✓
+                │       ├── メールアドレス入力欄が disabled であること ✓
+                │       ├── 注文履歴が表示されること ✓
+                │       ├── 注文がない場合「まだ注文はありません」が表示されること ✓
+                │       ├── プロフィール保存成功時に成功メッセージが表示されること ✓
+                │       ├── プロフィール保存失敗時にエラーメッセージが表示されること ✓
+                │       ├── 退会ボタンを押すと確認ダイアログが表示されること ✓
+                │       ├── 退会成功時にトークンを削除してログインページへリダイレクトすること ✓
+                │       ├── 退会失敗時にエラーメッセージがダイアログ内に表示されること ✓
+                │       └── 読み込み中は「読み込み中...」が表示されること ✓
                 ├── AdminLayout.test.tsx
                 │   ├── サイドバーに「ダッシュボード」リンクが表示されること
                 │   ├── サイドバーに「商品管理」リンクが表示されること
