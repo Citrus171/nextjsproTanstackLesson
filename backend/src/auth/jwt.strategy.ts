@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../users/users.service';
@@ -21,8 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (payload.type !== 'user') throw new UnauthorizedException('無効なトークンです');
     try {
       await this.usersService.findById(payload.sub);
-    } catch {
-      throw new UnauthorizedException('アカウントは無効です');
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        throw new UnauthorizedException('アカウントは無効です');
+      }
+      throw err;
     }
     return { id: payload.sub };
   }

@@ -19,9 +19,7 @@ export type UserProfileDto = {
 
 export type UpdateUserProfileDto = {
   name: string;
-  address?: {
-    [key: string]: unknown;
-  } | null;
+  address?: string | null;
 };
 
 export type ChangePasswordDto = {

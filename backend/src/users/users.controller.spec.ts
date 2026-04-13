@@ -119,14 +119,20 @@ describe('UsersController', () => {
 
   // ── GET /users/me/orders ───────────────────────────────────
   describe('getOrders', () => {
-    it('注文一覧を返すこと', async () => {
+    it('注文一覧をOrderSummaryDto形式（id/status/totalAmount/createdAtのみ）で返すこと', async () => {
       const orders = [makeOrder({ id: 2 }), makeOrder({ id: 1 })];
       mockUsersService.findOrdersByUserId.mockResolvedValue(orders);
 
       const result = await controller.getOrders({ id: 1 });
 
       expect(mockUsersService.findOrdersByUserId).toHaveBeenCalledWith(1);
-      expect(result).toEqual(orders);
+      expect(result).toEqual([
+        { id: 2, status: 'paid', totalAmount: 5000, createdAt: orders[0].createdAt },
+        { id: 1, status: 'paid', totalAmount: 5000, createdAt: orders[1].createdAt },
+      ]);
+      // 余計なフィールドが含まれないこと
+      expect(result[0]).not.toHaveProperty('shippingAddress');
+      expect(result[0]).not.toHaveProperty('stripeSessionId');
     });
 
     it('注文がない場合は空配列を返すこと', async () => {

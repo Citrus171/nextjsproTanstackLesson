@@ -49,7 +49,13 @@ export class UsersController {
   @Get('me/orders')
   @ApiOkResponse({ type: [OrderSummaryDto] })
   async getOrders(@CurrentUser() user: { id: number }): Promise<OrderSummaryDto[]> {
-    return this.usersService.findOrdersByUserId(user.id);
+    const orders = await this.usersService.findOrdersByUserId(user.id);
+    return orders.map(({ id, status, totalAmount, createdAt }) => ({
+      id,
+      status,
+      totalAmount,
+      createdAt,
+    }));
   }
 
   @Delete('me')

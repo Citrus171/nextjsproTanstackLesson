@@ -40,5 +40,14 @@ describe('JwtStrategy', () => {
         strategy.validate({ sub: 99, type: 'user' as const }),
       ).rejects.toThrow(UnauthorizedException);
     });
+
+    it('DB障害などNotFoundException以外の例外は再throwすること', async () => {
+      const dbError = new Error('DB connection failed');
+      (mockUsersService.findById as jest.Mock).mockRejectedValue(dbError);
+
+      await expect(
+        strategy.validate({ sub: 1, type: 'user' as const }),
+      ).rejects.toThrow(dbError);
+    });
   });
 });

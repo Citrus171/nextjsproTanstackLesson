@@ -1715,7 +1715,7 @@
             "type": "string"
           },
           "address": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           }
         },

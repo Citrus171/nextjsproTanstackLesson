@@ -76,7 +76,8 @@ nestjspro/
         │   │   └── validate
         │   │       ├── 有効なJWTペイロードかつ存在するユーザーの時、idを返すこと ✓
         │   │       ├── type が "user" でない時、UnauthorizedExceptionを投げること ✓
-        │   │       └── 論理削除済みユーザーの時（findByIdがNotFoundExceptionを投げる）、UnauthorizedExceptionを投げること ✓
+        │   │       ├── 論理削除済みユーザーの時（findByIdがNotFoundExceptionを投げる）、UnauthorizedExceptionを投げること ✓
+        │   │       └── DB障害などNotFoundException以外の例外は再throwすること ✓
         │   └── guards/
         │       └── super-admin.guard.spec.ts
         │           ├── superロールの時、アクセスを許可すること
@@ -188,7 +189,7 @@ nestjspro/
         │   │   │   ├── 更新済みプロフィールを返すこと（passwordを除く） ✓
         │   │   │   └── address が undefined の時は null として渡すこと ✓
         │   │   ├── getOrders
-        │   │   │   ├── 注文一覧を返すこと ✓
+        │   │   │   ├── 注文一覧をOrderSummaryDto形式（id/status/totalAmount/createdAtのみ）で返すこと ✓
         │   │   │   └── 注文がない場合は空配列を返すこと ✓
         │   │   └── withdraw
         │   │       └── 退会成功時に undefined を返すこと ✓

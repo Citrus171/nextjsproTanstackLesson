@@ -7,9 +7,9 @@ export class UpdateUserProfileDto {
   @MaxLength(50)
   name: string;
 
-  @ApiProperty({ nullable: true, required: false })
+  @ApiProperty({ type: String, nullable: true, required: false })
   @IsOptional()
   @IsString()
   @MaxLength(200)
-  address: string | null;
+  address?: string | null;
 }
