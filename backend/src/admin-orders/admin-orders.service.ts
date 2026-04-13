@@ -51,6 +51,7 @@ export class AdminOrdersService {
       take,
       order: { createdAt: "DESC" },
       relations: { user: true },
+      withDeleted: true,
       ...(status ? { where: { status } } : {}),
     });
 
@@ -76,6 +77,7 @@ export class AdminOrdersService {
     const order = await this.orderRepository.findOne({
       where: { id },
       relations: { user: true, items: true },
+      withDeleted: true,
     });
     if (!order) {
       throw new NotFoundException("注文が見つかりません");

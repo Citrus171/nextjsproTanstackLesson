@@ -306,7 +306,8 @@ export function AdminOrdersPage() {
                       配達完了にする
                     </button>
                   )}
-                  {(selectedOrder.status === "paid" ||
+                  {(selectedOrder.status === "pending" ||
+                    selectedOrder.status === "paid" ||
                     selectedOrder.status === "shipped") && (
                     <button
                       type="button"

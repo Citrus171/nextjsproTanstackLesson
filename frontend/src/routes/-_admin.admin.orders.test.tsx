@@ -251,6 +251,30 @@ describe("AdminOrdersPage", () => {
     });
   });
 
+  it("pending状態の注文でもキャンセルボタンが表示されること", async () => {
+    mockFindAll.mockResolvedValue(orderListResponse());
+    mockFindById.mockResolvedValue({
+      data: { ...orderDetailResponse().data, status: "pending" },
+      error: undefined,
+    });
+
+    const user = userEvent.setup();
+    render(<AdminOrdersPage />);
+
+    await waitFor(() =>
+      expect(screen.getByText("yamada@example.com")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByRole("button", { name: "詳細" }));
+    await waitFor(() =>
+      expect(screen.getByText("テストシャツ")).toBeInTheDocument(),
+    );
+
+    expect(screen.getByRole("button", { name: "キャンセル・返金" })).toBeInTheDocument();
+    // pending は未決済なので発送済みボタンは表示されない
+    expect(screen.queryByRole("button", { name: "発送済みにする" })).not.toBeInTheDocument();
+  });
+
   it("キャンセルに失敗したとき、エラーメッセージが表示されること", async () => {
     mockFindAll.mockResolvedValue(orderListResponse());
     mockFindById.mockResolvedValue(orderDetailResponse());

@@ -114,6 +114,7 @@ describe("AdminOrdersService", () => {
         take: 20,
         order: { createdAt: "DESC" },
         relations: { user: true },
+        withDeleted: true,
       });
       expect(result).toEqual({
         items: [
@@ -169,6 +170,7 @@ describe("AdminOrdersService", () => {
       expect(orderRepo.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
         relations: { user: true, items: true },
+        withDeleted: true,
       });
       expect(result).toEqual({
         id: 1,
