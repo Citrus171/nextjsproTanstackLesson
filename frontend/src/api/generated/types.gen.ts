@@ -257,6 +257,65 @@ export type AdminMemberDetailDto = {
   orders: Array<OrderSummaryDto>;
 };
 
+export type AdminOrderUserDto = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+export type AdminOrderListItemDto = {
+  id: number;
+  status:
+    | "pending"
+    | "paid"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded";
+  totalAmount: number;
+  createdAt: string;
+  user: AdminOrderUserDto;
+};
+
+export type AdminOrderListDto = {
+  items: Array<AdminOrderListItemDto>;
+  page: number;
+  limit: number;
+  total: number;
+};
+
+export type AdminOrderItemDto = {
+  id: number;
+  productName: string;
+  size: string;
+  color: string;
+  quantity: number;
+  price: number;
+};
+
+export type AdminOrderDetailDto = {
+  id: number;
+  status:
+    | "pending"
+    | "paid"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded";
+  shippingAddress: {
+    [key: string]: unknown;
+  };
+  shippingFee: number;
+  totalAmount: number;
+  createdAt: string;
+  user: AdminOrderUserDto;
+  items: Array<AdminOrderItemDto>;
+};
+
+export type UpdateOrderStatusDto = {
+  status: "shipped" | "delivered";
+};
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -881,3 +940,81 @@ export type AdminMembersControllerFindByIdResponses = {
 
 export type AdminMembersControllerFindByIdResponse =
   AdminMembersControllerFindByIdResponses[keyof AdminMembersControllerFindByIdResponses];
+
+export type AdminOrdersControllerFindAllData = {
+  body?: never;
+  path?: never;
+  query?: {
+    status?:
+      | "pending"
+      | "paid"
+      | "shipped"
+      | "delivered"
+      | "cancelled"
+      | "refunded";
+    limit?: number;
+    page?: number;
+  };
+  url: "/admin/orders";
+};
+
+export type AdminOrdersControllerFindAllResponses = {
+  200: AdminOrderListDto;
+};
+
+export type AdminOrdersControllerFindAllResponse =
+  AdminOrdersControllerFindAllResponses[keyof AdminOrdersControllerFindAllResponses];
+
+export type AdminOrdersControllerFindByIdData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/orders/{id}";
+};
+
+export type AdminOrdersControllerFindByIdResponses = {
+  200: AdminOrderDetailDto;
+};
+
+export type AdminOrdersControllerFindByIdResponse =
+  AdminOrdersControllerFindByIdResponses[keyof AdminOrdersControllerFindByIdResponses];
+
+export type AdminOrdersControllerUpdateStatusData = {
+  body: UpdateOrderStatusDto;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/orders/{id}/status";
+};
+
+export type AdminOrdersControllerUpdateStatusResponses = {
+  /**
+   * ステータス更新成功
+   */
+  204: void;
+};
+
+export type AdminOrdersControllerUpdateStatusResponse =
+  AdminOrdersControllerUpdateStatusResponses[keyof AdminOrdersControllerUpdateStatusResponses];
+
+export type AdminOrdersControllerCancelOrderData = {
+  body?: never;
+  path: {
+    id: number;
+  };
+  query?: never;
+  url: "/admin/orders/{id}/cancel";
+};
+
+export type AdminOrdersControllerCancelOrderResponses = {
+  /**
+   * キャンセル・返金成功
+   */
+  204: void;
+};
+
+export type AdminOrdersControllerCancelOrderResponse =
+  AdminOrdersControllerCancelOrderResponses[keyof AdminOrdersControllerCancelOrderResponses];

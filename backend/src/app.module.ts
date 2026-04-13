@@ -13,6 +13,7 @@ import { CartsModule } from "./carts/carts.module";
 import { PaymentsModule } from "./payments/payments.module";
 import { AdminUserEntity } from "./admin-users/entities/admin-user.entity";
 import { AdminMembersModule } from "./admin-members/admin-members.module";
+import { AdminOrdersModule } from "./admin-orders/admin-orders.module";
 import { CategoryEntity } from "./categories/entities/category.entity";
 import { ProductEntity } from "./products/entities/product.entity";
 import { ProductImageEntity } from "./products/entities/product-image.entity";
@@ -70,6 +71,7 @@ import { StripeEventEntity } from "./payments/entities/stripe-event.entity";
     CartsModule,
     PaymentsModule,
     AdminMembersModule,
+    AdminOrdersModule,
   ],
 })
 export class AppModule {}
