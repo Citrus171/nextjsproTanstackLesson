@@ -20,7 +20,10 @@ export class MailService {
       template: 'order-confirmation',
       context: {
         orderId: order.id,
-        items: order.items,
+        items: order.items.map((item) => ({
+          ...item,
+          subtotal: item.price * item.quantity,
+        })),
         shippingFee: order.shippingFee,
         totalAmount: order.totalAmount,
         shippingAddress: order.shippingAddress,

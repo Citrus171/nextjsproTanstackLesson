@@ -78,14 +78,14 @@ describe('MailService', () => {
       );
     });
 
-    it('テンプレートに注文番号・商品一覧・配送料・合計・配送先が渡されること', async () => {
+    it('テンプレートに注文番号・商品一覧（subtotal付き）・配送料・合計・配送先が渡されること', async () => {
       await service.sendOrderConfirmation(mockOrder);
 
       expect(mockMailerService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           context: expect.objectContaining({
             orderId: 42,
-            items: mockItems,
+            items: [expect.objectContaining({ ...mockItems[0], subtotal: 3000 })],
             shippingFee: 800,
             totalAmount: 3800,
             shippingAddress: mockOrder.shippingAddress,
