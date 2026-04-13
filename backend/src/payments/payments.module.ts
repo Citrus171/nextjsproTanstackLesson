@@ -7,6 +7,7 @@ import { OrderEntity } from '../orders/entities/order.entity';
 import { OrderItemEntity } from '../orders/entities/order-item.entity';
 import { StoreSettingsEntity } from '../store-settings/entities/store-settings.entity';
 import { StripeEventEntity } from './entities/stripe-event.entity';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { StripeEventEntity } from './entities/stripe-event.entity';
       StoreSettingsEntity,
       StripeEventEntity,
     ]),
+    MailModule,
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService],

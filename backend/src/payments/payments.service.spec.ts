@@ -8,6 +8,7 @@ import { OrderEntity } from "../orders/entities/order.entity";
 import { OrderItemEntity } from "../orders/entities/order-item.entity";
 import { StoreSettingsEntity } from "../store-settings/entities/store-settings.entity";
 import { StripeEventEntity } from "./entities/stripe-event.entity";
+import { MailService } from "../mail/mail.service";
 
 // Stripe モック
 const mockStripeCheckoutCreate = jest.fn();
@@ -34,6 +35,7 @@ describe("PaymentsService", () => {
   let mockStoreSettingsRepository: any;
   let mockStripeEventRepository: any;
   let mockDataSource: any;
+  let mockMailService: { sendOrderConfirmation: jest.Mock };
 
   const mockStoreSettings: Partial<StoreSettingsEntity> = {
     shippingFixedFee: 800,
@@ -91,6 +93,10 @@ describe("PaymentsService", () => {
       transaction: jest.fn(),
     };
 
+    mockMailService = {
+      sendOrderConfirmation: jest.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PaymentsService,
@@ -117,6 +123,10 @@ describe("PaymentsService", () => {
         {
           provide: DataSource,
           useValue: mockDataSource,
+        },
+        {
+          provide: MailService,
+          useValue: mockMailService,
         },
       ],
     }).compile();
@@ -495,6 +505,118 @@ describe("PaymentsService", () => {
         StripeEventEntity,
         expect.objectContaining({ eventId: "evt_new3" }),
       );
+    });
+
+    it("checkout.session.completed受信後にメール送信が呼ばれること", async () => {
+      const mockManager = {
+        findOne: jest.fn(),
+        update: jest.fn(),
+        save: jest.fn(),
+      };
+
+      mockStripeWebhookConstruct.mockReturnValue({
+        id: "evt_mail_send",
+        type: "checkout.session.completed",
+        data: {
+          object: {
+            id: "cs_test_mail",
+            metadata: { orderId: "10" },
+          },
+        },
+      });
+
+      mockStripeEventRepository.findOne.mockResolvedValue(null);
+      mockDataSource.transaction.mockImplementation((cb: any) =>
+        cb(mockManager),
+      );
+
+      const mockManagerOrder = { id: 10, status: "pending", userId: 5 };
+      mockManager.findOne.mockResolvedValue(mockManagerOrder);
+      mockManager.update.mockResolvedValue({});
+      mockManager.save.mockResolvedValue({});
+
+      const orderWithRelations = {
+        id: 10,
+        userId: 5,
+        status: "paid",
+        shippingFee: 800,
+        totalAmount: 3800,
+        shippingAddress: { zip: "150-0001", prefecture: "東京都", city: "渋谷区", address1: "渋谷1-1-1" },
+        user: { id: 5, email: "user5@example.com", name: "テスト" },
+        items: [{ id: 1, productName: "シャツ", quantity: 2, price: 1500 }],
+      };
+      mockOrderRepository.findOne.mockResolvedValue(orderWithRelations);
+
+      await service.handleWebhook(signature, rawBody);
+
+      expect(mockMailService.sendOrderConfirmation).toHaveBeenCalledWith(
+        orderWithRelations,
+      );
+    });
+
+    it("メール送信が失敗してもWebhookが正常完了すること", async () => {
+      const mockManager = {
+        findOne: jest.fn(),
+        update: jest.fn(),
+        save: jest.fn(),
+      };
+
+      mockStripeWebhookConstruct.mockReturnValue({
+        id: "evt_mail_fail",
+        type: "checkout.session.completed",
+        data: {
+          object: {
+            id: "cs_test_mailfail",
+            metadata: { orderId: "11" },
+          },
+        },
+      });
+
+      mockStripeEventRepository.findOne.mockResolvedValue(null);
+      mockDataSource.transaction.mockImplementation((cb: any) =>
+        cb(mockManager),
+      );
+
+      mockManager.findOne.mockResolvedValue({ id: 11, status: "pending", userId: 6 });
+      mockManager.update.mockResolvedValue({});
+      mockManager.save.mockResolvedValue({});
+
+      const orderWithRelations = {
+        id: 11,
+        user: { email: "user6@example.com" },
+        items: [],
+      };
+      mockOrderRepository.findOne.mockResolvedValue(orderWithRelations);
+      mockMailService.sendOrderConfirmation.mockRejectedValue(
+        new Error("SMTP connection failed"),
+      );
+
+      await expect(
+        service.handleWebhook(signature, rawBody),
+      ).resolves.toBeUndefined();
+    });
+
+    it("無効署名の時はメール送信が呼ばれないこと", async () => {
+      mockStripeWebhookConstruct.mockImplementation(() => {
+        throw new Error("signature mismatch");
+      });
+
+      await expect(service.handleWebhook(signature, rawBody)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(mockMailService.sendOrderConfirmation).not.toHaveBeenCalled();
+    });
+
+    it("checkout.session.completed以外のイベントはメール送信されないこと", async () => {
+      mockStripeWebhookConstruct.mockReturnValue({
+        id: "evt_other_nomail",
+        type: "payment_intent.created",
+        data: { object: {} },
+      });
+
+      await service.handleWebhook(signature, rawBody);
+
+      expect(mockMailService.sendOrderConfirmation).not.toHaveBeenCalled();
     });
   });
 });
