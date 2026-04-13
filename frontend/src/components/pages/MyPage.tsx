@@ -57,30 +57,32 @@ export function MyPage() {
     const fetchData = async () => {
       const token = getToken() ?? undefined;
 
-      const [profileRes, ordersRes] = await Promise.all([
-        usersControllerGetMe({ auth: token, throwOnError: false }),
-        usersControllerGetOrders({ auth: token, throwOnError: false }),
-      ]);
+      try {
+        const [profileRes, ordersRes] = await Promise.all([
+          usersControllerGetMe({ auth: token, throwOnError: false }),
+          usersControllerGetOrders({ auth: token, throwOnError: false }),
+        ]);
 
-      const profileStatus = profileRes.response?.status;
-      const ordersStatus = ordersRes.response?.status;
-      if (profileStatus === 401 || ordersStatus === 401) {
-        removeToken();
-        void navigate({ to: "/login" });
-        return;
+        const profileStatus = profileRes.response?.status;
+        const ordersStatus = ordersRes.response?.status;
+        if (profileStatus === 401 || ordersStatus === 401) {
+          removeToken();
+          void navigate({ to: "/login" });
+          return;
+        }
+
+        if (profileRes.data) {
+          setProfile(profileRes.data);
+          setName(profileRes.data.name);
+          setAddress(profileRes.data.address ?? "");
+        }
+
+        if (ordersRes.data) {
+          setOrders(ordersRes.data);
+        }
+      } finally {
+        setLoading(false);
       }
-
-      if (profileRes.data) {
-        setProfile(profileRes.data);
-        setName(profileRes.data.name);
-        setAddress(profileRes.data.address ?? "");
-      }
-
-      if (ordersRes.data) {
-        setOrders(ordersRes.data);
-      }
-
-      setLoading(false);
     };
 
     void fetchData();
@@ -91,16 +93,22 @@ export function MyPage() {
     setProfileSaving(true);
     setProfileMessage(null);
 
-    const { data, error } = await usersControllerUpdateProfile({
+    const res = await usersControllerUpdateProfile({
       auth: getToken() ?? undefined,
       body: { name, address: address || null },
       throwOnError: false,
     });
 
-    if (error || !data) {
+    if (res.response?.status === 401) {
+      removeToken();
+      void navigate({ to: "/login" });
+      return;
+    }
+
+    if (res.error || !res.data) {
       setProfileMessage({ type: "error", text: "更新に失敗しました" });
     } else {
-      setProfile(data);
+      setProfile(res.data);
       setProfileMessage({ type: "success", text: "プロフィールを更新しました" });
     }
 
@@ -111,12 +119,18 @@ export function MyPage() {
     setWithdrawing(true);
     setWithdrawError(null);
 
-    const { error } = await usersControllerWithdraw({
+    const res = await usersControllerWithdraw({
       auth: getToken() ?? undefined,
       throwOnError: false,
     });
 
-    if (error) {
+    if (res.response?.status === 401) {
+      removeToken();
+      void navigate({ to: "/login" });
+      return;
+    }
+
+    if (res.error) {
       setWithdrawError("退会処理に失敗しました。時間をおいてお試しください。");
       setWithdrawing(false);
       return;

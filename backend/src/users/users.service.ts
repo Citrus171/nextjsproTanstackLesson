@@ -42,8 +42,12 @@ export class UsersService {
     await this.userRepository.update(userId, { password: hashed });
   }
 
-  async updateProfile(userId: number, name: string, address: string | null): Promise<UserEntity> {
-    await this.userRepository.update(userId, { name, address });
+  async updateProfile(userId: number, name: string, address?: string | null): Promise<UserEntity> {
+    const updateData: Partial<UserEntity> = { name };
+    if (address !== undefined) {
+      updateData.address = address;
+    }
+    await this.userRepository.update(userId, updateData);
     return this.findById(userId);
   }
 

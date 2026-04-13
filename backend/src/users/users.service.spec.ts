@@ -215,6 +215,16 @@ describe('UsersService', () => {
       expect(repo.update).toHaveBeenCalledWith(1, { name: '山田太郎', address: null });
       expect(result.address).toBeNull();
     });
+
+    it('address が undefined の時は name のみ更新すること', async () => {
+      const updated = makeUser({ name: '新しい名前', address: '大阪府大阪市' });
+      repo.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
+      repo.findOneBy.mockResolvedValue(updated);
+
+      await service.updateProfile(1, '新しい名前', undefined);
+
+      expect(repo.update).toHaveBeenCalledWith(1, { name: '新しい名前' });
+    });
   });
 
   // ── findOrdersByUserId ────────────────────────────────────
