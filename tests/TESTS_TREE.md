@@ -471,6 +471,41 @@ nestjspro/
                     ├── addToCartがCartsServiceのaddToCartメソッドを呼ぶこと ✓
                     ├── updateItemがCartsServiceのupdateItemメソッドを呼ぶこと ✓
                     └── removeItemがCartsServiceのremoveItemメソッドを呼ぶこと ✓
+        ├── admin-orders/
+        │   ├── admin-orders.service.spec.ts
+        │   │   ├── findAll
+        │   │   │   ├── ページネーション付きで注文一覧（ユーザー情報含む）を返すこと ✓
+        │   │   │   ├── page=2,limit=10の時スキップ量が10になること ✓
+        │   │   │   └── ステータスフィルターが指定された場合、そのステータスで絞り込むこと ✓
+        │   │   ├── findById
+        │   │   │   ├── 存在する注文IDの詳細（商品明細・配送先・ユーザー情報）を返すこと ✓
+        │   │   │   └── 存在しない注文IDではNotFoundExceptionを投げること ✓
+        │   │   ├── updateStatus
+        │   │   │   ├── paid→shippedへの遷移が成功すること ✓
+        │   │   │   ├── shipped→deliveredへの遷移が成功すること ✓
+        │   │   │   ├── 不正遷移（delivered→shipped）はBadRequestExceptionを投げること ✓
+        │   │   │   ├── 不正遷移（paid→delivered）はBadRequestExceptionを投げること ✓
+        │   │   │   └── 存在しない注文IDではNotFoundExceptionを投げること ✓
+        │   │   └── cancelOrder
+        │   │       ├── paidの注文をcancelledにしStripe返金後refundedになること ✓
+        │   │       ├── shippedの注文もStripe返金してrefundedになること ✓
+        │   │       ├── pendingの注文はStripe返金なしでcancelledになること ✓
+        │   │       ├── pendingでstripeSessionIdがあっても返金しないこと ✓
+        │   │       ├── payment_statusがpaidでない場合はcancelledのまま返金しないこと ✓
+        │   │       ├── Stripe返金APIが失敗した場合、InternalServerErrorExceptionを投げること ✓
+        │   │       ├── sessions.retrieve が失敗した場合、InternalServerErrorExceptionを投げること ✓
+        │   │       ├── deliveredの注文はキャンセル不可でBadRequestExceptionを投げること ✓
+        │   │       └── 存在しない注文IDではNotFoundExceptionを投げること ✓
+        │   └── admin-orders.controller.spec.ts
+        │       ├── findAll
+        │       │   ├── page/limit付きで注文一覧を返すこと ✓
+        │       │   └── statusフィルターが指定された場合サービスへ渡すこと ✓
+        │       ├── findById
+        │       │   └── 注文詳細を返すこと ✓
+        │       ├── updateStatus
+        │       │   └── ステータス更新をサービスに委譲してvoidを返すこと ✓
+        │       └── cancelOrder
+        │           └── キャンセルをサービスに委譲してvoidを返すこと ✓
         ├── payments/
         │   ├── payments.service.spec.ts
         │   │   ├── createCheckoutSession
@@ -547,6 +582,17 @@ nestjspro/
         │   ├── 会員一覧の取得に失敗したとき、エラーメッセージが表示されること ✓
         │   ├── 会員詳細の取得に失敗したとき、エラーメッセージが表示されること ✓
         │   └── 会員削除に失敗したとき、エラーメッセージが表示されること ✓
+        ├── -_admin.admin.orders.test.tsx
+        │   ├── 注文一覧が表示されること ✓
+        │   ├── 詳細ボタンで注文詳細が表示されること ✓
+        │   ├── ステータス更新ボタンで発送済みに変更でき、詳細が再取得されること ✓
+        │   ├── キャンセル・返金ボタンで注文をキャンセルでき、詳細が再取得されること ✓
+        │   ├── 注文一覧の取得に失敗したとき、エラーメッセージが表示されること ✓
+        │   ├── 注文詳細の取得に失敗したとき、エラーメッセージが表示されること ✓
+        │   ├── 詳細取得に失敗したとき、前回の詳細が残らないこと ✓
+        │   ├── ステータス更新に失敗したとき、エラーメッセージが表示されること ✓
+        │   ├── キャンセルに失敗したとき、エラーメッセージが表示されること ✓
+        │   └── pending状態の注文でもキャンセルボタンが表示されること ✓
         ├── -admin.login.test.tsx
         │   ├── 表示時、管理者ログインフォームが表示されること
         │   ├── 有効な認証情報の時、トークンを保存して/adminへ遷移すること

@@ -825,6 +825,54 @@
 
 ---
 
+### AdminOrdersService `backend/src/admin-orders/admin-orders.service.spec.ts`
+
+**findAll**
+- [x] ページネーション付きで注文一覧（ユーザー情報含む）を返すこと
+- [x] page=2,limit=10の時スキップ量が10になること
+- [x] ステータスフィルターが指定された場合、そのステータスで絞り込むこと
+
+**findById**
+- [x] 存在する注文IDの詳細（商品明細・配送先・ユーザー情報）を返すこと
+- [x] 存在しない注文IDではNotFoundExceptionを投げること
+
+**updateStatus**
+- [x] paid→shippedへの遷移が成功すること
+- [x] shipped→deliveredへの遷移が成功すること
+- [x] 不正遷移（delivered→shipped）はBadRequestExceptionを投げること
+- [x] 不正遷移（paid→delivered）はBadRequestExceptionを投げること
+- [x] 存在しない注文IDではNotFoundExceptionを投げること
+
+**cancelOrder**
+- [x] paidの注文をcancelledにしStripe返金後refundedになること
+- [x] shippedの注文もStripe返金してrefundedになること
+- [x] pendingの注文はStripe返金なしでcancelledになること
+- [x] pendingでstripeSessionIdがあっても返金しないこと
+- [x] payment_statusがpaidでない場合はcancelledのまま返金しないこと
+- [x] Stripe返金APIが失敗した場合、InternalServerErrorExceptionを投げること
+- [x] sessions.retrieve が失敗した場合、InternalServerErrorExceptionを投げること
+- [x] deliveredの注文はキャンセル不可でBadRequestExceptionを投げること
+- [x] 存在しない注文IDではNotFoundExceptionを投げること
+
+---
+
+### AdminOrdersController `backend/src/admin-orders/admin-orders.controller.spec.ts`
+
+**findAll**
+- [x] page/limit付きで注文一覧を返すこと
+- [x] statusフィルターが指定された場合サービスへ渡すこと
+
+**findById**
+- [x] 注文詳細を返すこと
+
+**updateStatus**
+- [x] ステータス更新をサービスに委譲してvoidを返すこと
+
+**cancelOrder**
+- [x] キャンセルをサービスに委譲してvoidを返すこと
+
+---
+
 ### Payments E2E `backend/src/payments/payments.e2e-spec.ts`
 
 **POST /payments/checkout**
@@ -838,6 +886,21 @@
 - [x] checkout.session.completedで注文ステータスがpaidに更新されること
 - [x] checkout.session.completedでカートがpurchasedに更新されること
 - [x] 同一イベントIDを2回受信しても二重処理しないこと（冪等性）
+
+---
+
+### AdminOrdersPage `frontend/src/routes/-_admin.admin.orders.test.tsx`
+
+- [x] 注文一覧が表示されること
+- [x] 詳細ボタンで注文詳細が表示されること
+- [x] ステータス更新ボタンで発送済みに変更でき、詳細が再取得されること
+- [x] キャンセル・返金ボタンで注文をキャンセルでき、詳細が再取得されること
+- [x] 注文一覧の取得に失敗したとき、エラーメッセージが表示されること
+- [x] 注文詳細の取得に失敗したとき、エラーメッセージが表示されること
+- [x] 詳細取得に失敗したとき、前回の詳細が残らないこと
+- [x] ステータス更新に失敗したとき、エラーメッセージが表示されること
+- [x] キャンセルに失敗したとき、エラーメッセージが表示されること
+- [x] pending状態の注文でもキャンセルボタンが表示されること
 
 ---
 

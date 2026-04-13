@@ -25,6 +25,10 @@ import {
   adminMembersControllerDelete,
   adminMembersControllerFindAll,
   adminMembersControllerFindById,
+  adminOrdersControllerCancelOrder,
+  adminOrdersControllerFindAll,
+  adminOrdersControllerFindById,
+  adminOrdersControllerUpdateStatus,
   authControllerLogin,
   authControllerRegister,
   cartsControllerAddToCart,
@@ -76,6 +80,14 @@ import type {
   AdminMembersControllerFindAllResponse,
   AdminMembersControllerFindByIdData,
   AdminMembersControllerFindByIdResponse,
+  AdminOrdersControllerCancelOrderData,
+  AdminOrdersControllerCancelOrderResponse,
+  AdminOrdersControllerFindAllData,
+  AdminOrdersControllerFindAllResponse,
+  AdminOrdersControllerFindByIdData,
+  AdminOrdersControllerFindByIdResponse,
+  AdminOrdersControllerUpdateStatusData,
+  AdminOrdersControllerUpdateStatusResponse,
   AuthControllerLoginData,
   AuthControllerRegisterData,
   CartsControllerAddToCartData,
@@ -1404,3 +1416,148 @@ export const adminMembersControllerFindByIdOptions = (
     },
     queryKey: adminMembersControllerFindByIdQueryKey(options),
   });
+
+export const adminOrdersControllerFindAllQueryKey = (
+  options?: Options<AdminOrdersControllerFindAllData>,
+) => createQueryKey("adminOrdersControllerFindAll", options);
+
+export const adminOrdersControllerFindAllOptions = (
+  options?: Options<AdminOrdersControllerFindAllData>,
+) =>
+  queryOptions<
+    AdminOrdersControllerFindAllResponse,
+    DefaultError,
+    AdminOrdersControllerFindAllResponse,
+    ReturnType<typeof adminOrdersControllerFindAllQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminOrdersControllerFindAll({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminOrdersControllerFindAllQueryKey(options),
+  });
+
+export const adminOrdersControllerFindAllInfiniteQueryKey = (
+  options?: Options<AdminOrdersControllerFindAllData>,
+): QueryKey<Options<AdminOrdersControllerFindAllData>> =>
+  createQueryKey("adminOrdersControllerFindAll", options, true);
+
+export const adminOrdersControllerFindAllInfiniteOptions = (
+  options?: Options<AdminOrdersControllerFindAllData>,
+) =>
+  infiniteQueryOptions<
+    AdminOrdersControllerFindAllResponse,
+    DefaultError,
+    InfiniteData<AdminOrdersControllerFindAllResponse>,
+    QueryKey<Options<AdminOrdersControllerFindAllData>>,
+    | number
+    | Pick<
+        QueryKey<Options<AdminOrdersControllerFindAllData>>[0],
+        "body" | "headers" | "path" | "query"
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<AdminOrdersControllerFindAllData>>[0],
+          "body" | "headers" | "path" | "query"
+        > =
+          typeof pageParam === "object"
+            ? pageParam
+            : {
+                query: {
+                  page: pageParam,
+                },
+              };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await adminOrdersControllerFindAll({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        });
+        return data;
+      },
+      queryKey: adminOrdersControllerFindAllInfiniteQueryKey(options),
+    },
+  );
+
+export const adminOrdersControllerFindByIdQueryKey = (
+  options: Options<AdminOrdersControllerFindByIdData>,
+) => createQueryKey("adminOrdersControllerFindById", options);
+
+export const adminOrdersControllerFindByIdOptions = (
+  options: Options<AdminOrdersControllerFindByIdData>,
+) =>
+  queryOptions<
+    AdminOrdersControllerFindByIdResponse,
+    DefaultError,
+    AdminOrdersControllerFindByIdResponse,
+    ReturnType<typeof adminOrdersControllerFindByIdQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await adminOrdersControllerFindById({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: adminOrdersControllerFindByIdQueryKey(options),
+  });
+
+export const adminOrdersControllerUpdateStatusMutation = (
+  options?: Partial<Options<AdminOrdersControllerUpdateStatusData>>,
+): UseMutationOptions<
+  AdminOrdersControllerUpdateStatusResponse,
+  DefaultError,
+  Options<AdminOrdersControllerUpdateStatusData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AdminOrdersControllerUpdateStatusResponse,
+    DefaultError,
+    Options<AdminOrdersControllerUpdateStatusData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminOrdersControllerUpdateStatus({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const adminOrdersControllerCancelOrderMutation = (
+  options?: Partial<Options<AdminOrdersControllerCancelOrderData>>,
+): UseMutationOptions<
+  AdminOrdersControllerCancelOrderResponse,
+  DefaultError,
+  Options<AdminOrdersControllerCancelOrderData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AdminOrdersControllerCancelOrderResponse,
+    DefaultError,
+    Options<AdminOrdersControllerCancelOrderData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminOrdersControllerCancelOrder({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};

@@ -33,6 +33,14 @@ import type {
   AdminMembersControllerFindAllResponses,
   AdminMembersControllerFindByIdData,
   AdminMembersControllerFindByIdResponses,
+  AdminOrdersControllerCancelOrderData,
+  AdminOrdersControllerCancelOrderResponses,
+  AdminOrdersControllerFindAllData,
+  AdminOrdersControllerFindAllResponses,
+  AdminOrdersControllerFindByIdData,
+  AdminOrdersControllerFindByIdResponses,
+  AdminOrdersControllerUpdateStatusData,
+  AdminOrdersControllerUpdateStatusResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
@@ -798,5 +806,69 @@ export const adminMembersControllerFindById = <
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/admin/members/{id}",
+    ...options,
+  });
+
+export const adminOrdersControllerFindAll = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<AdminOrdersControllerFindAllData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    AdminOrdersControllerFindAllResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/orders",
+    ...options,
+  });
+
+export const adminOrdersControllerFindById = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminOrdersControllerFindByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    AdminOrdersControllerFindByIdResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/orders/{id}",
+    ...options,
+  });
+
+export const adminOrdersControllerUpdateStatus = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminOrdersControllerUpdateStatusData, ThrowOnError>,
+) =>
+  (options.client ?? client).patch<
+    AdminOrdersControllerUpdateStatusResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/orders/{id}/status",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const adminOrdersControllerCancelOrder = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<AdminOrdersControllerCancelOrderData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    AdminOrdersControllerCancelOrderResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/admin/orders/{id}/cancel",
     ...options,
   });
