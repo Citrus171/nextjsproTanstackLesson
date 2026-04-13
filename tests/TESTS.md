@@ -847,6 +847,9 @@
 - [x] paidの注文をcancelledにしStripe返金後refundedになること
 - [x] shippedの注文もStripe返金してrefundedになること
 - [x] pendingの注文はStripe返金なしでcancelledになること
+- [x] pendingでstripeSessionIdがあっても返金しないこと
+- [x] payment_statusがpaidでない場合はcancelledのまま返金しないこと
+- [x] Stripe返金APIが失敗した場合、InternalServerErrorExceptionを投げること
 - [x] deliveredの注文はキャンセル不可でBadRequestExceptionを投げること
 - [x] 存在しない注文IDではNotFoundExceptionを投げること
 
@@ -889,8 +892,8 @@
 
 - [x] 注文一覧が表示されること
 - [x] 詳細ボタンで注文詳細が表示されること
-- [x] ステータス更新ボタンで発送済みに変更できること
-- [x] キャンセル・返金ボタンで注文をキャンセルできること
+- [x] ステータス更新ボタンで発送済みに変更でき、詳細が再取得されること
+- [x] キャンセル・返金ボタンで注文をキャンセルでき、詳細が再取得されること
 - [x] 注文一覧の取得に失敗したとき、エラーメッセージが表示されること
 - [x] 注文詳細の取得に失敗したとき、エラーメッセージが表示されること
 - [x] ステータス更新に失敗したとき、エラーメッセージが表示されること

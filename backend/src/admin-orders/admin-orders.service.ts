@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -26,6 +28,7 @@ const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 export class AdminOrdersService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly stripe: any;
+  private readonly logger = new Logger(AdminOrdersService.name);
 
   constructor(
     @InjectRepository(OrderEntity)
@@ -135,22 +138,43 @@ export class AdminOrdersService {
       );
     }
 
+    const previousStatus = order.status;
+
     // cancelled に更新
     order.status = "cancelled";
     await this.orderRepository.save(order);
 
-    // Stripe決済済みの場合は返金処理
-    if (order.stripeSessionId) {
-      const session = await this.stripe.checkout.sessions.retrieve(
-        order.stripeSessionId,
-      );
-      await this.stripe.refunds.create({
-        payment_intent: session.payment_intent,
-      });
-
-      // refunded に更新
-      order.status = "refunded";
-      await this.orderRepository.save(order);
+    // paid/shipped のみ Stripe返金対象（pendingは未決済のため対象外）
+    if (!["paid", "shipped"].includes(previousStatus) || !order.stripeSessionId) {
+      return;
     }
+
+    const session = await this.stripe.checkout.sessions.retrieve(
+      order.stripeSessionId,
+    );
+
+    // payment_statusがpaidでない場合（未決済）は返金しない
+    if (session.payment_status !== "paid" || !session.payment_intent) {
+      return;
+    }
+
+    const paymentIntentId =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : (session.payment_intent as { id: string }).id;
+
+    try {
+      await this.stripe.refunds.create({ payment_intent: paymentIntentId });
+    } catch (error) {
+      this.logger.error(
+        `Stripe返金失敗: orderId=${order.id}, paymentIntentId=${paymentIntentId}`,
+        error,
+      );
+      throw new InternalServerErrorException("Stripe返金処理に失敗しました");
+    }
+
+    // refunded に更新
+    order.status = "refunded";
+    await this.orderRepository.save(order);
   }
 }

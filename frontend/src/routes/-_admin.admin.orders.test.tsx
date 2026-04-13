@@ -106,7 +106,6 @@ describe("AdminOrdersPage", () => {
     mockFindAll.mockResolvedValue(orderListResponse());
     mockFindById.mockResolvedValue(orderDetailResponse());
     mockUpdateStatus.mockResolvedValue({ data: undefined, error: undefined });
-    mockFindAll.mockResolvedValue(orderListResponse());
 
     const user = userEvent.setup();
     render(<AdminOrdersPage />);
@@ -131,6 +130,8 @@ describe("AdminOrdersPage", () => {
         body: { status: "shipped" },
       }),
     );
+    // 詳細も再取得すること（2回目の呼び出し）
+    expect(mockFindById).toHaveBeenCalledTimes(2);
   });
 
   it("キャンセル・返金ボタンで注文をキャンセルできること", async () => {
@@ -158,6 +159,8 @@ describe("AdminOrdersPage", () => {
     expect(mockCancelOrder).toHaveBeenCalledWith(
       expect.objectContaining({ path: { id: 1 } }),
     );
+    // 詳細も再取得すること（2回目の呼び出し）
+    expect(mockFindById).toHaveBeenCalledTimes(2);
   });
 
   it("注文一覧の取得に失敗したとき、エラーメッセージが表示されること", async () => {

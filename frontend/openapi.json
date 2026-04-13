@@ -2229,6 +2229,33 @@
           "total"
         ]
       },
+      "ShippingAddressDto": {
+        "type": "object",
+        "properties": {
+          "zip": {
+            "type": "string"
+          },
+          "prefecture": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "address1": {
+            "type": "string"
+          },
+          "address2": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "zip",
+          "prefecture",
+          "city",
+          "address1"
+        ]
+      },
       "AdminOrderItemDto": {
         "type": "object",
         "properties": {
@@ -2278,7 +2305,7 @@
             ]
           },
           "shippingAddress": {
-            "type": "object"
+            "$ref": "#/components/schemas/ShippingAddressDto"
           },
           "shippingFee": {
             "type": "number"

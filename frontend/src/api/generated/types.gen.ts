@@ -284,6 +284,14 @@ export type AdminOrderListDto = {
   total: number;
 };
 
+export type ShippingAddressDto = {
+  zip: string;
+  prefecture: string;
+  city: string;
+  address1: string;
+  address2?: string | null;
+};
+
 export type AdminOrderItemDto = {
   id: number;
   productName: string;
@@ -302,9 +310,7 @@ export type AdminOrderDetailDto = {
     | "delivered"
     | "cancelled"
     | "refunded";
-  shippingAddress: {
-    [key: string]: unknown;
-  };
+  shippingAddress: ShippingAddressDto;
   shippingFee: number;
   totalAmount: number;
   createdAt: string;

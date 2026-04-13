@@ -1,6 +1,23 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { OrderStatus, ShippingAddress } from "../../orders/entities/order.entity";
+import { OrderStatus } from "../../orders/entities/order.entity";
 import { AdminOrderUserDto } from "./admin-order-list.dto";
+
+export class ShippingAddressDto {
+  @ApiProperty()
+  zip: string;
+
+  @ApiProperty()
+  prefecture: string;
+
+  @ApiProperty()
+  city: string;
+
+  @ApiProperty()
+  address1: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  address2?: string;
+}
 
 export class AdminOrderItemDto {
   @ApiProperty()
@@ -31,8 +48,8 @@ export class AdminOrderDetailDto {
   })
   status: OrderStatus;
 
-  @ApiProperty()
-  shippingAddress: ShippingAddress;
+  @ApiProperty({ type: ShippingAddressDto })
+  shippingAddress: ShippingAddressDto;
 
   @ApiProperty()
   shippingFee: number;

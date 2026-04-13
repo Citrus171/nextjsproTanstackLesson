@@ -77,6 +77,18 @@ export function AdminOrdersPage() {
     setDetailLoading(false);
   };
 
+  // 操作後のサイレント詳細再取得（successMessageをクリアしない）
+  const refreshOrderDetail = async (id: number) => {
+    const { data, error } = await adminOrdersControllerFindById({
+      auth: getAdminToken() ?? undefined,
+      path: { id },
+      throwOnError: false,
+    });
+    if (!error && data) {
+      setSelectedOrder(data);
+    }
+  };
+
   const handleUpdateStatus = async (
     id: number,
     status: "shipped" | "delivered",
@@ -101,6 +113,7 @@ export function AdminOrdersPage() {
     setSuccessMessage("ステータスを更新しました");
     setActionLoading(false);
     void fetchOrders();
+    void refreshOrderDetail(id);
   };
 
   const handleCancel = async (id: number) => {
@@ -123,6 +136,7 @@ export function AdminOrdersPage() {
     setSuccessMessage("注文をキャンセルしました");
     setActionLoading(false);
     void fetchOrders();
+    void refreshOrderDetail(id);
   };
 
   return (

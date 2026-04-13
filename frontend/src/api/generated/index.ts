@@ -175,6 +175,7 @@ export type {
   PublicProductsControllerFindByIdData,
   PublicProductsControllerFindByIdResponses,
   RegisterDto,
+  ShippingAddressDto,
   StoreSettingsControllerGetSettingsData,
   StoreSettingsControllerGetSettingsResponse,
   StoreSettingsControllerGetSettingsResponses,

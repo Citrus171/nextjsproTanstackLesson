@@ -1,7 +1,7 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import type { Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { AdminOrdersService } from "./admin-orders.service";
 import { OrderEntity } from "../orders/entities/order.entity";
 import { OrderItemEntity } from "../orders/entities/order-item.entity";
@@ -277,6 +277,7 @@ describe("AdminOrdersService", () => {
       orderRepo.save!.mockResolvedValue(order);
       mockStripe.checkout.sessions.retrieve.mockResolvedValue({
         payment_intent: "pi_test_xyz",
+        payment_status: "paid",
       });
       mockStripe.refunds.create.mockResolvedValue({ id: "re_test_123" });
 
@@ -303,14 +304,14 @@ describe("AdminOrdersService", () => {
       orderRepo.save!.mockResolvedValue(order);
       mockStripe.checkout.sessions.retrieve.mockResolvedValue({
         payment_intent: "pi_test_uvw",
+        payment_status: "paid",
       });
       mockStripe.refunds.create.mockResolvedValue({ id: "re_test_456" });
 
       await service.cancelOrder(1);
 
       expect(mockStripe.refunds.create).toHaveBeenCalled();
-      expect(orderRepo.save).toHaveBeenNthCalledWith(
-        2,
+      expect(orderRepo.save).toHaveBeenLastCalledWith(
         expect.objectContaining({ status: "refunded" }),
       );
     });
@@ -327,6 +328,49 @@ describe("AdminOrdersService", () => {
         expect.objectContaining({ status: "cancelled" }),
       );
       expect(mockStripe.refunds.create).not.toHaveBeenCalled();
+    });
+
+    it("pendingでstripeSessionIdがあっても返金しないこと", async () => {
+      // pending状態でもstripeSessionIdが存在するケースがある（Checkout Session作成後・未決済）
+      const order = makeOrder({ status: "pending", stripeSessionId: "cs_test_pending" });
+      orderRepo.findOne!.mockResolvedValue(order);
+      orderRepo.save!.mockResolvedValue(order);
+
+      await service.cancelOrder(1);
+
+      expect(orderRepo.save).toHaveBeenCalledTimes(1);
+      expect(mockStripe.checkout.sessions.retrieve).not.toHaveBeenCalled();
+      expect(mockStripe.refunds.create).not.toHaveBeenCalled();
+    });
+
+    it("payment_statusがpaidでない場合はcancelledのまま返金しないこと", async () => {
+      const order = makeOrder({ status: "paid", stripeSessionId: "cs_test_unpaid" });
+      orderRepo.findOne!.mockResolvedValue(order);
+      orderRepo.save!.mockResolvedValue(order);
+      mockStripe.checkout.sessions.retrieve.mockResolvedValue({
+        payment_intent: "pi_test_xyz",
+        payment_status: "unpaid",
+      });
+
+      await service.cancelOrder(1);
+
+      expect(orderRepo.save).toHaveBeenCalledTimes(1);
+      expect(mockStripe.refunds.create).not.toHaveBeenCalled();
+    });
+
+    it("Stripe返金APIが失敗した場合、InternalServerErrorExceptionを投げること", async () => {
+      const order = makeOrder({ status: "paid", stripeSessionId: "cs_test_abc" });
+      orderRepo.findOne!.mockResolvedValue(order);
+      orderRepo.save!.mockResolvedValue(order);
+      mockStripe.checkout.sessions.retrieve.mockResolvedValue({
+        payment_intent: "pi_test_xyz",
+        payment_status: "paid",
+      });
+      mockStripe.refunds.create.mockRejectedValue(new Error("Stripe error"));
+
+      await expect(service.cancelOrder(1)).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
 
     it("deliveredの注文はキャンセル不可でBadRequestExceptionを投げること", async () => {
