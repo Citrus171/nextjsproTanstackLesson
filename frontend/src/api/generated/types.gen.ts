@@ -17,6 +17,11 @@ export type UserProfileDto = {
   } | null;
 };
 
+export type UpdateUserProfileDto = {
+  name: string;
+  address?: string | null;
+};
+
 export type ChangePasswordDto = {
   /**
    * 現在のパスワード
@@ -26,6 +31,19 @@ export type ChangePasswordDto = {
    * 新しいパスワード（8文字以上）
    */
   newPassword: string;
+};
+
+export type OrderSummaryDto = {
+  id: number;
+  status:
+    | "pending"
+    | "paid"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded";
+  totalAmount: number;
+  createdAt: string;
 };
 
 export type RegisterDto = {
@@ -234,19 +252,6 @@ export type AdminMemberListDto = {
   total: number;
 };
 
-export type OrderSummaryDto = {
-  id: number;
-  status:
-    | "pending"
-    | "paid"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  totalAmount: number;
-  createdAt: string;
-};
-
 export type AdminMemberDetailDto = {
   id: number;
   name: string;
@@ -322,6 +327,23 @@ export type UpdateOrderStatusDto = {
   status: "shipped" | "delivered";
 };
 
+export type UsersControllerWithdrawData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/users/me";
+};
+
+export type UsersControllerWithdrawResponses = {
+  /**
+   * アカウント退会成功
+   */
+  204: void;
+};
+
+export type UsersControllerWithdrawResponse =
+  UsersControllerWithdrawResponses[keyof UsersControllerWithdrawResponses];
+
 export type UsersControllerGetMeData = {
   body?: never;
   path?: never;
@@ -335,6 +357,20 @@ export type UsersControllerGetMeResponses = {
 
 export type UsersControllerGetMeResponse =
   UsersControllerGetMeResponses[keyof UsersControllerGetMeResponses];
+
+export type UsersControllerUpdateProfileData = {
+  body: UpdateUserProfileDto;
+  path?: never;
+  query?: never;
+  url: "/users/me";
+};
+
+export type UsersControllerUpdateProfileResponses = {
+  200: UserProfileDto;
+};
+
+export type UsersControllerUpdateProfileResponse =
+  UsersControllerUpdateProfileResponses[keyof UsersControllerUpdateProfileResponses];
 
 export type UsersControllerChangePasswordData = {
   body: ChangePasswordDto;
@@ -352,6 +388,20 @@ export type UsersControllerChangePasswordResponses = {
 
 export type UsersControllerChangePasswordResponse =
   UsersControllerChangePasswordResponses[keyof UsersControllerChangePasswordResponses];
+
+export type UsersControllerGetOrdersData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/users/me/orders";
+};
+
+export type UsersControllerGetOrdersResponses = {
+  200: Array<OrderSummaryDto>;
+};
+
+export type UsersControllerGetOrdersResponse =
+  UsersControllerGetOrdersResponses[keyof UsersControllerGetOrdersResponses];
 
 export type AuthControllerRegisterData = {
   body: RegisterDto;

@@ -3,21 +3,32 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { OrderEntity } from '../orders/entities/order.entity';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
-type MockRepository = {
+type MockUserRepository = {
   findOneBy: jest.MockedFunction<Repository<UserEntity>['findOneBy']>;
   create: jest.MockedFunction<Repository<UserEntity>['create']>;
   save: jest.MockedFunction<Repository<UserEntity>['save']>;
   update: jest.MockedFunction<Repository<UserEntity>['update']>;
+  softDelete: jest.MockedFunction<Repository<UserEntity>['softDelete']>;
 };
 
-const mockRepository = (): MockRepository => ({
+type MockOrderRepository = {
+  find: jest.MockedFunction<Repository<OrderEntity>['find']>;
+};
+
+const mockUserRepository = (): MockUserRepository => ({
   findOneBy: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
   update: jest.fn(),
+  softDelete: jest.fn(),
+});
+
+const mockOrderRepository = (): MockOrderRepository => ({
+  find: jest.fn(),
 });
 
 const makeUser = (overrides: Partial<UserEntity> = {}): UserEntity =>
@@ -25,24 +36,39 @@ const makeUser = (overrides: Partial<UserEntity> = {}): UserEntity =>
     id: 1,
     email: 'test@example.com',
     password: '$2b$10$hashedpassword',
+    name: '山田太郎',
+    address: null,
     createdAt: new Date('2024-01-01'),
+    ...overrides,
+  });
+
+const makeOrder = (overrides: Partial<OrderEntity> = {}): OrderEntity =>
+  Object.assign(new OrderEntity(), {
+    id: 1,
+    userId: 1,
+    status: 'paid' as const,
+    totalAmount: 5000,
+    createdAt: new Date('2024-06-01'),
     ...overrides,
   });
 
 describe('UsersService', () => {
   let service: UsersService;
-  let repo: MockRepository;
+  let repo: MockUserRepository;
+  let orderRepo: MockOrderRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        { provide: getRepositoryToken(UserEntity), useFactory: mockRepository },
+        { provide: getRepositoryToken(UserEntity), useFactory: mockUserRepository },
+        { provide: getRepositoryToken(OrderEntity), useFactory: mockOrderRepository },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    repo = module.get<MockRepository>(getRepositoryToken(UserEntity));
+    repo = module.get<MockUserRepository>(getRepositoryToken(UserEntity));
+    orderRepo = module.get<MockOrderRepository>(getRepositoryToken(OrderEntity));
   });
 
   // ── create ────────────────────────────────────────────────
@@ -162,6 +188,81 @@ describe('UsersService', () => {
       await service.changePassword(1, 'wrongPass', 'newPassword123').catch(() => {});
 
       expect(repo.update).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── updateProfile ─────────────────────────────────────────
+  describe('updateProfile', () => {
+    it('name と address を更新して更新済みユーザーを返すこと', async () => {
+      const updated = makeUser({ name: '新しい名前', address: '東京都渋谷区' });
+      repo.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
+      repo.findOneBy.mockResolvedValue(updated);
+
+      const result = await service.updateProfile(1, '新しい名前', '東京都渋谷区');
+
+      expect(repo.update).toHaveBeenCalledWith(1, { name: '新しい名前', address: '東京都渋谷区' });
+      expect(result.name).toBe('新しい名前');
+      expect(result.address).toBe('東京都渋谷区');
+    });
+
+    it('address に null を渡すと住所が削除されること', async () => {
+      const updated = makeUser({ address: null });
+      repo.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
+      repo.findOneBy.mockResolvedValue(updated);
+
+      const result = await service.updateProfile(1, '山田太郎', null);
+
+      expect(repo.update).toHaveBeenCalledWith(1, { name: '山田太郎', address: null });
+      expect(result.address).toBeNull();
+    });
+
+    it('address が undefined の時は name のみ更新すること', async () => {
+      const updated = makeUser({ name: '新しい名前', address: '大阪府大阪市' });
+      repo.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
+      repo.findOneBy.mockResolvedValue(updated);
+
+      await service.updateProfile(1, '新しい名前', undefined);
+
+      expect(repo.update).toHaveBeenCalledWith(1, { name: '新しい名前' });
+    });
+  });
+
+  // ── findOrdersByUserId ────────────────────────────────────
+  describe('findOrdersByUserId', () => {
+    it('ユーザーの注文を createdAt DESC 順で返すこと', async () => {
+      const orders = [
+        makeOrder({ id: 2, createdAt: new Date('2024-06-02') }),
+        makeOrder({ id: 1, createdAt: new Date('2024-06-01') }),
+      ];
+      orderRepo.find.mockResolvedValue(orders);
+
+      const result = await service.findOrdersByUserId(1);
+
+      expect(orderRepo.find).toHaveBeenCalledWith({
+        select: { id: true, status: true, totalAmount: true, createdAt: true },
+        where: { userId: 1 },
+        order: { createdAt: 'DESC' },
+      });
+      expect(result).toEqual(orders);
+    });
+
+    it('注文がない場合は空配列を返すこと', async () => {
+      orderRepo.find.mockResolvedValue([]);
+
+      const result = await service.findOrdersByUserId(1);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ── withdraw ──────────────────────────────────────────────
+  describe('withdraw', () => {
+    it('softDelete でユーザーを論理削除すること', async () => {
+      repo.softDelete.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
+
+      await service.withdraw(1);
+
+      expect(repo.softDelete).toHaveBeenCalledWith(1);
     });
   });
 });

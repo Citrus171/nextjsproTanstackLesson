@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { isAuthenticated } from '@/lib/auth'
 
 interface MemberLayoutProps {
   children: ReactNode
@@ -19,9 +20,15 @@ export function MemberLayout({ children }: MemberLayoutProps) {
             <a href="/cart" className="text-sm hover:underline">
               カート
             </a>
-            <a href="/login" className="text-sm hover:underline">
-              ログイン
-            </a>
+            {isAuthenticated() ? (
+              <a href="/my-page" className="text-sm hover:underline">
+                マイページ
+              </a>
+            ) : (
+              <a href="/login" className="text-sm hover:underline">
+                ログイン
+              </a>
+            )}
           </nav>
         </div>
       </header>

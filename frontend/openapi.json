@@ -25,6 +25,57 @@
             "bearer": []
           }
         ]
+      },
+      "put": {
+        "operationId": "UsersController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_withdraw",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "アカウント退会成功"
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/users/me/password": {
@@ -44,6 +95,35 @@
         "responses": {
           "204": {
             "description": "パスワード変更成功"
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/users/me/orders": {
+      "get": {
+        "operationId": "UsersController_getOrders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderSummaryDto"
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1628,6 +1708,21 @@
           "deletedAt"
         ]
       },
+      "UpdateUserProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
       "ChangePasswordDto": {
         "type": "object",
         "properties": {
@@ -1643,6 +1738,38 @@
         "required": [
           "currentPassword",
           "newPassword"
+        ]
+      },
+      "OrderSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "shipped",
+              "delivered",
+              "cancelled",
+              "refunded"
+            ]
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "totalAmount",
+          "createdAt"
         ]
       },
       "RegisterDto": {
@@ -2072,38 +2199,6 @@
           "page",
           "limit",
           "total"
-        ]
-      },
-      "OrderSummaryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "paid",
-              "shipped",
-              "delivered",
-              "cancelled",
-              "refunded"
-            ]
-          },
-          "totalAmount": {
-            "type": "number"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "status",
-          "totalAmount",
-          "createdAt"
         ]
       },
       "AdminMemberDetailDto": {

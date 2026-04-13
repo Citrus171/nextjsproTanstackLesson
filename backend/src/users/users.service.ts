@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
+import { OrderEntity } from '../orders/entities/order.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>,
   ) {}
 
   async create(name: string, email: string, password: string): Promise<UserEntity> {
@@ -37,5 +40,26 @@ export class UsersService {
 
     const hashed = await bcrypt.hash(newPassword, 10);
     await this.userRepository.update(userId, { password: hashed });
+  }
+
+  async updateProfile(userId: number, name: string, address?: string | null): Promise<UserEntity> {
+    const updateData: Partial<UserEntity> = { name };
+    if (address !== undefined) {
+      updateData.address = address;
+    }
+    await this.userRepository.update(userId, updateData);
+    return this.findById(userId);
+  }
+
+  async findOrdersByUserId(userId: number): Promise<OrderEntity[]> {
+    return this.orderRepository.find({
+      select: { id: true, status: true, totalAmount: true, createdAt: true },
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async withdraw(userId: number): Promise<void> {
+    await this.userRepository.softDelete(userId);
   }
 }

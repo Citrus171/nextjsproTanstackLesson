@@ -58,6 +58,9 @@ import {
   storeSettingsControllerUpdateSettings,
   usersControllerChangePassword,
   usersControllerGetMe,
+  usersControllerGetOrders,
+  usersControllerUpdateProfile,
+  usersControllerWithdraw,
 } from "../sdk.gen";
 import type {
   AdminAccountsControllerCreateData,
@@ -125,7 +128,37 @@ import type {
   UsersControllerChangePasswordResponse,
   UsersControllerGetMeData,
   UsersControllerGetMeResponse,
+  UsersControllerGetOrdersData,
+  UsersControllerGetOrdersResponse,
+  UsersControllerUpdateProfileData,
+  UsersControllerUpdateProfileResponse,
+  UsersControllerWithdrawData,
+  UsersControllerWithdrawResponse,
 } from "../types.gen";
+
+export const usersControllerWithdrawMutation = (
+  options?: Partial<Options<UsersControllerWithdrawData>>,
+): UseMutationOptions<
+  UsersControllerWithdrawResponse,
+  DefaultError,
+  Options<UsersControllerWithdrawData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UsersControllerWithdrawResponse,
+    DefaultError,
+    Options<UsersControllerWithdrawData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await usersControllerWithdraw({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
@@ -192,6 +225,30 @@ export const usersControllerGetMeOptions = (
     queryKey: usersControllerGetMeQueryKey(options),
   });
 
+export const usersControllerUpdateProfileMutation = (
+  options?: Partial<Options<UsersControllerUpdateProfileData>>,
+): UseMutationOptions<
+  UsersControllerUpdateProfileResponse,
+  DefaultError,
+  Options<UsersControllerUpdateProfileData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UsersControllerUpdateProfileResponse,
+    DefaultError,
+    Options<UsersControllerUpdateProfileData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await usersControllerUpdateProfile({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const usersControllerChangePasswordMutation = (
   options?: Partial<Options<UsersControllerChangePasswordData>>,
 ): UseMutationOptions<
@@ -215,6 +272,31 @@ export const usersControllerChangePasswordMutation = (
   };
   return mutationOptions;
 };
+
+export const usersControllerGetOrdersQueryKey = (
+  options?: Options<UsersControllerGetOrdersData>,
+) => createQueryKey("usersControllerGetOrders", options);
+
+export const usersControllerGetOrdersOptions = (
+  options?: Options<UsersControllerGetOrdersData>,
+) =>
+  queryOptions<
+    UsersControllerGetOrdersResponse,
+    DefaultError,
+    UsersControllerGetOrdersResponse,
+    ReturnType<typeof usersControllerGetOrdersQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await usersControllerGetOrders({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: usersControllerGetOrdersQueryKey(options),
+  });
 
 export const authControllerRegisterMutation = (
   options?: Partial<Options<AuthControllerRegisterData>>,

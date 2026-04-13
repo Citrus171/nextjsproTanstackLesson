@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AuthenticatedMyPageRouteImport } from './routes/_authenticated/my-page'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as AuthenticatedCheckoutIndexRouteImport } from './routes/_authenticated/checkout/index'
@@ -52,6 +53,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMyPageRoute = AuthenticatedMyPageRouteImport.update({
+  id: '/my-page',
+  path: '/my-page',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCartRoute = AuthenticatedCartRouteImport.update({
   id: '/cart',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/cart': typeof AuthenticatedCartRoute
+  '/my-page': typeof AuthenticatedMyPageRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/cart': typeof AuthenticatedCartRoute
+  '/my-page': typeof AuthenticatedMyPageRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/_authenticated/cart': typeof AuthenticatedCartRoute
+  '/_authenticated/my-page': typeof AuthenticatedMyPageRoute
   '/admin/login': typeof AdminLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_admin/admin/admins': typeof AdminAdminAdminsRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin'
     | '/cart'
+    | '/my-page'
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin'
     | '/cart'
+    | '/my-page'
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/_admin/admin'
     | '/_authenticated/cart'
+    | '/_authenticated/my-page'
     | '/admin/login'
     | '/_authenticated/'
     | '/_admin/admin/admins'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/my-page': {
+      id: '/_authenticated/my-page'
+      path: '/my-page'
+      fullPath: '/my-page'
+      preLoaderRoute: typeof AuthenticatedMyPageRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/cart': {
       id: '/_authenticated/cart'
@@ -349,6 +368,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedCartRoute: typeof AuthenticatedCartRoute
+  AuthenticatedMyPageRoute: typeof AuthenticatedMyPageRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCheckoutCompleteRoute: typeof AuthenticatedCheckoutCompleteRoute
   AuthenticatedCheckoutIndexRoute: typeof AuthenticatedCheckoutIndexRoute
@@ -356,6 +376,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCartRoute: AuthenticatedCartRoute,
+  AuthenticatedMyPageRoute: AuthenticatedMyPageRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCheckoutCompleteRoute: AuthenticatedCheckoutCompleteRoute,
   AuthenticatedCheckoutIndexRoute: AuthenticatedCheckoutIndexRoute,
