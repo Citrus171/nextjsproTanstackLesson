@@ -162,7 +162,7 @@ export class AdminOrdersService {
     } catch (error) {
       this.logger.error(
         `Stripe返金失敗: orderId=${order.id}, stripeSessionId=${order.stripeSessionId}`,
-        error,
+        (error as Error).stack ?? String(error),
       );
       throw new InternalServerErrorException("Stripe返金処理に失敗しました");
     }

@@ -272,7 +272,7 @@ describe("AdminOrdersPage", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("キャンセルに失敗しました"),
+        screen.getByText("返金に失敗しました（注文はキャンセル済みの可能性があります）"),
       ).toBeInTheDocument();
     });
   });

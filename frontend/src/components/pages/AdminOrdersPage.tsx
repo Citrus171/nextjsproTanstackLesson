@@ -129,8 +129,12 @@ export function AdminOrdersPage() {
     });
 
     if (error) {
-      setDetailErrorMessage("キャンセルに失敗しました");
+      setDetailErrorMessage(
+        "返金に失敗しました（注文はキャンセル済みの可能性があります）",
+      );
       setActionLoading(false);
+      void fetchOrders();
+      void refreshOrderDetail(id);
       return;
     }
 
