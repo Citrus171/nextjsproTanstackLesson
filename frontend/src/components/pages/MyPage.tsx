@@ -62,13 +62,12 @@ export function MyPage() {
         usersControllerGetOrders({ auth: token, throwOnError: false }),
       ]);
 
-      if (profileRes.error) {
-        const status = (profileRes.error as { status?: number }).status;
-        if (status === 401) {
-          removeToken();
-          void navigate({ to: "/login" });
-          return;
-        }
+      const profileStatus = profileRes.response?.status;
+      const ordersStatus = ordersRes.response?.status;
+      if (profileStatus === 401 || ordersStatus === 401) {
+        removeToken();
+        void navigate({ to: "/login" });
+        return;
       }
 
       if (profileRes.data) {
