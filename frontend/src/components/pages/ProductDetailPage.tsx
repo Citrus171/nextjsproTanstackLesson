@@ -70,6 +70,9 @@ export function ProductDetailPage() {
     const id = Number(productId);
     if (!id) return;
 
+    setSelectedVariationId(null);
+    setQuantity(1);
+
     void (async () => {
       setLoading(true);
       setErrorMessage(null);
@@ -237,11 +240,17 @@ export function ProductDetailPage() {
               <select
                 id="variation-select"
                 value={selectedVariationId ?? ""}
-                onChange={(e) =>
-                  setSelectedVariationId(
-                    e.target.value ? Number(e.target.value) : null,
-                  )
-                }
+                onChange={(e) => {
+                  const newId = e.target.value
+                    ? Number(e.target.value)
+                    : null;
+                  setSelectedVariationId(newId);
+                  if (newId) {
+                    const v = variations.find((v) => v.id === newId);
+                    if (v)
+                      setQuantity((q) => Math.max(1, Math.min(q, v.stock)));
+                  }
+                }}
                 className="w-full rounded-md border px-3 py-2 text-sm"
               >
                 <option value="">選択してください</option>
@@ -296,7 +305,12 @@ export function ProductDetailPage() {
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={addingToCart}
+            disabled={
+              !selectedVariation ||
+              addingToCart ||
+              selectedVariation.stock === 0 ||
+              quantity > selectedVariation.stock
+            }
             className="w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {addingToCart ? "追加中..." : "カートに追加"}

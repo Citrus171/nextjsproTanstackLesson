@@ -184,7 +184,7 @@ describe("ProductDetailPage", () => {
     });
   });
 
-  it("バリエーション未選択でカートに追加しようとするとエラーになること", async () => {
+  it("バリエーション未選択時はカートボタンが無効化されていること", async () => {
     render(<ProductDetailPage />);
 
     await waitFor(() => {
@@ -193,12 +193,57 @@ describe("ProductDetailPage", () => {
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "カートに追加" }));
-
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "バリエーションを選択してください",
-    );
+    expect(
+      screen.getByRole("button", { name: "カートに追加" }),
+    ).toBeDisabled();
     expect(mockAddToCart).not.toHaveBeenCalled();
+  });
+
+  it("バリエーション選択時に数量が在庫上限にクランプされること", async () => {
+    const user = userEvent.setup();
+    render(<ProductDetailPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "テストシャツ" }),
+      ).toBeInTheDocument();
+    });
+
+    const quantityInput = screen.getByRole("spinbutton", { name: /数量/ });
+    const variationSelect = screen.getByRole("combobox", {
+      name: /バリエーション/,
+    });
+
+    // 数量を5に増やしてから stock=3 のバリエーションを選択
+    fireEvent.change(quantityInput, { target: { value: "5" } });
+    await user.selectOptions(variationSelect, "10");
+
+    // 在庫(3)にクランプされること
+    expect(quantityInput).toHaveValue(3);
+  });
+
+  it("数量が在庫を超えているとカートボタンが無効化されること", async () => {
+    const user = userEvent.setup();
+    render(<ProductDetailPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "テストシャツ" }),
+      ).toBeInTheDocument();
+    });
+
+    const variationSelect = screen.getByRole("combobox", {
+      name: /バリエーション/,
+    });
+    const quantityInput = screen.getByRole("spinbutton", { name: /数量/ });
+
+    // stock=3 のバリエーションを選択してから数量を在庫超えに設定
+    await user.selectOptions(variationSelect, "10");
+    fireEvent.change(quantityInput, { target: { value: "10" } });
+
+    expect(
+      screen.getByRole("button", { name: "カートに追加" }),
+    ).toBeDisabled();
   });
 
   it("カート追加失敗時にエラーメッセージが表示されること", async () => {
