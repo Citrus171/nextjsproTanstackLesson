@@ -64,7 +64,7 @@ export class ProductsService {
       description: createProductDto.description || null,
       price: createProductDto.price,
       categoryId: createProductDto.categoryId || null,
-      isPublished: false,
+      isPublished: createProductDto.isPublished ?? false,
     });
 
     return this.productRepository.save(product);

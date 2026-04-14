@@ -1,13 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/')({
-  component: IndexPage,
+  beforeLoad: () => {
+    throw redirect({ to: '/products' });
+  },
+  component: () => null,
 });
-
-function IndexPage() {
-  return (
-    <div style={{ maxWidth: 600, margin: '2rem auto', fontFamily: 'sans-serif', padding: '0 1rem' }}>
-      <h1>ECサイト</h1>
-    </div>
-  );
-}

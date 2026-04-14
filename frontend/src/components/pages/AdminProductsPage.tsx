@@ -9,11 +9,26 @@ import {
   productsControllerUnpublish,
   productsControllerAddVariation,
   productsControllerDeleteVariation,
+  productsControllerAddImage,
+  productsControllerDeleteImage,
+  adminCategoriesControllerFindAll,
 } from "@/api/generated/sdk.gen";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { getAdminToken } from "@/lib/auth";
 
 // ── 型定義 ──────────────────────────────────────────────────────────────────
+
+const categorySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  parentId: z.number().nullable().optional(),
+});
+
+const imageSchema = z.object({
+  id: z.number(),
+  url: z.string(),
+  sortOrder: z.number(),
+});
 
 const variationSchema = z.object({
   id: z.number(),
@@ -34,6 +49,7 @@ const productSchema = z.object({
   isPublished: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  images: z.array(imageSchema).optional(),
   variations: z.array(variationSchema).optional(),
 });
 
@@ -44,11 +60,14 @@ const productsListSchema = z.object({
 
 type Product = z.infer<typeof productSchema>;
 type Variation = z.infer<typeof variationSchema>;
+type Category = z.infer<typeof categorySchema>;
+type ProductImage = z.infer<typeof imageSchema>;
 
 // ── コンポーネント ───────────────────────────────────────────────────────────
 
 export function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -59,11 +78,14 @@ export function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [expandedProductId, setExpandedProductId] = useState<number | null>(null);
   const [showVariationForm, setShowVariationForm] = useState(false);
+  const [expandedImageProductId, setExpandedImageProductId] = useState<number | null>(null);
 
   // 商品フォーム
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const [formPrice, setFormPrice] = useState("");
+  const [formCategoryId, setFormCategoryId] = useState<string>("");
+  const [formIsPublished, setFormIsPublished] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
 
   // バリエーションフォーム
@@ -72,6 +94,10 @@ export function AdminProductsPage() {
   const [varPrice, setVarPrice] = useState("");
   const [varStock, setVarStock] = useState("");
   const [varSubmitting, setVarSubmitting] = useState(false);
+
+  // 画像フォーム
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageSubmitting, setImageSubmitting] = useState(false);
 
   const auth = getAdminToken() ?? undefined;
 
@@ -103,7 +129,21 @@ export function AdminProductsPage() {
     setLoading(false);
   };
 
+  const fetchCategories = async () => {
+    const { data } = await adminCategoriesControllerFindAll({
+      auth,
+      throwOnError: false,
+    });
+    if (data) {
+      const parsed = z.array(categorySchema).safeParse(data);
+      if (parsed.success) {
+        setCategories(parsed.data);
+      }
+    }
+  };
+
   useEffect(() => {
+    void fetchCategories();
     void fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -121,6 +161,8 @@ export function AdminProductsPage() {
         name: formName,
         description: formDescription || undefined,
         price: Number(formPrice),
+        categoryId: formCategoryId ? Number(formCategoryId) : undefined,
+        isPublished: formIsPublished,
       },
       throwOnError: false,
     });
@@ -133,9 +175,7 @@ export function AdminProductsPage() {
 
     setSuccessMessage("商品を登録しました");
     setShowCreateForm(false);
-    setFormName("");
-    setFormDescription("");
-    setFormPrice("");
+    resetForm();
     setFormSubmitting(false);
     await fetchProducts();
   };
@@ -155,6 +195,7 @@ export function AdminProductsPage() {
         name: formName,
         description: formDescription || undefined,
         price: Number(formPrice),
+        categoryId: formCategoryId ? Number(formCategoryId) : null,
       },
       throwOnError: false,
     });
@@ -267,6 +308,53 @@ export function AdminProductsPage() {
     await fetchProducts();
   };
 
+  // ── 画像追加 ──────────────────────────────────────────────────────────────
+
+  const handleAddImage = async (e: React.FormEvent, productId: number) => {
+    e.preventDefault();
+    setImageSubmitting(true);
+    setErrorMessage(null);
+
+    const { error } = await productsControllerAddImage({
+      auth,
+      path: { id: productId },
+      body: { url: imageUrl },
+      throwOnError: false,
+    });
+
+    if (error) {
+      setErrorMessage("画像の追加に失敗しました");
+      setImageSubmitting(false);
+      return;
+    }
+
+    setSuccessMessage("画像を追加しました");
+    setImageUrl("");
+    setImageSubmitting(false);
+    await fetchProducts();
+  };
+
+  // ── 画像削除 ──────────────────────────────────────────────────────────────
+
+  const handleDeleteImage = async (imageId: number) => {
+    if (!window.confirm("この画像を削除しますか？")) return;
+    setErrorMessage(null);
+
+    const { error } = await productsControllerDeleteImage({
+      auth,
+      path: { imageId },
+      throwOnError: false,
+    });
+
+    if (error) {
+      setErrorMessage("画像の削除に失敗しました");
+      return;
+    }
+
+    setSuccessMessage("画像を削除しました");
+    await fetchProducts();
+  };
+
   // ── 編集開始 ──────────────────────────────────────────────────────────────
 
   const startEdit = (product: Product) => {
@@ -274,7 +362,16 @@ export function AdminProductsPage() {
     setFormName(product.name);
     setFormDescription(product.description ?? "");
     setFormPrice(String(product.price));
+    setFormCategoryId(product.categoryId ? String(product.categoryId) : "");
     setShowCreateForm(false);
+  };
+
+  const resetForm = () => {
+    setFormName("");
+    setFormDescription("");
+    setFormPrice("");
+    setFormCategoryId("");
+    setFormIsPublished(false);
   };
 
   // ── レンダリング ──────────────────────────────────────────────────────────
@@ -289,9 +386,7 @@ export function AdminProductsPage() {
             onClick={() => {
               setShowCreateForm(true);
               setEditingProduct(null);
-              setFormName("");
-              setFormDescription("");
-              setFormPrice("");
+              resetForm();
             }}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
@@ -318,10 +413,26 @@ export function AdminProductsPage() {
               name={formName}
               description={formDescription}
               price={formPrice}
+              categoryId={formCategoryId}
+              categories={categories}
               onNameChange={setFormName}
               onDescriptionChange={setFormDescription}
               onPriceChange={setFormPrice}
+              onCategoryIdChange={setFormCategoryId}
             />
+            {/* 公開状態 */}
+            <div className="flex items-center gap-2">
+              <input
+                id="form-is-published"
+                type="checkbox"
+                checked={formIsPublished}
+                onChange={(e) => setFormIsPublished(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <label htmlFor="form-is-published" className="text-sm font-medium">
+                登録後すぐに公開する
+              </label>
+            </div>
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -353,9 +464,12 @@ export function AdminProductsPage() {
               name={formName}
               description={formDescription}
               price={formPrice}
+              categoryId={formCategoryId}
+              categories={categories}
               onNameChange={setFormName}
               onDescriptionChange={setFormDescription}
               onPriceChange={setFormPrice}
+              onCategoryIdChange={setFormCategoryId}
             />
             <div className="flex gap-2">
               <button
@@ -436,10 +550,26 @@ export function AdminProductsPage() {
                                   setExpandedProductId(product.id);
                                   setShowVariationForm(false);
                                 }
+                                setExpandedImageProductId(null);
                               }}
                               className="rounded px-2 py-1 text-xs border hover:bg-accent"
                             >
                               バリエーション
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (expandedImageProductId === product.id) {
+                                  setExpandedImageProductId(null);
+                                } else {
+                                  setExpandedImageProductId(product.id);
+                                }
+                                setExpandedProductId(null);
+                                setShowVariationForm(false);
+                              }}
+                              className="rounded px-2 py-1 text-xs border hover:bg-accent"
+                            >
+                              画像
                             </button>
                             <button
                               type="button"
@@ -473,6 +603,20 @@ export function AdminProductsPage() {
                           </td>
                         </tr>
                       )}
+                      {expandedImageProductId === product.id && (
+                        <tr key={`img-${product.id}`} className="bg-muted/20">
+                          <td colSpan={5} className="px-6 py-3">
+                            <ImageSection
+                              product={product}
+                              imageUrl={imageUrl}
+                              imageSubmitting={imageSubmitting}
+                              onImageUrlChange={setImageUrl}
+                              onAddImage={(e) => handleAddImage(e, product.id)}
+                              onDeleteImage={handleDeleteImage}
+                            />
+                          </td>
+                        </tr>
+                      )}
                     </>
                   ))}
                 </tbody>
@@ -491,14 +635,17 @@ interface ProductFormFieldsProps {
   name: string;
   description: string;
   price: string;
+  categoryId: string;
+  categories: Category[];
   onNameChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onPriceChange: (v: string) => void;
+  onCategoryIdChange: (v: string) => void;
 }
 
 function ProductFormFields({
-  name, description, price,
-  onNameChange, onDescriptionChange, onPriceChange,
+  name, description, price, categoryId, categories,
+  onNameChange, onDescriptionChange, onPriceChange, onCategoryIdChange,
 }: ProductFormFieldsProps) {
   return (
     <>
@@ -543,6 +690,24 @@ function ProductFormFields({
           className="w-full rounded-md border px-3 py-2 text-sm"
           placeholder="例: 1000"
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1" htmlFor="product-category">
+          カテゴリ
+        </label>
+        <select
+          id="product-category"
+          value={categoryId}
+          onChange={(e) => onCategoryIdChange(e.target.value)}
+          className="w-full rounded-md border px-3 py-2 text-sm"
+        >
+          <option value="">なし</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </div>
     </>
   );
@@ -683,6 +848,70 @@ function VariationSection({
             ))}
           </tbody>
         </table>
+      )}
+    </div>
+  );
+}
+
+interface ImageSectionProps {
+  product: Product;
+  imageUrl: string;
+  imageSubmitting: boolean;
+  onImageUrlChange: (v: string) => void;
+  onAddImage: (e: React.FormEvent) => void;
+  onDeleteImage: (id: number) => void;
+}
+
+function ImageSection({
+  product, imageUrl, imageSubmitting,
+  onImageUrlChange, onAddImage, onDeleteImage,
+}: ImageSectionProps) {
+  const images: ProductImage[] = product.images ?? [];
+
+  return (
+    <div className="space-y-3">
+      <h3 className="text-sm font-semibold">画像管理</h3>
+
+      <form onSubmit={onAddImage} aria-label="画像追加フォーム" className="flex gap-2">
+        <input
+          type="url"
+          value={imageUrl}
+          onChange={(e) => onImageUrlChange(e.target.value)}
+          placeholder="https://example.com/image.jpg"
+          required
+          className="flex-1 rounded border px-2 py-1 text-sm"
+        />
+        <button
+          type="submit"
+          disabled={imageSubmitting}
+          className="rounded px-3 py-1 text-xs bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {imageSubmitting ? "追加中..." : "画像追加"}
+        </button>
+      </form>
+
+      {images.length === 0 ? (
+        <p className="text-xs text-muted-foreground">画像がありません</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {images.map((img) => (
+            <div key={img.id} className="relative">
+              <img
+                src={img.url}
+                alt={`商品画像 ${img.sortOrder + 1}`}
+                className="w-16 h-16 rounded object-cover border"
+              />
+              <button
+                type="button"
+                onClick={() => onDeleteImage(img.id)}
+                className="absolute -top-1 -right-1 rounded-full bg-destructive text-destructive-foreground text-xs px-1"
+                aria-label="画像削除"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
