@@ -20,6 +20,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     passWithNoTests: true,
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
@@ -35,6 +36,7 @@ export default defineConfig({
         "src/routerTypes.d.ts",
         "src/components/ui/**",
         "src/lib/utils.ts",
+        "tests/**",
       ],
       thresholds: {
         lines: 80,
