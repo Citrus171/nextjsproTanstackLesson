@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProductDetailPage } from "@/components/pages/ProductDetailPage";
 
@@ -184,5 +184,61 @@ describe("ProductDetailPage", () => {
 
     const links = screen.getAllByRole("link", { name: "商品一覧" });
     expect(links.length).toBeGreaterThan(0);
+  });
+
+  it("バリエーション切り替え時に数量が在庫上限にクランプされること", async () => {
+    const productWith2Variations = {
+      ...mockProduct,
+      variations: [
+        { id: 10, productId: 1, size: "M", color: "赤", price: 2000, stock: 5, deletedAt: null },
+        { id: 13, productId: 1, size: "XL", color: "緑", price: 2200, stock: 2, deletedAt: null },
+      ],
+    };
+    mockFindById.mockResolvedValue({ data: productWith2Variations, error: undefined });
+
+    render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
+    });
+
+    // M/赤(stock=5)を選択して数量を4に増やす
+    fireEvent.click(screen.getByLabelText("M / 赤"));
+    const increaseBtn = screen.getByRole("button", { name: "数量を増やす" });
+    fireEvent.click(increaseBtn);
+    fireEvent.click(increaseBtn);
+    fireEvent.click(increaseBtn);
+    expect(screen.getByText("4")).toBeInTheDocument();
+
+    // XL/緑(stock=2)に切り替えると数量が2にクランプされること
+    fireEvent.click(screen.getByLabelText("XL / 緑"));
+    expect(screen.getByText("2")).toBeInTheDocument();
+  });
+
+  it("productId変更時に選択バリエーションと数量がリセットされること", async () => {
+    const { rerender } = render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
+    });
+
+    // バリエーションを選択
+    fireEvent.click(screen.getByLabelText("M / 赤"));
+    expect(screen.getByLabelText("M / 赤")).toHaveAttribute("aria-pressed", "true");
+
+    // productId を変更
+    const product2 = { ...mockProduct, id: 2, name: "別の商品" };
+    mockFindById.mockResolvedValue({ data: product2, error: undefined });
+
+    await act(async () => {
+      rerender(<ProductDetailPage productId={2} />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "別の商品" })).toBeInTheDocument();
+    });
+
+    // カートボタンがリセット後も無効（未選択）であること
+    expect(screen.getByRole("button", { name: "カートに追加" })).toBeDisabled();
   });
 });

@@ -53,6 +53,12 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
   useEffect(() => {
     let active = true;
 
+    setSelectedVariation(null);
+    setQuantity(1);
+    setProduct(null);
+    setLoading(true);
+    setErrorMessage(null);
+
     const fetchProduct = async () => {
       const { data, error } = await publicProductsControllerFindById({
         path: { id: productId },
@@ -172,7 +178,10 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
                         <button
                           key={v.id}
                           type="button"
-                          onClick={() => setSelectedVariation(v)}
+                          onClick={() => {
+                            setSelectedVariation(v);
+                            setQuantity((q) => Math.max(1, Math.min(q, v.stock)));
+                          }}
                           disabled={v.stock === 0}
                           aria-label={`${v.size} / ${v.color}`}
                           aria-pressed={selectedVariation?.id === v.id}
@@ -231,7 +240,12 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  disabled={!selectedVariation || addingToCart || selectedVariation.stock === 0}
+                  disabled={
+                    !selectedVariation ||
+                    addingToCart ||
+                    selectedVariation.stock === 0 ||
+                    quantity > selectedVariation.stock
+                  }
                   className="w-full rounded-md bg-primary py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
                   {addingToCart ? "追加中..." : "カートに追加"}
