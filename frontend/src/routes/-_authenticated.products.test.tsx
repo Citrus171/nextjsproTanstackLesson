@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -5,7 +6,7 @@ import { ProductsPage } from "@/components/pages/ProductsPage";
 
 // Mock the Link component to avoid router setup
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ to, children, className }: any) => (
+  Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => (
     <a href={to} className={className}>
       {children}
     </a>
