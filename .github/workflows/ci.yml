@@ -170,6 +170,9 @@ jobs:
       DB_USER: root
       DB_PASSWORD: password
       DB_NAME: ec_db
+      JWT_SECRET: test-jwt-secret-for-ci
+      STRIPE_SECRET_KEY: sk_test_dummy_stripe_secret_key_for_ci
+      STRIPE_WEBHOOK_SECRET: whsec_dummy_webhook_secret_for_ci
 
     steps:
       - name: Checkout
