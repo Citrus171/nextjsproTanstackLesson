@@ -216,7 +216,8 @@ describe("ProductDetailPage", () => {
   });
 
   it("productId変更時に選択バリエーションと数量がリセットされること", async () => {
-    const { rerender } = render(<ProductDetailPage productId={1} />);
+    // key={1} でマウント（ルートが key={productId} を渡す実装を再現）
+    const { rerender } = render(<ProductDetailPage key={1} productId={1} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
@@ -226,19 +227,19 @@ describe("ProductDetailPage", () => {
     fireEvent.click(screen.getByLabelText("M / 赤"));
     expect(screen.getByLabelText("M / 赤")).toHaveAttribute("aria-pressed", "true");
 
-    // productId を変更
+    // productId を変更（key を変えることで React がリマウント）
     const product2 = { ...mockProduct, id: 2, name: "別の商品" };
     mockFindById.mockResolvedValue({ data: product2, error: undefined });
 
     await act(async () => {
-      rerender(<ProductDetailPage productId={2} />);
+      rerender(<ProductDetailPage key={2} productId={2} />);
     });
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { level: 1, name: "別の商品" })).toBeInTheDocument();
     });
 
-    // カートボタンがリセット後も無効（未選択）であること
+    // リマウント後はバリエーション未選択でカートボタンが無効であること
     expect(screen.getByRole("button", { name: "カートに追加" })).toBeDisabled();
   });
 });

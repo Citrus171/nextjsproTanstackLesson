@@ -7,5 +7,5 @@ export const Route = createFileRoute("/_authenticated/products/$productId")({
 
 function ProductDetailRoute() {
   const { productId } = Route.useParams();
-  return <ProductDetailPage productId={Number(productId)} />;
+  return <ProductDetailPage key={productId} productId={Number(productId)} />;
 }

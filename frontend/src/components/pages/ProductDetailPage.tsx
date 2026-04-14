@@ -53,12 +53,6 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
   useEffect(() => {
     let active = true;
 
-    setSelectedVariation(null);
-    setQuantity(1);
-    setProduct(null);
-    setLoading(true);
-    setErrorMessage(null);
-
     const fetchProduct = async () => {
       const { data, error } = await publicProductsControllerFindById({
         path: { id: productId },
