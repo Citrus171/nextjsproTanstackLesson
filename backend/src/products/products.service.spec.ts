@@ -203,6 +203,41 @@ describe('ProductsService', () => {
         BadRequestException,
       );
     });
+
+    it('isPublished: trueを渡したとき、公開状態で商品が作成されること', async () => {
+      // Arrange
+      const createProductDto = {
+        name: 'テスト商品',
+        price: 1000,
+        isPublished: true,
+      };
+
+      const createdProduct = {
+        id: 1,
+        name: 'テスト商品',
+        price: 1000,
+        isPublished: true,
+        images: [],
+        variations: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      };
+
+      mockProductRepository.create.mockReturnValue(createdProduct);
+      mockProductRepository.save.mockResolvedValue(createdProduct);
+
+      // Act
+      const result = await service.create(createProductDto);
+
+      // Assert
+      expect(mockProductRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isPublished: true,
+        }),
+      );
+      expect(result.isPublished).toBe(true);
+    });
   });
 
   describe('findById', () => {

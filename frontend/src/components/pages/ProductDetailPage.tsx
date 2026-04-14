@@ -5,7 +5,7 @@ import { MemberLayout } from "@/components/layouts/MemberLayout";
 import { getToken } from "@/lib/auth";
 import { toast } from "sonner";
 
-// ── 型定義 ───────────────────────────────────────────────────────────────────
+// ── 型定義 ──────────────────────────────────────────────────────────────────
 
 const variationSchema = z.object({
   id: z.number(),
@@ -75,7 +75,6 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
       }
 
       setProduct(parsed.data);
-      // バリエーションが1つなら自動選択
       const activeVariations = parsed.data.variations?.filter((v) => !v.deletedAt) ?? [];
       if (activeVariations.length === 1) {
         setSelectedVariation(activeVariations[0]);

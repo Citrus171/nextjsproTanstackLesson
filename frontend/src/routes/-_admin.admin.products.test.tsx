@@ -13,6 +13,9 @@ const mockPublish = vi.fn();
 const mockUnpublish = vi.fn();
 const mockAddVariation = vi.fn();
 const mockDeleteVariation = vi.fn();
+const mockAddImage = vi.fn();
+const mockDeleteImage = vi.fn();
+const mockFindAllCategories = vi.fn();
 
 vi.mock("@/api/generated/sdk.gen", () => ({
   productsControllerFindAll: (...args: unknown[]) => mockFindAll(...args),
@@ -23,6 +26,9 @@ vi.mock("@/api/generated/sdk.gen", () => ({
   productsControllerUnpublish: (...args: unknown[]) => mockUnpublish(...args),
   productsControllerAddVariation: (...args: unknown[]) => mockAddVariation(...args),
   productsControllerDeleteVariation: (...args: unknown[]) => mockDeleteVariation(...args),
+  productsControllerAddImage: (...args: unknown[]) => mockAddImage(...args),
+  productsControllerDeleteImage: (...args: unknown[]) => mockDeleteImage(...args),
+  adminCategoriesControllerFindAll: (...args: unknown[]) => mockFindAllCategories(...args),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -31,15 +37,23 @@ vi.mock("@/lib/auth", () => ({
 
 // ── テストデータ ─────────────────────────────────────────────────────────────
 
+const mockCategories = [
+  { id: 1, name: "衣類", parentId: null },
+  { id: 2, name: "小物", parentId: null },
+];
+
 const mockProduct = {
   id: 1,
   name: "テストシャツ",
   description: "テスト用の説明",
   price: 2000,
-  categoryId: null,
+  categoryId: 1,
   isPublished: true,
   createdAt: "2026-04-01T00:00:00Z",
   updatedAt: "2026-04-01T00:00:00Z",
+  images: [
+    { id: 100, url: "https://example.com/img1.jpg", sortOrder: 0 },
+  ],
   variations: [
     { id: 10, productId: 1, size: "M", color: "赤", price: 2000, stock: 5 },
   ],
@@ -50,6 +64,7 @@ const mockProductUnpublished = {
   id: 2,
   name: "非公開商品",
   isPublished: false,
+  images: [],
   variations: [],
 };
 
@@ -63,6 +78,10 @@ describe("AdminProductsPage", () => {
     // window.confirm は全テストでデフォルトtrue
     vi.spyOn(window, "confirm").mockReturnValue(true);
     mockFindAll.mockResolvedValue(successResponse);
+    mockFindAllCategories.mockResolvedValue({
+      data: mockCategories,
+      error: undefined,
+    });
   });
 
   // ── 一覧表示 ────────────────────────────────────────────────────────────
@@ -327,6 +346,250 @@ describe("AdminProductsPage", () => {
       expect(mockDeleteVariation).toHaveBeenCalledWith(
         expect.objectContaining({ path: { variationId: 10 } }),
       );
+    });
+  });
+
+  // ── カテゴリ選択 ──────────────────────────────────────────────────────
+
+  it("商品登録フォームにカテゴリ選択肢が表示されること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: "商品登録" }));
+
+    await waitFor(() => {
+      const categorySelect = screen.getByRole("combobox", { name: /カテゴリ/ });
+      expect(categorySelect).toBeInTheDocument();
+      expect(categorySelect.querySelector('option[value="1"]')).toHaveTextContent("衣類");
+      expect(categorySelect.querySelector('option[value="2"]')).toHaveTextContent("小物");
+    });
+  });
+
+  it("商品登録フォームでカテゴリを選択して登録するとAPIにcategoryIdが渡されること", async () => {
+    const user = userEvent.setup();
+    mockCreate.mockResolvedValue({ data: { id: 3 }, error: undefined });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: "商品登録" }));
+    await user.type(screen.getByLabelText(/商品名/), "新商品");
+    await user.type(screen.getByLabelText(/価格/), "1500");
+
+    const categorySelect = screen.getByRole("combobox", { name: /カテゴリ/ });
+    await user.selectOptions(categorySelect, "1");
+
+    fireEvent.click(screen.getByRole("button", { name: "登録する" }));
+
+    await waitFor(() => {
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ categoryId: 1 }),
+        }),
+      );
+    });
+  });
+
+  it("商品編集フォームにカテゴリ選択肢が表示されること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "編集" })[0]);
+
+    const categorySelect = screen.getByRole("combobox", { name: /カテゴリ/ });
+    expect(categorySelect).toBeInTheDocument();
+    // 既存のcategoryId(1)が選択されていること
+    expect(categorySelect).toHaveValue("1");
+  });
+
+  // ── 公開状態 ──────────────────────────────────────────────────────────
+
+  it("商品登録フォームに公開状態チェックボックスが表示されること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: "商品登録" }));
+
+    expect(
+      screen.getByRole("checkbox", { name: /登録後すぐに公開/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("公開チェックをオンにして登録するとAPIにisPublished:trueが渡されること", async () => {
+    const user = userEvent.setup();
+    mockCreate.mockResolvedValue({ data: { id: 3 }, error: undefined });
+    mockPublish.mockResolvedValue({ data: {}, error: undefined });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: "商品登録" }));
+    await user.type(screen.getByLabelText(/商品名/), "公開商品");
+    await user.type(screen.getByLabelText(/価格/), "2000");
+
+    const publishCheckbox = screen.getByRole("checkbox", { name: /登録後すぐに公開/ });
+    await user.click(publishCheckbox);
+
+    fireEvent.click(screen.getByRole("button", { name: "登録する" }));
+
+    await waitFor(() => {
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ isPublished: true }),
+        }),
+      );
+    });
+  });
+
+  // ── 画像管理 ──────────────────────────────────────────────────────────
+
+  it("画像管理ボタンをクリックすると画像セクションが表示されること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+
+    await waitFor(() => {
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument();
+    });
+  });
+
+  it("画像URLを入力して追加するとAPIが呼ばれること", async () => {
+    const user = userEvent.setup();
+    mockAddImage.mockResolvedValue({ data: { id: 200 }, error: undefined });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+
+    await waitFor(() => {
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument();
+    });
+
+    await user.type(
+      screen.getByPlaceholderText("https://example.com/image.jpg"),
+      "https://example.com/new.jpg",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "画像追加" }));
+
+    await waitFor(() => {
+      expect(mockAddImage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { id: 1 },
+          body: expect.objectContaining({ url: "https://example.com/new.jpg" }),
+        }),
+      );
+    });
+  });
+
+  it("画像削除ボタンをクリックするとAPIが呼ばれること", async () => {
+    mockDeleteImage.mockResolvedValue({ data: {}, error: undefined });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+
+    await waitFor(() => {
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "画像削除" }));
+
+    await waitFor(() => {
+      expect(mockDeleteImage).toHaveBeenCalledWith(
+        expect.objectContaining({ path: { imageId: 100 } }),
+      );
+    });
+  });
+
+  it("「バリエーション」ボタンを2回クリックするとバリエーション一覧が非表示になること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    // 1回目: 表示
+    fireEvent.click(screen.getAllByRole("button", { name: "バリエーション" })[0]);
+    await waitFor(() => expect(screen.getByText("M")).toBeInTheDocument());
+
+    // 2回目: 非表示（trueブランチをカバー）
+    fireEvent.click(screen.getAllByRole("button", { name: "バリエーション" })[0]);
+
+    await waitFor(() => {
+      expect(screen.queryByText("M")).not.toBeInTheDocument();
+    });
+  });
+
+  it("「画像」ボタンを2回クリックすると画像セクションが非表示になること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    // 1回目: 表示
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+    await waitFor(() =>
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument(),
+    );
+
+    // 2回目: 非表示（trueブランチをカバー）
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("form", { name: "画像追加フォーム" }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("画像がない商品の画像セクションを開くと「画像がありません」と表示されること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    // 非公開商品（images:[]）の画像ボタン（インデックス1）をクリック
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText("画像がありません")).toBeInTheDocument();
+    });
+  });
+
+  it("画像追加に失敗した場合エラーメッセージが表示されること", async () => {
+    const user = userEvent.setup();
+    mockAddImage.mockResolvedValue({ data: undefined, error: "error" });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+    await waitFor(() =>
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument(),
+    );
+
+    await user.type(
+      screen.getByPlaceholderText("https://example.com/image.jpg"),
+      "https://example.com/fail.jpg",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "画像追加" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("画像の追加に失敗しました");
+    });
+  });
+
+  it("画像削除に失敗した場合エラーメッセージが表示されること", async () => {
+    mockDeleteImage.mockResolvedValue({ data: undefined, error: "error" });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+    await waitFor(() =>
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "画像削除" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("画像の削除に失敗しました");
     });
   });
 });
