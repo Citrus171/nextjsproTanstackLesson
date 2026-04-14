@@ -732,6 +732,17 @@ nestjspro/
                     ├── childrenが描画されること
                     └── toast()を呼ぶとトースト通知が表示されること
     └── tests/
-        └── admin-login.spec.ts
-            └── Navigate to admin login page and login as admin, verify dashboard displays with correct title ✓
+        ├── admin-login.spec.ts
+        │   └── Navigate to admin login page and login as admin, verify dashboard displays with correct title ✓
+        └── purchase.spec.ts
+            └── 商品購入からカード決済完了まで
+                ├── ユーザー登録（API） ✓
+                ├── ログインしてトークン取得（API） ✓
+                ├── カートに商品追加（API） ✓
+                ├── カートページでアイテム確認（ブラウザ） ✓
+                ├── チェックアウトページへ移動（ブラウザ） ✓
+                ├── 配送先フォーム入力（ブラウザ） ✓
+                ├── Stripe Checkout へリダイレクト（ブラウザ） ✓
+                ├── Stripe 決済フォーム入力（ブラウザ） ✓
+                └── 決済完了ページ確認（ブラウザ） ✓
 ```

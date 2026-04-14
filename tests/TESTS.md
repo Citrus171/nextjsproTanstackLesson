@@ -753,6 +753,18 @@
 
 - [x] Navigate to admin login page and login as admin, verify dashboard displays with correct title
 
+### Purchase Flow `frontend/tests/purchase.spec.ts`
+
+- [x] ユーザー登録（API）
+- [x] ログインしてトークン取得（API）
+- [x] カートに商品追加（API）
+- [x] カートページでアイテム確認（ブラウザ）
+- [x] チェックアウトページへ移動（ブラウザ）
+- [x] 配送先フォーム入力（ブラウザ）
+- [x] Stripe Checkout へリダイレクト（ブラウザ）
+- [x] Stripe 決済フォーム入力（ブラウザ）
+- [x] 決済完了ページ確認（ブラウザ）
+
 ---
 
 ## Issue#11 カート機能
