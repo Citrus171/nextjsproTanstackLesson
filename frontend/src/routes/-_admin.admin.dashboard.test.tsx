@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import { AdminDashboardPage } from "../_admin.admin.dashboard";
+import { AdminDashboardPage } from "./_admin.admin.dashboard";
 
 describe("Admin Dashboard Page", () => {
   it("ダッシュボードが表示されること", () => {
