@@ -40,6 +40,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@hey-api/openapi-ts": "^0.95.0",
+    "@playwright/test": "^1.50.1",
     "@tanstack/router-plugin": "^1.167.12",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
