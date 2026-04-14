@@ -200,6 +200,11 @@ jobs:
       - name: Generate OpenAPI and frontend client
         run: npm run gen
 
+      - name: Run database migrations
+        run: npm run migration:run --prefix backend
+        env:
+          NODE_ENV: test
+
       - name: Start backend
         run: npm run start:dev --prefix backend
         env:
