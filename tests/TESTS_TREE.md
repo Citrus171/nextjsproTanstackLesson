@@ -630,7 +630,8 @@ nestjspro/
         ├── -_authenticated.cart.test.tsx
         │   ├── カートアイテムが一覧表示されること ✓
         │   ├── 空カート時にメッセージが表示されること ✓
-        │   └── 削除ボタンクリックでremoveItemが呼ばれること ✓
+        │   ├── 削除ボタンクリックでremoveItemが呼ばれること ✓
+        │   └── チェックアウトボタンが表示され、クリックで遷移できること ✓
         ├── -_authenticated.checkout.test.tsx
         │   ├── 配送先フォームが表示されること ✓
         │   ├── フォーム送信でcheckout APIが呼ばれStripeにリダイレクトすること ✓

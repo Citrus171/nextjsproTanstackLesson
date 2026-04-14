@@ -558,4 +558,38 @@ describe("Cart Page", () => {
     expect(screen.getByText("Tシャツ")).toBeInTheDocument();
     expect(screen.getByText("パンツ")).toBeInTheDocument();
   });
+
+  it("チェックアウトボタンが表示され、クリックで遷移できること", async () => {
+    mockGetCart.mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          variationId: 100,
+          quantity: 1,
+          status: "reserved",
+          variation: {
+            id: 100,
+            size: "M",
+            color: "red",
+            price: 1000,
+            product: {
+              id: 1,
+              name: "Tシャツ",
+            },
+          },
+        },
+      ],
+      error: undefined,
+    });
+
+    render(<CartPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("チェックアウトへ進む")).toBeInTheDocument();
+    });
+
+    const checkoutButton = screen.getByText("チェックアウトへ進む");
+    expect(checkoutButton).toBeInTheDocument();
+    expect(checkoutButton.closest("a")).toHaveAttribute("href", "/checkout");
+  });
 });

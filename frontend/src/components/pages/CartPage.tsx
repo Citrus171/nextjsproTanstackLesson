@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   cartsControllerGetCart,
@@ -164,8 +165,17 @@ export function CartPage() {
         ))}
       </div>
 
-      <div className="text-right text-2xl font-bold">
+      <div className="text-right text-2xl font-bold mb-6">
         合計金額: ¥{totalPrice.toLocaleString()}
+      </div>
+
+      <div className="text-center">
+        <Link
+          to="/checkout"
+          className="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors"
+        >
+          チェックアウトへ進む
+        </Link>
       </div>
     </div>
   );
