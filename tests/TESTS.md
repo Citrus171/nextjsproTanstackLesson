@@ -741,6 +741,12 @@
 
 ---
 
+### Admin Dashboard Page `frontend/src/routes/-_admin.admin.dashboard.test.tsx`
+
+- [ ] ダッシュボードが表示されること
+
+---
+
 ### RootLayout（Toast統合） `frontend/src/components/layouts/RootLayout.test.tsx`
 
 - [x] childrenが描画されること
