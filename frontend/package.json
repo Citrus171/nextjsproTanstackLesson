@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "type-coverage": "npx type-coverage --at-least 95 --strict --project tsconfig.app.json --ignore-files \"src/api/generated/**\" --ignore-files \"src/test/**\" --ignore-files \"src/main.tsx\""
   },
   "dependencies": {
