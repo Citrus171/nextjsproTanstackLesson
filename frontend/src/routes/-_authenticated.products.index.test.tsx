@@ -201,4 +201,19 @@ describe("ProductsPage", () => {
     const productLink = screen.getByRole("link", { name: "テストシャツ" });
     expect(productLink).toHaveAttribute("href", "/products/1");
   });
+
+  // ── データ形式エラー ──────────────────────────────────────────────────────
+
+  it("APIが不正な形式のデータを返した場合にエラーメッセージが表示されること", async () => {
+    // スキーマ（{data:[...], total:N}）に合わない不正なデータを返す
+    mockFindAll.mockResolvedValue({ data: { invalid: "format" }, error: undefined });
+
+    render(<ProductsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "商品データの形式が不正です",
+      );
+    });
+  });
 });

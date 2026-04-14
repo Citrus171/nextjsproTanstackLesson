@@ -64,6 +64,7 @@ const mockProductUnpublished = {
   id: 2,
   name: "非公開商品",
   isPublished: false,
+  images: [],
   variations: [],
 };
 
@@ -500,6 +501,95 @@ describe("AdminProductsPage", () => {
       expect(mockDeleteImage).toHaveBeenCalledWith(
         expect.objectContaining({ path: { imageId: 100 } }),
       );
+    });
+  });
+
+  it("「バリエーション」ボタンを2回クリックするとバリエーション一覧が非表示になること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    // 1回目: 表示
+    fireEvent.click(screen.getAllByRole("button", { name: "バリエーション" })[0]);
+    await waitFor(() => expect(screen.getByText("M")).toBeInTheDocument());
+
+    // 2回目: 非表示（trueブランチをカバー）
+    fireEvent.click(screen.getAllByRole("button", { name: "バリエーション" })[0]);
+
+    await waitFor(() => {
+      expect(screen.queryByText("M")).not.toBeInTheDocument();
+    });
+  });
+
+  it("「画像」ボタンを2回クリックすると画像セクションが非表示になること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    // 1回目: 表示
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+    await waitFor(() =>
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument(),
+    );
+
+    // 2回目: 非表示（trueブランチをカバー）
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("form", { name: "画像追加フォーム" }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("画像がない商品の画像セクションを開くと「画像がありません」と表示されること", async () => {
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    // 非公開商品（images:[]）の画像ボタン（インデックス1）をクリック
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText("画像がありません")).toBeInTheDocument();
+    });
+  });
+
+  it("画像追加に失敗した場合エラーメッセージが表示されること", async () => {
+    const user = userEvent.setup();
+    mockAddImage.mockResolvedValue({ data: undefined, error: "error" });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+    await waitFor(() =>
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument(),
+    );
+
+    await user.type(
+      screen.getByPlaceholderText("https://example.com/image.jpg"),
+      "https://example.com/fail.jpg",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "画像追加" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("画像の追加に失敗しました");
+    });
+  });
+
+  it("画像削除に失敗した場合エラーメッセージが表示されること", async () => {
+    mockDeleteImage.mockResolvedValue({ data: undefined, error: "error" });
+
+    render(<AdminProductsPage />);
+    await waitFor(() => expect(screen.getByText("テストシャツ")).toBeInTheDocument());
+
+    fireEvent.click(screen.getAllByRole("button", { name: "画像" })[0]);
+    await waitFor(() =>
+      expect(screen.getByRole("form", { name: "画像追加フォーム" })).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "画像削除" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("画像の削除に失敗しました");
     });
   });
 });
