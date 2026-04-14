@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import {
   productsControllerFindAll,
@@ -508,8 +508,8 @@ export function AdminProductsPage() {
                 </thead>
                 <tbody>
                   {products.map((product) => (
-                    <>
-                      <tr key={product.id} className="border-b last:border-0">
+                    <React.Fragment key={product.id}>
+                      <tr className="border-b last:border-0">
                         <td className="px-4 py-2">{product.id}</td>
                         <td className="px-4 py-2 font-medium">{product.name}</td>
                         <td className="px-4 py-2">¥{product.price.toLocaleString()}</td>
@@ -582,7 +582,7 @@ export function AdminProductsPage() {
                         </td>
                       </tr>
                       {expandedProductId === product.id && (
-                        <tr key={`var-${product.id}`} className="bg-muted/20">
+                        <tr className="bg-muted/20">
                           <td colSpan={5} className="px-6 py-3">
                             <VariationSection
                               product={product}
@@ -604,7 +604,7 @@ export function AdminProductsPage() {
                         </tr>
                       )}
                       {expandedImageProductId === product.id && (
-                        <tr key={`img-${product.id}`} className="bg-muted/20">
+                        <tr className="bg-muted/20">
                           <td colSpan={5} className="px-6 py-3">
                             <ImageSection
                               product={product}
@@ -617,7 +617,7 @@ export function AdminProductsPage() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
