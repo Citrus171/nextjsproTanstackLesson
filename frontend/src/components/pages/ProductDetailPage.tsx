@@ -1,94 +1,73 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { useParams, Link } from "@tanstack/react-router";
-import {
-  publicProductsControllerFindById,
-  cartsControllerAddToCart,
-} from "@/api/generated/sdk.gen";
+import { publicProductsControllerFindById, cartsControllerAddToCart } from "@/api/generated/sdk.gen";
+import { MemberLayout } from "@/components/layouts/MemberLayout";
 import { getToken } from "@/lib/auth";
+import { toast } from "sonner";
 
 // ── 型定義 ──────────────────────────────────────────────────────────────────
 
 const variationSchema = z.object({
   id: z.number(),
+  productId: z.number(),
   size: z.string(),
   color: z.string(),
   price: z.number(),
   stock: z.number(),
+  imageUrl: z.string().nullable().optional(),
+  deletedAt: z.string().nullable().optional(),
 });
 
-const productSchema = z.object({
+const productDetailSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string().nullable().optional(),
   price: z.number(),
+  categoryId: z.number().nullable().optional(),
+  images: z.array(z.object({ id: z.number(), url: z.string() })).optional(),
+  variations: z.array(variationSchema).optional(),
   category: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-    })
+    .object({ id: z.number(), name: z.string() })
     .nullable()
     .optional(),
-  images: z
-    .array(
-      z.object({
-        id: z.number(),
-        url: z.string(),
-        sortOrder: z.number(),
-      }),
-    )
-    .optional(),
-  variations: z.array(variationSchema).optional(),
 });
 
-type Product = z.infer<typeof productSchema>;
+type ProductDetail = z.infer<typeof productDetailSchema>;
 type Variation = z.infer<typeof variationSchema>;
 
 // ── コンポーネント ───────────────────────────────────────────────────────────
 
-export function ProductDetailPage() {
-  const { productId } = useParams({ strict: false }) as { productId: string };
+interface ProductDetailPageProps {
+  productId: number;
+}
 
-  const [product, setProduct] = useState<Product | null>(null);
+export function ProductDetailPage({ productId }: ProductDetailPageProps) {
+  const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // カート操作
-  const [selectedVariationId, setSelectedVariationId] = useState<
-    number | null
-  >(null);
+  const [selectedVariation, setSelectedVariation] = useState<Variation | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
 
-  // 選択中の画像インデックス
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
-  const auth = getToken() ?? undefined;
-
   useEffect(() => {
-    const id = Number(productId);
-    if (!id) return;
+    let active = true;
 
-    setSelectedVariationId(null);
-    setQuantity(1);
-
-    void (async () => {
-      setLoading(true);
-      setErrorMessage(null);
-
+    const fetchProduct = async () => {
       const { data, error } = await publicProductsControllerFindById({
-        path: { id },
+        path: { id: productId },
         throwOnError: false,
       });
 
+      if (!active) return;
+
       if (error) {
-        setErrorMessage("商品の取得に失敗しました");
+        setErrorMessage("商品情報の取得に失敗しました");
         setLoading(false);
         return;
       }
 
-      const parsed = productSchema.safeParse(data);
+      const parsed = productDetailSchema.safeParse(data);
       if (!parsed.success) {
         setErrorMessage("商品データの形式が不正です");
         setLoading(false);
@@ -96,227 +75,185 @@ export function ProductDetailPage() {
       }
 
       setProduct(parsed.data);
+      const activeVariations = parsed.data.variations?.filter((v) => !v.deletedAt) ?? [];
+      if (activeVariations.length === 1) {
+        setSelectedVariation(activeVariations[0]);
+      }
       setLoading(false);
-    })();
+    };
+
+    void fetchProduct();
+
+    return () => {
+      active = false;
+    };
   }, [productId]);
 
   const handleAddToCart = async () => {
-    if (!selectedVariationId) {
-      setErrorMessage("バリエーションを選択してください");
-      return;
-    }
-
+    if (!selectedVariation) return;
     setAddingToCart(true);
-    setErrorMessage(null);
 
     const { error } = await cartsControllerAddToCart({
-      auth,
-      body: { variationId: selectedVariationId, quantity },
+      auth: getToken() ?? undefined,
+      body: { variationId: selectedVariation.id, quantity },
       throwOnError: false,
     });
 
     if (error) {
-      setErrorMessage("カートへの追加に失敗しました");
+      toast.error("カートへの追加に失敗しました");
       setAddingToCart(false);
       return;
     }
 
-    setSuccessMessage("カートに追加しました");
+    toast.success("カートに追加しました");
     setAddingToCart(false);
   };
 
-  // ── レンダリング ──────────────────────────────────────────────────────────
-
-  if (loading) {
-    return (
-      <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <p>読み込み中...</p>
-      </div>
-    );
-  }
-
-  if (errorMessage && !product) {
-    return (
-      <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <p role="alert" className="text-sm text-destructive">
-          {errorMessage}
-        </p>
-      </div>
-    );
-  }
-
-  if (!product) return null;
-
-  const images = product.images ?? [];
-  const variations: Variation[] = product.variations ?? [];
-  const mainImage = images[selectedImageIndex];
-  const selectedVariation = variations.find(
-    (v) => v.id === selectedVariationId,
-  );
-  const displayPrice = selectedVariation?.price ?? product.price;
+  const activeVariations = product?.variations?.filter((v) => !v.deletedAt) ?? [];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-      {/* パンくず */}
-      <nav className="mb-4 text-sm text-muted-foreground">
-        <Link to="/products" className="hover:underline">
-          商品一覧
-        </Link>
-        <span className="mx-1">/</span>
-        <span>{product.name}</span>
-      </nav>
+    <MemberLayout>
+      <div className="max-w-3xl mx-auto p-4">
+        {loading && <p>読み込み中...</p>}
 
-      <div className="grid gap-8 md:grid-cols-2">
-        {/* 画像エリア */}
-        <div className="space-y-3">
-          {mainImage ? (
-            <img
-              src={mainImage.url}
-              alt={`${product.name} - メイン画像`}
-              className="w-full rounded-lg object-cover aspect-square"
-            />
-          ) : (
-            <div className="w-full rounded-lg bg-muted aspect-square flex items-center justify-center text-muted-foreground">
-              画像なし
-            </div>
-          )}
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto">
-              {images.map((img, idx) => (
-                <button
-                  key={img.id}
-                  type="button"
-                  onClick={() => setSelectedImageIndex(idx)}
-                  className={`flex-shrink-0 rounded border-2 overflow-hidden w-16 h-16 ${
-                    idx === selectedImageIndex
-                      ? "border-primary"
-                      : "border-transparent"
-                  }`}
-                >
+        {errorMessage && (
+          <p role="alert" className="text-destructive">{errorMessage}</p>
+        )}
+
+        {!loading && product && (
+          <div className="space-y-6">
+            {/* パンくず */}
+            <nav aria-label="パンくず" className="text-sm text-muted-foreground">
+              <a href="/products" className="hover:underline">商品一覧</a>
+              <span className="mx-1">/</span>
+              <span>{product.name}</span>
+            </nav>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* 商品画像 */}
+              <div>
+                {product.images && product.images.length > 0 ? (
                   <img
-                    src={img.url}
-                    alt={`${product.name} - サムネイル${idx + 1}`}
-                    className="w-full h-full object-cover"
+                    src={product.images[0].url}
+                    alt={product.name}
+                    className="w-full aspect-square object-cover rounded-md border"
                   />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+                ) : (
+                  <div className="w-full aspect-square bg-muted rounded-md border flex items-center justify-center text-muted-foreground">
+                    画像なし
+                  </div>
+                )}
+              </div>
 
-        {/* 商品情報・カートエリア */}
-        <div className="space-y-4">
-          {/* カテゴリ */}
-          {product.category && (
-            <p className="text-sm text-muted-foreground">
-              {product.category.name}
-            </p>
-          )}
+              {/* 商品情報 */}
+              <div className="space-y-4">
+                {product.category && (
+                  <p className="text-sm text-muted-foreground">{product.category.name}</p>
+                )}
+                <h1 className="text-2xl font-bold">{product.name}</h1>
 
-          {/* 商品名 */}
-          <h1 className="text-2xl font-bold">{product.name}</h1>
+                {product.description && (
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {product.description}
+                  </p>
+                )}
 
-          {/* 価格 */}
-          <p className="text-xl font-semibold">
-            ¥{displayPrice.toLocaleString()}
-          </p>
+                <p className="text-2xl font-bold">
+                  ¥{(selectedVariation?.price ?? product.price).toLocaleString()}
+                </p>
 
-          {/* 説明 */}
-          {product.description && (
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {product.description}
-            </p>
-          )}
+                {/* バリエーション選択 */}
+                {activeVariations.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">バリエーションを選択</p>
+                    <div className="flex flex-wrap gap-2">
+                      {activeVariations.map((v) => (
+                        <button
+                          key={v.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedVariation(v);
+                            setQuantity((q) => Math.max(1, Math.min(q, v.stock)));
+                          }}
+                          disabled={v.stock === 0}
+                          aria-label={`${v.size} / ${v.color}`}
+                          aria-pressed={selectedVariation?.id === v.id}
+                          className={[
+                            "rounded-md border px-3 py-1.5 text-sm transition-colors",
+                            selectedVariation?.id === v.id
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "hover:border-primary",
+                            v.stock === 0 ? "opacity-40 cursor-not-allowed" : "",
+                          ].join(" ")}
+                        >
+                          {v.size} / {v.color}
+                          {v.stock === 0 && <span className="ml-1 text-xs">(在庫なし)</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-          {/* バリエーション選択 */}
-          {variations.length > 0 && (
-            <div className="space-y-2">
-              <label
-                htmlFor="variation-select"
-                className="block text-sm font-medium"
-              >
-                バリエーション
-              </label>
-              <select
-                id="variation-select"
-                value={selectedVariationId ?? ""}
-                onChange={(e) => {
-                  const newId = e.target.value
-                    ? Number(e.target.value)
-                    : null;
-                  setSelectedVariationId(newId);
-                  if (newId) {
-                    const v = variations.find((v) => v.id === newId);
-                    if (v)
-                      setQuantity((q) => Math.max(1, Math.min(q, v.stock)));
+                {/* 数量選択 */}
+                <div>
+                  <p className="text-sm font-medium mb-2">数量</p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      disabled={quantity <= 1}
+                      className="rounded border px-3 py-1 hover:bg-accent disabled:opacity-40"
+                      aria-label="数量を減らす"
+                    >
+                      −
+                    </button>
+                    <span className="min-w-[2rem] text-center">{quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setQuantity((q) =>
+                          Math.min(selectedVariation?.stock ?? 99, q + 1),
+                        )
+                      }
+                      disabled={quantity >= (selectedVariation?.stock ?? 99)}
+                      className="rounded border px-3 py-1 hover:bg-accent disabled:opacity-40"
+                      aria-label="数量を増やす"
+                    >
+                      ＋
+                    </button>
+                    {selectedVariation && (
+                      <span className="text-xs text-muted-foreground">
+                        在庫：{selectedVariation.stock}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* カートに追加 */}
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={
+                    !selectedVariation ||
+                    addingToCart ||
+                    selectedVariation.stock === 0 ||
+                    quantity > selectedVariation.stock
                   }
-                }}
-                className="w-full rounded-md border px-3 py-2 text-sm"
-              >
-                <option value="">選択してください</option>
-                {variations.map((v) => (
-                  <option key={v.id} value={v.id} disabled={v.stock === 0}>
-                    {v.size} / {v.color}
-                    {v.stock === 0 ? " (在庫なし)" : ""}
-                  </option>
-                ))}
-              </select>
+                  className="w-full rounded-md bg-primary py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {addingToCart ? "追加中..." : "カートに追加"}
+                </button>
+
+                {!selectedVariation && activeVariations.length > 0 && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    バリエーションを選択してください
+                  </p>
+                )}
+              </div>
             </div>
-          )}
-
-          {/* 数量選択 */}
-          <div className="space-y-2">
-            <label
-              htmlFor="quantity-input"
-              className="block text-sm font-medium"
-            >
-              数量
-            </label>
-            <input
-              id="quantity-input"
-              type="number"
-              value={quantity}
-              onChange={(e) =>
-                setQuantity(Math.max(1, Number(e.target.value)))
-              }
-              min={1}
-              max={
-                selectedVariation
-                  ? Math.max(1, selectedVariation.stock)
-                  : 99
-              }
-              className="w-24 rounded-md border px-3 py-2 text-sm"
-            />
           </div>
-
-          {/* メッセージ */}
-          {successMessage && (
-            <p role="status" className="text-sm text-green-600">
-              {successMessage}
-            </p>
-          )}
-          {errorMessage && (
-            <p role="alert" className="text-sm text-destructive">
-              {errorMessage}
-            </p>
-          )}
-
-          {/* カートに追加ボタン */}
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={
-              !selectedVariation ||
-              addingToCart ||
-              selectedVariation.stock === 0 ||
-              quantity > selectedVariation.stock
-            }
-            className="w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            {addingToCart ? "追加中..." : "カートに追加"}
-          </button>
-        </div>
+        )}
       </div>
-    </div>
+    </MemberLayout>
   );
 }

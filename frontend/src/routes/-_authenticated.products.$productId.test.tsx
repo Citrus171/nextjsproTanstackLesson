@@ -1,52 +1,41 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProductDetailPage } from "@/components/pages/ProductDetailPage";
-
-// ── モック ──────────────────────────────────────────────────────────────────
 
 const mockFindById = vi.fn();
 const mockAddToCart = vi.fn();
 
 vi.mock("@/api/generated/sdk.gen", () => ({
-  publicProductsControllerFindById: (...args: unknown[]) =>
-    mockFindById(...args),
+  publicProductsControllerFindAll: vi.fn(),
+  publicProductsControllerFindById: (...args: unknown[]) => mockFindById(...args),
   cartsControllerAddToCart: (...args: unknown[]) => mockAddToCart(...args),
 }));
 
-vi.mock("@tanstack/react-router", () => ({
-  useParams: () => ({ productId: "1" }),
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
-}));
-
 vi.mock("@/lib/auth", () => ({
+  isAuthenticated: () => true,
   getToken: () => "test-token",
 }));
 
-// ── テストデータ ─────────────────────────────────────────────────────────────
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
 
 const mockProduct = {
   id: 1,
   name: "テストシャツ",
-  description: "これはテスト用の説明文です。",
+  description: "テスト用の商品説明",
   price: 2000,
-  category: { id: 1, name: "衣類" },
-  images: [
-    { id: 1, url: "https://example.com/shirt1.jpg", sortOrder: 0 },
-    { id: 2, url: "https://example.com/shirt2.jpg", sortOrder: 1 },
-  ],
+  categoryId: 1,
+  images: [],
   variations: [
-    { id: 10, size: "S", color: "赤", price: 2000, stock: 3 },
-    { id: 11, size: "M", color: "赤", price: 2000, stock: 0 },
-    { id: 12, size: "L", color: "青", price: 2500, stock: 5 },
+    { id: 10, productId: 1, size: "M", color: "赤", price: 2000, stock: 5, deletedAt: null },
+    { id: 11, productId: 1, size: "L", color: "青", price: 2200, stock: 0, deletedAt: null },
+    { id: 12, productId: 1, size: "S", color: "白", price: 1800, stock: 3, deletedAt: "2026-01-01" },
   ],
+  category: { id: 1, name: "衣類" },
 };
 
 const successResponse = { data: mockProduct, error: undefined };
-
-// ── テスト ───────────────────────────────────────────────────────────────────
 
 describe("ProductDetailPage", () => {
   beforeEach(() => {
@@ -54,119 +43,77 @@ describe("ProductDetailPage", () => {
     mockFindById.mockResolvedValue(successResponse);
   });
 
-  // ── 詳細表示 ────────────────────────────────────────────────────────────
-
-  it("商品名・価格・説明が表示されること", async () => {
-    render(<ProductDetailPage />);
+  it("商品名・説明・価格が表示されること", async () => {
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1, name: "テストシャツ" })).toBeInTheDocument();
     });
 
-    expect(
-      screen.getByText("これはテスト用の説明文です。"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("¥2,000")).toBeInTheDocument();
-    expect(screen.getByText("衣類")).toBeInTheDocument();
+    expect(screen.getByText("テスト用の商品説明")).toBeInTheDocument();
   });
 
-  it("商品画像が表示されること", async () => {
-    render(<ProductDetailPage />);
+  it("カテゴリ名が表示されること", async () => {
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
-    });
-
-    const images = screen.getAllByRole("img");
-    expect(images.length).toBeGreaterThan(0);
-  });
-
-  it("API取得失敗時にエラーメッセージが表示されること", async () => {
-    mockFindById.mockResolvedValue({ data: undefined, error: "not found" });
-
-    render(<ProductDetailPage />);
-
-    await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "商品の取得に失敗しました",
-      );
+      expect(screen.getByText("衣類")).toBeInTheDocument();
     });
   });
 
-  // ── バリエーション選択 ───────────────────────────────────────────────────
-
-  it("バリエーション一覧が選択肢として表示されること", async () => {
-    render(<ProductDetailPage />);
+  it("論理削除済みバリエーションは表示されないこと", async () => {
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
     });
 
-    const variationSelect = screen.getByRole("combobox", {
-      name: /バリエーション/,
-    });
-    expect(variationSelect).toBeInTheDocument();
-    expect(variationSelect.querySelector('option[value="10"]')).toHaveTextContent("S / 赤");
-    expect(variationSelect.querySelector('option[value="12"]')).toHaveTextContent("L / 青");
+    expect(screen.queryByLabelText("S / 白")).not.toBeInTheDocument();
   });
 
-  it("在庫0のバリエーションは無効化されていること", async () => {
-    render(<ProductDetailPage />);
+  it("在庫0のバリエーションは無効で表示されること", async () => {
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText("L / 青")).toBeInTheDocument();
     });
 
-    const variationSelect = screen.getByRole("combobox", {
-      name: /バリエーション/,
-    });
-    const outOfStockOption = variationSelect.querySelector('option[value="11"]');
-    expect(outOfStockOption).toBeDisabled();
+    expect(screen.getByLabelText("L / 青")).toBeDisabled();
   });
 
-  // ── 数量選択 ────────────────────────────────────────────────────────────
-
-  it("数量入力フィールドが表示されること", async () => {
-    render(<ProductDetailPage />);
+  it("バリエーションを選択するとaria-pressedがtrueになること", async () => {
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("spinbutton", { name: /数量/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("M / 赤"));
+
+    expect(screen.getByLabelText("M / 赤")).toHaveAttribute("aria-pressed", "true");
   });
 
-  // ── カートに追加 ──────────────────────────────────────────────────────
+  it("バリエーション未選択時はカートに追加ボタンが無効なこと", async () => {
+    render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "カートに追加" })).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("button", { name: "カートに追加" })).toBeDisabled();
+  });
 
   it("バリエーションを選択してカートに追加するとAPIが呼ばれること", async () => {
-    const user = userEvent.setup();
+    const { toast } = await import("sonner");
     mockAddToCart.mockResolvedValue({ data: {}, error: undefined });
 
-    render(<ProductDetailPage />);
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
     });
 
-    // バリエーション選択
-    const variationSelect = screen.getByRole("combobox", {
-      name: /バリエーション/,
-    });
-    await user.selectOptions(variationSelect, "10");
-
-    // カートに追加
+    fireEvent.click(screen.getByLabelText("M / 赤"));
     fireEvent.click(screen.getByRole("button", { name: "カートに追加" }));
 
     await waitFor(() => {
@@ -178,96 +125,117 @@ describe("ProductDetailPage", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("status")).toHaveTextContent(
-        "カートに追加しました",
-      );
+      expect(toast.success).toHaveBeenCalledWith("カートに追加しました");
     });
   });
 
-  it("バリエーション未選択時はカートボタンが無効化されていること", async () => {
-    render(<ProductDetailPage />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
-    });
-
-    expect(
-      screen.getByRole("button", { name: "カートに追加" }),
-    ).toBeDisabled();
-    expect(mockAddToCart).not.toHaveBeenCalled();
-  });
-
-  it("バリエーション選択時に数量が在庫上限にクランプされること", async () => {
-    const user = userEvent.setup();
-    render(<ProductDetailPage />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
-    });
-
-    const quantityInput = screen.getByRole("spinbutton", { name: /数量/ });
-    const variationSelect = screen.getByRole("combobox", {
-      name: /バリエーション/,
-    });
-
-    // 数量を5に増やしてから stock=3 のバリエーションを選択
-    fireEvent.change(quantityInput, { target: { value: "5" } });
-    await user.selectOptions(variationSelect, "10");
-
-    // 在庫(3)にクランプされること
-    expect(quantityInput).toHaveValue(3);
-  });
-
-  it("数量が在庫を超えているとカートボタンが無効化されること", async () => {
-    const user = userEvent.setup();
-    render(<ProductDetailPage />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
-    });
-
-    const variationSelect = screen.getByRole("combobox", {
-      name: /バリエーション/,
-    });
-    const quantityInput = screen.getByRole("spinbutton", { name: /数量/ });
-
-    // stock=3 のバリエーションを選択してから数量を在庫超えに設定
-    await user.selectOptions(variationSelect, "10");
-    fireEvent.change(quantityInput, { target: { value: "10" } });
-
-    expect(
-      screen.getByRole("button", { name: "カートに追加" }),
-    ).toBeDisabled();
-  });
-
-  it("カート追加失敗時にエラーメッセージが表示されること", async () => {
-    const user = userEvent.setup();
+  it("カート追加失敗時にエラートーストが表示されること", async () => {
+    const { toast } = await import("sonner");
     mockAddToCart.mockResolvedValue({ data: undefined, error: "error" });
 
-    render(<ProductDetailPage />);
+    render(<ProductDetailPage productId={1} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: "テストシャツ" }),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
     });
 
-    const variationSelect = screen.getByRole("combobox", {
-      name: /バリエーション/,
-    });
-    await user.selectOptions(variationSelect, "10");
+    fireEvent.click(screen.getByLabelText("M / 赤"));
     fireEvent.click(screen.getByRole("button", { name: "カートに追加" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
-        "カートへの追加に失敗しました",
-      );
+      expect(toast.error).toHaveBeenCalledWith("カートへの追加に失敗しました");
     });
+  });
+
+  it("API取得失敗時にエラーメッセージが表示されること", async () => {
+    mockFindById.mockResolvedValue({ data: undefined, error: "error" });
+
+    render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("商品情報の取得に失敗しました");
+    });
+  });
+
+  it("数量を増減できること", async () => {
+    render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByLabelText("M / 赤"));
+
+    const increaseBtn = screen.getByRole("button", { name: "数量を増やす" });
+    fireEvent.click(increaseBtn);
+    expect(screen.getByText("2")).toBeInTheDocument();
+
+    const decreaseBtn = screen.getByRole("button", { name: "数量を減らす" });
+    fireEvent.click(decreaseBtn);
+    expect(screen.getByText("1")).toBeInTheDocument();
+  });
+
+  it("商品一覧へのパンくずが表示されること", async () => {
+    render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("navigation", { name: "パンくず" })).toBeInTheDocument();
+    });
+
+    const links = screen.getAllByRole("link", { name: "商品一覧" });
+    expect(links.length).toBeGreaterThan(0);
+  });
+
+  it("バリエーション切り替え時に数量が在庫上限にクランプされること", async () => {
+    const productWith2Variations = {
+      ...mockProduct,
+      variations: [
+        { id: 10, productId: 1, size: "M", color: "赤", price: 2000, stock: 5, deletedAt: null },
+        { id: 13, productId: 1, size: "XL", color: "緑", price: 2200, stock: 2, deletedAt: null },
+      ],
+    };
+    mockFindById.mockResolvedValue({ data: productWith2Variations, error: undefined });
+
+    render(<ProductDetailPage productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
+    });
+
+    // M/赤(stock=5)を選択して数量を4に増やす
+    fireEvent.click(screen.getByLabelText("M / 赤"));
+    const increaseBtn = screen.getByRole("button", { name: "数量を増やす" });
+    fireEvent.click(increaseBtn);
+    fireEvent.click(increaseBtn);
+    fireEvent.click(increaseBtn);
+    expect(screen.getByText("4")).toBeInTheDocument();
+
+    // XL/緑(stock=2)に切り替えると数量が2にクランプされること
+    fireEvent.click(screen.getByLabelText("XL / 緑"));
+    expect(screen.getByText("2")).toBeInTheDocument();
+  });
+
+  it("productId変更時に選択バリエーションと数量がリセットされること", async () => {
+    const { rerender } = render(<ProductDetailPage key={1} productId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("M / 赤")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByLabelText("M / 赤"));
+    expect(screen.getByLabelText("M / 赤")).toHaveAttribute("aria-pressed", "true");
+
+    const product2 = { ...mockProduct, id: 2, name: "別の商品" };
+    mockFindById.mockResolvedValue({ data: product2, error: undefined });
+
+    await act(async () => {
+      rerender(<ProductDetailPage key={2} productId={2} />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1, name: "別の商品" })).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("button", { name: "カートに追加" })).toBeDisabled();
   });
 });

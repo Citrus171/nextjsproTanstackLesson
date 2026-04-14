@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { z } from "zod";
 import { Link } from "@tanstack/react-router";
 import {
@@ -125,13 +125,13 @@ export function ProductsPage() {
     void fetchProducts({ keyword: inputKeyword, categoryId, sort });
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value ? Number(e.target.value) : undefined;
     setCategoryId(val);
     void fetchProducts({ keyword, categoryId: val, sort });
   };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSortChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value || undefined;
     setSort(val);
     void fetchProducts({ keyword, categoryId, sort: val });
