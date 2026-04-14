@@ -27,6 +27,7 @@ import { Route as AdminAdminSettingsRouteImport } from './routes/_admin.admin.se
 import { Route as AdminAdminProductsRouteImport } from './routes/_admin.admin.products'
 import { Route as AdminAdminOrdersRouteImport } from './routes/_admin.admin.orders'
 import { Route as AdminAdminMembersRouteImport } from './routes/_admin.admin.members'
+import { Route as AdminAdminDashboardRouteImport } from './routes/_admin.admin.dashboard'
 import { Route as AdminAdminCategoriesRouteImport } from './routes/_admin.admin.categories'
 import { Route as AdminAdminAdminsRouteImport } from './routes/_admin.admin.admins'
 
@@ -122,6 +123,11 @@ const AdminAdminMembersRoute = AdminAdminMembersRouteImport.update({
   path: '/members',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminDashboardRoute = AdminAdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminCategoriesRoute = AdminAdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/members': typeof AdminAdminMembersRoute
   '/admin/orders': typeof AdminAdminOrdersRoute
   '/admin/products': typeof AdminAdminProductsRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/admins': typeof AdminAdminAdminsRoute
   '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/admin/members': typeof AdminAdminMembersRoute
   '/admin/orders': typeof AdminAdminOrdersRoute
   '/admin/products': typeof AdminAdminProductsRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_admin/admin/admins': typeof AdminAdminAdminsRoute
   '/_admin/admin/categories': typeof AdminAdminCategoriesRoute
+  '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_admin/admin/members': typeof AdminAdminMembersRoute
   '/_admin/admin/orders': typeof AdminAdminOrdersRoute
   '/_admin/admin/products': typeof AdminAdminProductsRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
+    | '/admin/dashboard'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/admins'
     | '/admin/categories'
+    | '/admin/dashboard'
     | '/admin/members'
     | '/admin/orders'
     | '/admin/products'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_admin/admin/admins'
     | '/_admin/admin/categories'
+    | '/_admin/admin/dashboard'
     | '/_admin/admin/members'
     | '/_admin/admin/orders'
     | '/_admin/admin/products'
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminMembersRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/dashboard': {
+      id: '/_admin/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminAdminDashboardRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/categories': {
       id: '/_admin/admin/categories'
       path: '/categories'
@@ -415,6 +434,7 @@ declare module '@tanstack/react-router' {
 interface AdminAdminRouteChildren {
   AdminAdminAdminsRoute: typeof AdminAdminAdminsRoute
   AdminAdminCategoriesRoute: typeof AdminAdminCategoriesRoute
+  AdminAdminDashboardRoute: typeof AdminAdminDashboardRoute
   AdminAdminMembersRoute: typeof AdminAdminMembersRoute
   AdminAdminOrdersRoute: typeof AdminAdminOrdersRoute
   AdminAdminProductsRoute: typeof AdminAdminProductsRoute
@@ -425,6 +445,7 @@ interface AdminAdminRouteChildren {
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminAdminsRoute: AdminAdminAdminsRoute,
   AdminAdminCategoriesRoute: AdminAdminCategoriesRoute,
+  AdminAdminDashboardRoute: AdminAdminDashboardRoute,
   AdminAdminMembersRoute: AdminAdminMembersRoute,
   AdminAdminOrdersRoute: AdminAdminOrdersRoute,
   AdminAdminProductsRoute: AdminAdminProductsRoute,
