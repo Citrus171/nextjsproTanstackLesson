@@ -1,7 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createRouter, createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import * as sonner from "sonner";
 import { CartPage } from "@/components/pages/CartPage";
 
@@ -24,7 +23,7 @@ vi.mock("@tanstack/react-router", async () => {
   const actual = await vi.importActual("@tanstack/react-router");
   return {
     ...actual,
-    Link: ({ to, children, className }: any) => (
+    Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => (
       <a href={to} className={className}>
         {children}
       </a>
