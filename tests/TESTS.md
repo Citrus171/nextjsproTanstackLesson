@@ -747,6 +747,14 @@
 
 ---
 
+## フロントエンド（Playwright E2E）
+
+### Admin Login and Dashboard `frontend/tests/admin-login.spec.ts`
+
+- [x] Navigate to admin login page and login as admin, verify dashboard displays with correct title
+
+---
+
 ## Issue#11 カート機能
 
 ### CartsService `backend/src/carts/carts.service.spec.ts`
