@@ -1,7 +1,7 @@
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn().mockImplementation(() => ({
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    $connect: jest.fn().mockResolvedValue(undefined),
+    $disconnect: jest.fn().mockResolvedValue(undefined),
     user: {},
   })),
 }));
@@ -10,10 +10,8 @@ jest.mock('@prisma/adapter-planetscale', () => ({
   PrismaPlanetScale: jest.fn().mockImplementation(() => ({})),
 }));
 
-jest.mock('./prisma/prisma.service');
-
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from './app.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
 
 describe('AppModule', () => {
@@ -21,7 +19,7 @@ describe('AppModule', () => {
 
   beforeEach(async () => {
     app = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [PrismaModule],
     }).compile();
   });
 
