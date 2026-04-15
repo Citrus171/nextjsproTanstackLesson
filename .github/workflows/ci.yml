@@ -31,6 +31,7 @@ jobs:
       DB_USER: root
       DB_PASSWORD: password
       DB_NAME: ec_db
+      DATABASE_URL: mysql://root:password@127.0.0.1:3306/ec_db
 
     steps:
       - name: Checkout
@@ -47,6 +48,10 @@ jobs:
 
       - name: Install backend dependencies
         run: npm ci --prefix backend
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        working-directory: backend
 
       - name: Install frontend dependencies
         run: npm ci --prefix frontend
@@ -76,6 +81,9 @@ jobs:
       run:
         working-directory: backend
 
+    env:
+      DATABASE_URL: mysql://root:password@127.0.0.1:3306/ec_db
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -89,6 +97,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
 
       - name: Lint
         run: npm run lint

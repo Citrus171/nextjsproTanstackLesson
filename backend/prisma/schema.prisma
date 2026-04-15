@@ -1,0 +1,175 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  relationMode = "prisma"
+}
+
+enum AdminRole {
+  super
+  general
+}
+
+enum CartStatus {
+  reserved
+  purchased
+  expired
+}
+
+enum OrderStatus {
+  pending
+  paid
+  shipped
+  delivered
+  cancelled
+  refunded
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  address   String?
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  orders    Order[]
+
+  @@map("users")
+}
+
+model AdminUser {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      AdminRole
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@map("admin_users")
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String
+  parentId  Int?
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children  Category[] @relation("CategoryHierarchy")
+  createdAt DateTime   @default(now())
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int               @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int
+  categoryId  Int?
+  category    Category?         @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  isPublished Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+  images      ProductImage[]
+  variations  ProductVariation[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  url       String
+  sortOrder Int     @default(0)
+
+  @@map("product_images")
+}
+
+model ProductVariation {
+  id         Int        @id @default(autoincrement())
+  productId  Int
+  product    Product    @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  size       String
+  color      String
+  price      Int
+  stock      Int        @default(0)
+  imageUrl   String?
+  deletedAt  DateTime?
+  carts      Cart[]
+  orderItems OrderItem[]
+
+  @@map("product_variations")
+}
+
+model Cart {
+  id          Int              @id @default(autoincrement())
+  sessionId   String
+  variationId Int
+  variation   ProductVariation @relation(fields: [variationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quantity    Int              @default(1)
+  reservedAt  DateTime
+  expiresAt   DateTime
+  status      CartStatus       @default(reserved)
+
+  @@map("carts")
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          Int
+  user            User        @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status          OrderStatus
+  shippingAddress Json
+  shippingFee     Int
+  totalAmount     Int
+  stripeSessionId String?
+  createdAt       DateTime    @default(now())
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          Int              @id @default(autoincrement())
+  orderId     Int
+  order       Order            @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variationId Int
+  variation   ProductVariation @relation(fields: [variationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productId   Int
+  productName String
+  size        String
+  color       String
+  quantity    Int
+  price       Int
+
+  @@map("order_items")
+}
+
+model StoreSettings {
+  id                    Int      @id @default(autoincrement())
+  invoiceNumber         String?
+  shippingFixedFee      Int
+  shippingFreeThreshold Int
+  updatedAt             DateTime @updatedAt
+
+  @@map("store_settings")
+}
+
+model StripeEvent {
+  id          Int      @id @default(autoincrement())
+  eventId     String   @unique
+  processedAt DateTime
+
+  @@map("stripe_events")
+}

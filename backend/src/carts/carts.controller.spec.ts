@@ -46,7 +46,7 @@ describe('CartsController', () => {
 
       mockCartsService.getCart.mockResolvedValue(mockCarts);
 
-      const result = await controller.getCart({ user: { id: userId } } as any);
+      const result = await controller.getCart({ id: userId });
 
       expect(mockCartsService.getCart).toHaveBeenCalledWith(userId);
       expect(result).toEqual(mockCarts);
@@ -69,7 +69,7 @@ describe('CartsController', () => {
 
       mockCartsService.addToCart.mockResolvedValue(mockCart);
 
-      const result = await controller.addToCart({ user: { id: userId } } as any, dto);
+      const result = await controller.addToCart({ id: userId }, dto);
 
       expect(mockCartsService.addToCart).toHaveBeenCalledWith(userId, dto);
       expect(result).toEqual(mockCart);
@@ -86,7 +86,7 @@ describe('CartsController', () => {
 
       mockCartsService.updateItem.mockResolvedValue(undefined);
 
-      await controller.updateItem({ user: { id: userId } } as any, cartId, dto);
+      await controller.updateItem({ id: userId }, cartId, dto);
 
       expect(mockCartsService.updateItem).toHaveBeenCalledWith(userId, cartId, dto);
     });
@@ -99,7 +99,7 @@ describe('CartsController', () => {
 
       mockCartsService.removeItem.mockResolvedValue(undefined);
 
-      await controller.removeItem({ user: { id: userId } } as any, cartId);
+      await controller.removeItem({ id: userId }, cartId);
 
       expect(mockCartsService.removeItem).toHaveBeenCalledWith(userId, cartId);
     });

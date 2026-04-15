@@ -44,10 +44,10 @@ describe("PaymentsController", () => {
         url: mockUrl,
       });
 
-      const req = { user: { id: 1 } };
+      const user = { id: 1 };
       const result = await controller.createCheckoutSession(
-        req as any,
-        dto as any,
+        user,
+        dto,
       );
 
       expect(result).toEqual({ url: mockUrl });
