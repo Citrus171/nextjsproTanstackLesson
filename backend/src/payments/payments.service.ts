@@ -97,7 +97,7 @@ export class PaymentsService {
     });
 
     // order_items を価格スナップショットとして保存
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     await this.orderItemRepository.save(
       cartItems.map((item: any) => ({
         orderId: order.id,

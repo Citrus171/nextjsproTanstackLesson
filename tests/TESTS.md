@@ -646,6 +646,15 @@
 
 ---
 
+### TypeORM Removal `backend/src/typeorm-removal.spec.ts`
+
+- [x] TypeORM パッケージが削除されていること
+- [x] @nestjs/typeorm パッケージが削除されていること
+- [x] data-source.ts が削除されていること
+- [x] マイグレーションファイルが削除されていること
+
+---
+
 ## フロントエンド（Vitest）
 
 ### auth ユーティリティ `frontend/src/lib/auth.test.ts`
