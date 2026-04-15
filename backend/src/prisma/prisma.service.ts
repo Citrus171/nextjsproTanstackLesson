@@ -6,21 +6,20 @@ import { PrismaPlanetScale } from '@prisma/adapter-planetscale';
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
     const databaseUrl = process.env.DATABASE_URL;
-
-    if (!databaseUrl) {
-      throw new Error('DATABASE_URL environment variable is required');
-    }
-
-    const adapter = new PrismaPlanetScale({
-      url: databaseUrl,
-    });
-    super({ adapter });
+    const adapter = databaseUrl
+      ? new PrismaPlanetScale({ url: databaseUrl })
+      : undefined;
+    super(adapter ? { adapter } : {});
   }
 
   async onModuleInit() {
-    if (process.env.NODE_ENV !== 'test') {
-      await this.$connect();
+    if (process.env.NODE_ENV === 'test') {
+      return;
     }
+    if (!process.env.DATABASE_URL) {
+      return;
+    }
+    await this.$connect();
   }
 
   async onModuleDestroy() {

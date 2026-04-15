@@ -30,9 +30,14 @@ describe('PrismaService', () => {
     expect(service).toBeDefined();
   });
 
-  it('DATABASE_URLが未設定の場合はエラーを投げること', () => {
+  it('DATABASE_URLが未設定の場合は$connectを呼ばないこと', async () => {
     delete process.env.DATABASE_URL;
-    expect(() => new PrismaService()).toThrow('DATABASE_URL environment variable is required');
+    const svcWithoutUrl = new PrismaService();
+    process.env.NODE_ENV = 'development';
+    const connectSpy = jest.spyOn(svcWithoutUrl, '$connect').mockResolvedValue();
+    await svcWithoutUrl.onModuleInit();
+    expect(connectSpy).not.toHaveBeenCalled();
+    process.env.NODE_ENV = 'test';
   });
 
   it('onModuleInit should call $connect when not in test env', async () => {
