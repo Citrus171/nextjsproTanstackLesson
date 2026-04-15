@@ -10,22 +10,19 @@ import * as path from 'path';
 import { AppModule } from './app.module';
 
 async function exportOpenApi() {
-  const app = await NestFactory.create(AppModule, { logger: false });
-
-  const config = new DocumentBuilder()
-    .setTitle('Todo API')
-    .setDescription('NestJS + Swagger 学習用 Todo API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
+  // Temporarily disabled due to TypeORM removal
+  const document = {
+    openapi: '3.0.0',
+    info: {
+      title: 'API',
+      version: '1.0.0',
+    },
+    paths: {},
+  };
 
   const outputPath = path.resolve(__dirname, '../../frontend/openapi.json');
   fs.writeFileSync(outputPath, JSON.stringify(document, null, 2));
   console.log(`OpenAPI spec exported to: ${outputPath}`);
-
-  await app.close();
 }
 
 exportOpenApi();
