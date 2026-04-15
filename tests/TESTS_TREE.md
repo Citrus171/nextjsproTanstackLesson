@@ -569,6 +569,19 @@ nestjspro/
         │           ├── checkout.session.completedで注文ステータスがpaidに更新されること ✓
         │           ├── checkout.session.completedでカートがpurchasedに更新されること ✓
         │           └── 同一イベントIDを2回受信しても二重処理しないこと（冪等性） ✓
+        ├── prisma/
+        │   ├── prisma.module.spec.ts
+        │   │   ├── PrismaServiceが提供されていること
+        │   │   │   └── PrismaServiceが提供されていること ✓
+        │   │   └── PrismaServiceがPrismaClientのメソッドを持っていること
+        │   │       └── $connect, $disconnect, user モデルが利用可能であること ✓
+        │   └── prisma.service.spec.ts
+        │       ├── should be defined
+        │       │   └── PrismaServiceが定義されていること ✓
+        │       ├── onModuleInit should call $connect when not in test env
+        │       │   └── テスト環境以外で$connectが呼ばれること ✓
+        │       └── onModuleInit should not call $connect in test env
+        │           └── テスト環境では$connectが呼ばれないこと ✓
 └── frontend/
     └── src/
         ├── lib/

@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ScheduleModule } from "@nestjs/schedule";
 import { LoggerModule } from "nestjs-pino";
 import { SentryModule, SentryGlobalFilter } from "@sentry/nestjs/setup";
+import { PrismaModule } from "./prisma/prisma.module";
 import { UsersModule } from "./users/users.module";
 import { UserEntity } from "./users/entities/user.entity";
 import { AuthModule } from "./auth/auth.module";
@@ -28,6 +29,7 @@ import { StripeEventEntity } from "./payments/entities/stripe-event.entity";
 
 @Module({
   imports: [
+    PrismaModule,
     SentryModule.forRoot(),
     LoggerModule.forRoot({
       pinoHttp: {

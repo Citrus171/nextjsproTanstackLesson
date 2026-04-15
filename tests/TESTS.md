@@ -862,6 +862,29 @@
 
 ---
 
+### PrismaModule `backend/src/prisma/prisma.module.spec.ts`
+
+**PrismaServiceが提供されていること**
+- [x] PrismaServiceが提供されていること
+
+**PrismaServiceがPrismaClientのメソッドを持っていること**
+- [x] $connect, $disconnect, user モデルが利用可能であること
+
+---
+
+### PrismaService `backend/src/prisma/prisma.service.spec.ts`
+
+**should be defined**
+- [x] PrismaServiceが定義されていること
+
+**onModuleInit should call $connect when not in test env**
+- [x] テスト環境以外で$connectが呼ばれること
+
+**onModuleInit should not call $connect in test env**
+- [x] テスト環境では$connectが呼ばれないこと
+
+---
+
 ### PaymentsController `backend/src/payments/payments.controller.spec.ts`
 
 **createCheckoutSession**
