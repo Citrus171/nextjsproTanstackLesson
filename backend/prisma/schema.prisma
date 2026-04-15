@@ -8,7 +8,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 enum AdminRole {
@@ -40,6 +42,8 @@ model User {
   createdAt DateTime @default(now())
   deletedAt DateTime?
   orders    Order[]
+
+  @@map("users")
 }
 
 model AdminUser {
@@ -50,6 +54,8 @@ model AdminUser {
   role      AdminRole
   createdAt DateTime  @default(now())
   deletedAt DateTime?
+
+  @@map("admin_users")
 }
 
 model Category {
@@ -60,6 +66,8 @@ model Category {
   children  Category[] @relation("CategoryHierarchy")
   createdAt DateTime  @default(now())
   products  Product[]
+
+  @@map("categories")
 }
 
 model Product {
@@ -75,6 +83,8 @@ model Product {
   deletedAt   DateTime?
   images      ProductImage[]
   variations  ProductVariation[]
+
+  @@map("products")
 }
 
 model ProductImage {
@@ -83,6 +93,8 @@ model ProductImage {
   product    Product @relation(fields: [productId], references: [id])
   url        String
   sortOrder  Int     @default(0)
+
+  @@map("product_images")
 }
 
 model ProductVariation {
@@ -97,6 +109,8 @@ model ProductVariation {
   deletedAt DateTime?
   carts     Cart[]
   orderItems OrderItem[]
+
+  @@map("product_variations")
 }
 
 model Cart {
@@ -108,6 +122,8 @@ model Cart {
   reservedAt DateTime
   expiresAt  DateTime
   status     CartStatus        @default(reserved)
+
+  @@map("carts")
 }
 
 model Order {
@@ -121,6 +137,8 @@ model Order {
   stripeSessionId  String?
   createdAt        DateTime        @default(now())
   items            OrderItem[]
+
+  @@map("orders")
 }
 
 model OrderItem {
@@ -135,6 +153,8 @@ model OrderItem {
   color       String
   quantity    Int
   price       Int
+
+  @@map("order_items")
 }
 
 model StoreSettings {
@@ -143,10 +163,14 @@ model StoreSettings {
   shippingFixedFee     Int
   shippingFreeThreshold Int
   updatedAt            DateTime @updatedAt
+
+  @@map("store_settings")
 }
 
 model StripeEvent {
   id          Int      @id @default(autoincrement())
   eventId     String   @unique
   processedAt DateTime
+
+  @@map("stripe_events")
 }
