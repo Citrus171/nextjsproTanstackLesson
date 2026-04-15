@@ -8,11 +8,11 @@ import {
   Param,
   UseGuards,
   ParseIntPipe,
-  Request,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CartsService } from './carts.service';
 import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { CartEntity } from './entities/cart.entity';
@@ -27,33 +27,33 @@ export class CartsController {
   @Get()
   @ApiOperation({ summary: 'カート取得' })
   @ApiOkResponse({ type: [CartEntity] })
-  async getCart(@Request() req: any): Promise<CartEntity[]> {
-    return this.cartsService.getCart(req.user.id);
+  async getCart(@CurrentUser() user: { id: number }): Promise<CartEntity[]> {
+    return this.cartsService.getCart(user.id);
   }
 
   @Post()
   @ApiOperation({ summary: 'カート追加' })
   @ApiOkResponse({ type: CartEntity })
-  async addToCart(@Request() req: any, @Body() dto: AddToCartDto): Promise<CartEntity | null> {
-    return this.cartsService.addToCart(req.user.id, dto);
+  async addToCart(@CurrentUser() user: { id: number }, @Body() dto: AddToCartDto): Promise<CartEntity | null> {
+    return this.cartsService.addToCart(user.id, dto);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'カートアイテム数量変更' })
   async updateItem(
-    @Request() req: any,
+    @CurrentUser() user: { id: number },
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCartItemDto,
   ): Promise<void> {
-    return this.cartsService.updateItem(req.user.id, id, dto);
+    return this.cartsService.updateItem(user.id, id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'カートアイテム削除' })
   async removeItem(
-    @Request() req: any,
+    @CurrentUser() user: { id: number },
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    return this.cartsService.removeItem(req.user.id, id);
+    return this.cartsService.removeItem(user.id, id);
   }
 }

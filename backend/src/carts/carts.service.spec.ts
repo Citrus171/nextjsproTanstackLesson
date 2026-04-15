@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { CartEntity } from './entities/cart.entity';
@@ -8,9 +8,9 @@ import { ProductVariationEntity } from '../products/entities/product-variation.e
 
 describe('CartsService', () => {
   let service: CartsService;
-  let mockCartRepository: any;
-  let mockVariationRepository: any;
-  let mockDataSource: any;
+  let mockCartRepository: jest.Mocked<Repository<CartEntity>>;
+  let mockVariationRepository: jest.Mocked<Repository<ProductVariationEntity>>;
+  let mockDataSource: jest.Mocked<DataSource>;
 
   beforeEach(async () => {
     mockCartRepository = {

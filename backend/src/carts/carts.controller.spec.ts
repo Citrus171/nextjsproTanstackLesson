@@ -6,7 +6,12 @@ import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 describe('CartsController', () => {
   let controller: CartsController;
-  let mockCartsService: any;
+  let mockCartsService: {
+    getCart: jest.MockedFunction<(userId: number) => Promise<any[]>>;
+    addToCart: jest.MockedFunction<(userId: number, dto: AddToCartDto) => Promise<any>>;
+    updateItem: jest.MockedFunction<(userId: number, cartId: number, dto: UpdateCartItemDto) => Promise<void>>;
+    removeItem: jest.MockedFunction<(userId: number, cartId: number) => Promise<void>>;
+  };
 
   beforeEach(async () => {
     mockCartsService = {
@@ -46,7 +51,7 @@ describe('CartsController', () => {
 
       mockCartsService.getCart.mockResolvedValue(mockCarts);
 
-      const result = await controller.getCart({ user: { id: userId } } as any);
+      const result = await controller.getCart({ id: userId });
 
       expect(mockCartsService.getCart).toHaveBeenCalledWith(userId);
       expect(result).toEqual(mockCarts);

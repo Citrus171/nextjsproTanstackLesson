@@ -13,6 +13,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PaymentsService } from './payments.service';
 import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth.guard';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
@@ -29,10 +30,10 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Stripe Checkout Sessionを作成してURLを返す' })
   @ApiOkResponse({ schema: { properties: { url: { type: 'string' } } } })
   async createCheckoutSession(
-    @Request() req: any,
+    @CurrentUser() user: { id: number },
     @Body() dto: CreateCheckoutSessionDto,
   ): Promise<{ url: string }> {
-    return this.paymentsService.createCheckoutSession(req.user.id, dto);
+    return this.paymentsService.createCheckoutSession(user.id, dto);
   }
 
   @Post('webhook')
