@@ -8,9 +8,9 @@ import { ProductVariationEntity } from '../products/entities/product-variation.e
 
 describe('CartsService', () => {
   let service: CartsService;
-  let mockCartRepository: jest.Mocked<Repository<CartEntity>>;
-  let mockVariationRepository: jest.Mocked<Repository<ProductVariationEntity>>;
-  let mockDataSource: jest.Mocked<DataSource>;
+  let mockCartRepository: any;
+  let mockVariationRepository: any;
+  let mockDataSource: any;
 
   beforeEach(async () => {
     mockCartRepository = {

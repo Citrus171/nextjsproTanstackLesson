@@ -6,12 +6,7 @@ import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 describe('CartsController', () => {
   let controller: CartsController;
-  let mockCartsService: {
-    getCart: jest.MockedFunction<(userId: number) => Promise<any[]>>;
-    addToCart: jest.MockedFunction<(userId: number, dto: AddToCartDto) => Promise<any>>;
-    updateItem: jest.MockedFunction<(userId: number, cartId: number, dto: UpdateCartItemDto) => Promise<void>>;
-    removeItem: jest.MockedFunction<(userId: number, cartId: number) => Promise<void>>;
-  };
+  let mockCartsService: any;
 
   beforeEach(async () => {
     mockCartsService = {
@@ -74,7 +69,7 @@ describe('CartsController', () => {
 
       mockCartsService.addToCart.mockResolvedValue(mockCart);
 
-      const result = await controller.addToCart({ user: { id: userId } } as any, dto);
+      const result = await controller.addToCart({ id: userId }, dto);
 
       expect(mockCartsService.addToCart).toHaveBeenCalledWith(userId, dto);
       expect(result).toEqual(mockCart);
@@ -91,7 +86,7 @@ describe('CartsController', () => {
 
       mockCartsService.updateItem.mockResolvedValue(undefined);
 
-      await controller.updateItem({ user: { id: userId } } as any, cartId, dto);
+      await controller.updateItem({ id: userId }, cartId, dto);
 
       expect(mockCartsService.updateItem).toHaveBeenCalledWith(userId, cartId, dto);
     });
@@ -104,7 +99,7 @@ describe('CartsController', () => {
 
       mockCartsService.removeItem.mockResolvedValue(undefined);
 
-      await controller.removeItem({ user: { id: userId } } as any, cartId);
+      await controller.removeItem({ id: userId }, cartId);
 
       expect(mockCartsService.removeItem).toHaveBeenCalledWith(userId, cartId);
     });
