@@ -1,20 +1,34 @@
 import { Injectable, BadRequestException, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, DataSource, QueryFailedError } from "typeorm";
+import Stripe from "stripe";
+type StripeClient = InstanceType<typeof Stripe>;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const StripeLib = require("stripe");
+const StripeLib = require("stripe") as unknown as new (
+  secretKey: string,
+  config?: ConstructorParameters<typeof Stripe>[1],
+) => StripeClient;
 import { CartEntity } from "../carts/entities/cart.entity";
 import { OrderEntity } from "../orders/entities/order.entity";
 import { OrderItemEntity } from "../orders/entities/order-item.entity";
 import { StoreSettingsEntity } from "../store-settings/entities/store-settings.entity";
 import { StripeEventEntity } from "./entities/stripe-event.entity";
+import { ProductVariationEntity } from "../products/entities/product-variation.entity";
 import { CreateCheckoutSessionDto } from "./dto/create-checkout-session.dto";
 import { MailService, OrderWithRelations } from "../mail/mail.service";
 
+type CartItemWithRelations = CartEntity & {
+  variation: ProductVariationEntity & {
+    product: {
+      id: number;
+      name: string;
+    };
+  };
+};
+
 @Injectable()
 export class PaymentsService {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly stripe: any;
+  private readonly stripe: StripeClient;
   private readonly logger = new Logger(PaymentsService.name);
 
   constructor(
@@ -44,7 +58,7 @@ export class PaymentsService {
     const sessionId = String(userId);
 
     // カート取得
-    const cartItems = await this.cartRepository.find({
+    const cartItems: CartItemWithRelations[] = await this.cartRepository.find({
       where: { sessionId, status: "reserved" },
       relations: { variation: { product: true } },
     });
@@ -61,17 +75,8 @@ export class PaymentsService {
 
     // 合計金額・配送料計算
     const subtotal = cartItems.reduce(
-      (
-        sum: number,
-        item: CartEntity & {
-          variation: {
-            price: number;
-            product: { id: number; name: string };
-            size: string;
-            color: string;
-          };
-        },
-      ) => sum + item.variation.price * item.quantity,
+      (sum: number, item: CartItemWithRelations) =>
+        sum + item.variation.price * item.quantity,
       0,
     );
     const shippingFee =
@@ -97,9 +102,9 @@ export class PaymentsService {
     });
 
     // order_items を価格スナップショットとして保存
-     
+
     await this.orderItemRepository.save(
-      cartItems.map((item: any) => ({
+      cartItems.map((item: CartItemWithRelations) => ({
         orderId: order.id,
         variationId: item.variationId,
         productId: item.variation.product.id,
@@ -112,7 +117,7 @@ export class PaymentsService {
     );
 
     // Stripe Checkout Session 作成
-    const lineItems = cartItems.map((item: any) => ({
+    const lineItems = cartItems.map((item: CartItemWithRelations) => ({
       price_data: {
         currency: "jpy",
         product_data: {
@@ -134,8 +139,7 @@ export class PaymentsService {
       });
     }
 
-    let session: { id: string; url?: string };
-
+    let session;
     try {
       session = await this.stripe.checkout.sessions.create({
         payment_method_types: ["card"],
@@ -156,15 +160,11 @@ export class PaymentsService {
       { stripeSessionId: session.id },
     );
 
-    return { url: session.url as string };
+    return { url: session.url ?? "" };
   }
 
   async handleWebhook(signature: string, rawBody: Buffer): Promise<void> {
-    let event: {
-      id: string;
-      type: string;
-      data: { object: { id: string; metadata?: { orderId?: string } } };
-    };
+    let event: Stripe.Event;
 
     try {
       event = this.stripe.webhooks.constructEvent(
@@ -181,7 +181,7 @@ export class PaymentsService {
       return;
     }
 
-    const session = event.data.object;
+    const session = event.data.object as Stripe.Checkout.Session;
     const orderId = Number(session.metadata?.orderId);
 
     if (!Number.isInteger(orderId) || orderId <= 0) {

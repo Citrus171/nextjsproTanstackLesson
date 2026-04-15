@@ -72,7 +72,7 @@ model Category {
 model Product {
   id          Int               @id @default(autoincrement())
   name        String
-  description String?
+  description String? @db.Text
   price       Int
   categoryId  Int?
   category    Category?         @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)

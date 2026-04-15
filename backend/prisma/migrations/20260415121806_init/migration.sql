@@ -40,7 +40,7 @@ CREATE TABLE `categories` (
 CREATE TABLE `products` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
+    `description` TEXT NULL,
     `price` INTEGER NOT NULL,
     `categoryId` INTEGER NULL,
     `isPublished` BOOLEAN NOT NULL DEFAULT false,
@@ -127,6 +127,9 @@ CREATE TABLE `store_settings` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+INSERT INTO `store_settings` (`id`, `invoiceNumber`, `shippingFixedFee`, `shippingFreeThreshold`, `updatedAt`)
+VALUES (1, NULL, 800, 5000, CURRENT_TIMESTAMP(3));
 
 -- CreateTable
 CREATE TABLE `stripe_events` (

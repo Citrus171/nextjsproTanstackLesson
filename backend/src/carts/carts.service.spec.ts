@@ -211,7 +211,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
       mockPrisma.productVariation.findUnique.mockResolvedValue(variation);
       mockPrisma.productVariation.update.mockResolvedValue({ ...variation, stock: 7 });
       mockPrisma.cart.update.mockResolvedValue({ ...cart, quantity: 5 });
@@ -243,7 +243,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
       mockPrisma.productVariation.findUnique.mockResolvedValue(variation);
       mockPrisma.productVariation.update.mockResolvedValue({ ...variation, stock: 9 });
       mockPrisma.cart.update.mockResolvedValue({ ...cart, quantity: 1 });
@@ -271,7 +271,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
       mockPrisma.productVariation.findUnique.mockResolvedValue(variation);
       mockPrisma.cart.update.mockResolvedValue(cart);
 
@@ -295,7 +295,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
       mockPrisma.productVariation.findUnique.mockResolvedValue(variation);
 
       await expect(service.updateItem(userId, cartId, { quantity: 10 })).rejects.toThrow(
@@ -317,7 +317,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
 
       await expect(service.updateItem(userId, cartId, { quantity: 5 })).rejects.toThrow(
         ForbiddenException,
@@ -331,7 +331,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(null);
+      mockPrisma.cart.findFirst.mockResolvedValue(null);
 
       await expect(service.updateItem(userId, cartId, { quantity: 5 })).rejects.toThrow(
         NotFoundException,
@@ -354,7 +354,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
       mockPrisma.productVariation.update.mockResolvedValue({});
       mockPrisma.cart.delete.mockResolvedValue(cart);
 
@@ -381,7 +381,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(cart);
+      mockPrisma.cart.findFirst.mockResolvedValue(cart);
 
       await expect(service.removeItem(userId, cartId)).rejects.toThrow(ForbiddenException);
     });
@@ -393,7 +393,7 @@ describe('CartsService', () => {
       mockPrisma.$transaction.mockImplementation((cb: (tx: MockPrisma) => Promise<unknown>) =>
         cb(mockPrisma),
       );
-      mockPrisma.cart.findUnique.mockResolvedValue(null);
+      mockPrisma.cart.findFirst.mockResolvedValue(null);
 
       await expect(service.removeItem(userId, cartId)).rejects.toThrow(NotFoundException);
     });

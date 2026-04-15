@@ -1,9 +1,14 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../prisma/prisma.service';
-import { CartStatus } from '@prisma/client';
-import { AddToCartDto } from './dto/add-to-cart.dto';
-import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { PrismaService } from "../prisma/prisma.service";
+import { CartStatus } from "@prisma/client";
+import { AddToCartDto } from "./dto/add-to-cart.dto";
+import { UpdateCartItemDto } from "./dto/update-cart-item.dto";
 
 @Injectable()
 export class CartsService {
@@ -28,11 +33,11 @@ export class CartsService {
       });
 
       if (!variation) {
-        throw new NotFoundException('バリエーションが見つかりません');
+        throw new NotFoundException("バリエーションが見つかりません");
       }
 
       if (variation.stock < quantity) {
-        throw new BadRequestException('在庫が不足しています');
+        throw new BadRequestException("在庫が不足しています");
       }
 
       // 同一セッション・同一バリエーションの既存カートを確認
@@ -74,21 +79,25 @@ export class CartsService {
     });
   }
 
-  async updateItem(userId: number, cartId: number, dto: UpdateCartItemDto): Promise<void> {
+  async updateItem(
+    userId: number,
+    cartId: number,
+    dto: UpdateCartItemDto,
+  ): Promise<void> {
     const sessionId = String(userId);
     const { quantity: newQuantity } = dto;
 
     return this.prisma.$transaction(async (tx) => {
-      const cart = await tx.cart.findUnique({
+      const cart = await tx.cart.findFirst({
         where: { id: cartId, status: CartStatus.reserved },
       });
 
       if (!cart) {
-        throw new NotFoundException('カートアイテムが見つかりません');
+        throw new NotFoundException("カートアイテムが見つかりません");
       }
 
       if (cart.sessionId !== sessionId) {
-        throw new ForbiddenException('このカートアイテムを操作できません');
+        throw new ForbiddenException("このカートアイテムを操作できません");
       }
 
       const oldQuantity = cart.quantity;
@@ -100,11 +109,11 @@ export class CartsService {
       });
 
       if (!variation) {
-        throw new NotFoundException('商品バリエーションが見つかりません');
+        throw new NotFoundException("商品バリエーションが見つかりません");
       }
 
       if (quantityDiff > 0 && variation.stock < quantityDiff) {
-        throw new BadRequestException('在庫が不足しています');
+        throw new BadRequestException("在庫が不足しています");
       }
 
       // 在庫を調整
@@ -132,16 +141,16 @@ export class CartsService {
     const sessionId = String(userId);
 
     return this.prisma.$transaction(async (tx) => {
-      const cart = await tx.cart.findUnique({
+      const cart = await tx.cart.findFirst({
         where: { id: cartId, status: CartStatus.reserved },
       });
 
       if (!cart) {
-        throw new NotFoundException('カートアイテムが見つかりません');
+        throw new NotFoundException("カートアイテムが見つかりません");
       }
 
       if (cart.sessionId !== sessionId) {
-        throw new ForbiddenException('このカートアイテムを操作できません');
+        throw new ForbiddenException("このカートアイテムを操作できません");
       }
 
       // 在庫を返却
