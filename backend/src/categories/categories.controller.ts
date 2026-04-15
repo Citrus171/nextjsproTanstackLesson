@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CategoryResponseDto } from './dto/category-response.dto';
-import { CategoryEntity } from './entities/category.entity';
+import { Category } from '@prisma/client';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -15,12 +15,12 @@ export class CategoriesController {
     return categories.map((cat) => this.toResponse(cat));
   }
 
-  private toResponse(category: CategoryEntity): CategoryResponseDto {
+  private toResponse(category: Category & { children?: Category[] }): CategoryResponseDto {
     return {
       id: category.id,
       name: category.name,
       parentId: category.parentId,
-      children: (category.children || []).map((child: CategoryEntity) =>
+      children: (category.children || []).map((child: Category & { children?: Category[] }) =>
         this.toResponse(child),
       ),
       createdAt: category.createdAt,

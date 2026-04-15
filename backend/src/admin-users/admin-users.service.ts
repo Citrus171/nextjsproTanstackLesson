@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PrismaService } from '../prisma/prisma.service';
+import { AdminUser, AdminRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { AdminUserEntity, AdminRole } from './entities/admin-user.entity';
 
 export interface AdminUserResponse {
   id: number;
@@ -19,13 +18,10 @@ export interface UpdateAdminUserInput {
 
 @Injectable()
 export class AdminUsersService {
-  constructor(
-    @InjectRepository(AdminUserEntity)
-    private readonly adminUserRepository: Repository<AdminUserEntity>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  findByEmail(email: string): Promise<AdminUserEntity | null> {
-    return this.adminUserRepository.findOneBy({ email });
+  findByEmail(email: string): Promise<AdminUser | null> {
+    return this.prisma.adminUser.findUnique({ where: { email } });
   }
 
   async create(
@@ -36,58 +32,63 @@ export class AdminUsersService {
   ): Promise<AdminUserResponse> {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const admin = new AdminUserEntity();
-    admin.name = name;
-    admin.email = email;
-    admin.password = hashedPassword;
-    admin.role = role;
-
-    const saved = await this.adminUserRepository.save(admin);
+    const saved = await this.prisma.adminUser.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role,
+      },
+    });
 
     return this.toResponse(saved);
   }
 
   async findAll(): Promise<AdminUserResponse[]> {
-    const admins = await this.adminUserRepository.find({
-      order: { createdAt: 'DESC' },
+    const admins = await this.prisma.adminUser.findMany({
+      orderBy: { createdAt: 'desc' },
     });
     return admins.map((admin) => this.toResponse(admin));
   }
 
   async findById(id: number): Promise<AdminUserResponse | null> {
-    const admin = await this.adminUserRepository.findOneBy({ id });
+    const admin = await this.prisma.adminUser.findUnique({ where: { id } });
     return admin ? this.toResponse(admin) : null;
   }
 
   async update(id: number, input: UpdateAdminUserInput): Promise<AdminUserResponse | null> {
-    const admin = await this.adminUserRepository.findOneBy({ id });
-    if (!admin) {
-      return null;
-    }
-
+    const updateData: Partial<AdminUser> = {};
     if (input.name !== undefined) {
-      admin.name = input.name;
+      updateData.name = input.name;
     }
     if (input.role !== undefined) {
-      admin.role = input.role;
+      updateData.role = input.role;
     }
 
-    const updated = await this.adminUserRepository.save(admin);
-    return this.toResponse(updated);
+    try {
+      const updated = await this.prisma.adminUser.update({
+        where: { id },
+        data: updateData,
+      });
+      return this.toResponse(updated);
+    } catch {
+      return null;
+    }
   }
 
   async softDelete(id: number): Promise<boolean> {
-    const admin = await this.adminUserRepository.findOneBy({ id });
-    if (!admin) {
+    try {
+      await this.prisma.adminUser.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+      return true;
+    } catch {
       return false;
     }
-
-    admin.deletedAt = new Date();
-    await this.adminUserRepository.save(admin);
-    return true;
   }
 
-  private toResponse(admin: AdminUserEntity): AdminUserResponse {
+  private toResponse(admin: AdminUser): AdminUserResponse {
     return {
       id: admin.id,
       name: admin.name,

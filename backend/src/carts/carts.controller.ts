@@ -20,7 +20,7 @@ import { UserJwtAuthGuard } from "../auth/guards/user-jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { AddToCartDto } from "./dto/add-to-cart.dto";
 import { UpdateCartItemDto } from "./dto/update-cart-item.dto";
-import { CartEntity } from "./entities/cart.entity";
+
 
 @ApiTags("cart")
 @Controller("cart")
@@ -31,14 +31,14 @@ export class CartsController {
 
   @Get()
   @ApiOperation({ summary: "カート取得" })
-  @ApiOkResponse({ type: [CartEntity] })
+  @ApiOkResponse({ type: Object })
   async getCart(@CurrentUser() user: { id: number }): Promise<unknown[]> {
     return this.cartsService.getCart(user.id);
   }
 
   @Post()
   @ApiOperation({ summary: "カート追加" })
-  @ApiOkResponse({ type: CartEntity })
+  @ApiOkResponse({ type: Object })
   async addToCart(
     @CurrentUser() user: { id: number },
     @Body() dto: AddToCartDto,

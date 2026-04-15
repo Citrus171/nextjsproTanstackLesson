@@ -1,28 +1,26 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { CategoryEntity } from './entities/category.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
-  constructor(
-    @InjectRepository(CategoryEntity)
-    private readonly categoryRepository: Repository<CategoryEntity>,
-    private readonly dataSource: DataSource,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<CategoryEntity[]> {
-    return this.categoryRepository.find({
-      relations: ['parent', 'children'],
-      order: { createdAt: 'ASC' },
+  async findAll(): Promise<Category[]> {
+    return this.prisma.category.findMany({
+      include: {
+        parent: true,
+        children: true,
+      },
+      orderBy: { createdAt: 'asc' },
     });
   }
 
-  async create(dto: CreateCategoryDto): Promise<CategoryEntity> {
+  async create(dto: CreateCategoryDto): Promise<Category> {
     if (dto.parentId !== undefined && dto.parentId !== null) {
-      const parent = await this.categoryRepository.findOne({
+      const parent = await this.prisma.category.findUnique({
         where: { id: dto.parentId },
       });
       if (!parent) {
@@ -30,16 +28,24 @@ export class CategoriesService {
       }
     }
 
-    const category = this.categoryRepository.create({
-      name: dto.name,
-      parentId: dto.parentId,
+    const category = await this.prisma.category.create({
+      data: {
+        name: dto.name,
+        parentId: dto.parentId,
+      },
     });
 
-    return this.categoryRepository.save(category);
+    return this.prisma.category.findUnique({
+      where: { id: category.id },
+      include: {
+        parent: true,
+        children: true,
+      },
+    }) as Promise<Category>;
   }
 
-  async findById(id: number): Promise<CategoryEntity | null> {
-    return this.categoryRepository.findOne({
+  async findById(id: number): Promise<Category | null> {
+    return this.prisma.category.findUnique({
       where: { id },
     });
   }
@@ -47,39 +53,48 @@ export class CategoriesService {
   async update(
     id: number,
     dto: UpdateCategoryDto | Partial<CreateCategoryDto>,
-  ): Promise<CategoryEntity | null> {
-    const category = await this.findById(id);
-    if (!category) {
-      return null;
-    }
-
+  ): Promise<Category | null> {
     if (dto.parentId !== undefined && dto.parentId !== null) {
-      const parent = await this.categoryRepository.findOne({
+      const parent = await this.prisma.category.findUnique({
         where: { id: dto.parentId },
       });
       if (!parent) {
         throw new BadRequestException('親カテゴリが見つかりません');
       }
-      category.parentId = dto.parentId;
     }
 
-    if (dto.name !== undefined) {
-      category.name = dto.name;
-    }
+    try {
+      await this.prisma.category.update({
+        where: { id },
+        data: {
+          name: dto.name,
+          parentId: dto.parentId,
+        },
+      });
 
-    return this.categoryRepository.save(category);
+      return this.prisma.category.findUnique({
+        where: { id },
+        include: {
+          parent: true,
+          children: true,
+        },
+      });
+    } catch {
+      return null;
+    }
   }
 
   async remove(id: number): Promise<void> {
-    const result = await this.dataSource.query(
-      'SELECT COUNT(*) as count FROM products WHERE category_id = ?',
-      [id],
-    );
+    const productCount = await this.prisma.product.count({
+      where: { categoryId: id },
+    });
 
-    if (result[0].count > 0) {
+    if (productCount > 0) {
       throw new ConflictException('このカテゴリに紐付く商品があります');
     }
 
-    await this.categoryRepository.delete({ id });
+    await this.prisma.category.delete({
+      where: { id },
+    });
   }
 }
