@@ -3,11 +3,8 @@
  * 使い方: npm run export:openapi
  * 出力先: backend/openapi.json → frontend の codegen に使用
  */
-import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as path from 'path';
-import { AppModule } from './app.module';
 
 async function exportOpenApi() {
   // Temporarily disabled due to TypeORM removal
