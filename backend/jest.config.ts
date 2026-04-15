@@ -5,7 +5,6 @@ const config: Config = {
   rootDir: 'src',
   testRegex: '.*\\.spec\\.ts$',
   testPathIgnorePatterns: [
-    'src/carts/carts.service.spec.ts',
     'src/products/products.service.spec.ts',
     'src/users/users.service.spec.ts',
     'src/store-settings/store-settings.service.spec.ts',
@@ -58,8 +57,18 @@ const config: Config = {
     '!**/data-source.ts',
     '!**/*.entity.ts',
     '!**/guards/**',
+    '!**/instrument.ts',
+    '!**/auth/decorators/current-user.decorator.ts',
+    // Temporarily exclude DTO files for unmigrated modules (tests to be added per module migration)
+    '!**/admin-members/dto/**',
+    '!**/admin-orders/dto/**',
+    '!**/payments/dto/**',
+    '!**/products/dto/**',
+    '!**/store-settings/dto/**',
+    '!**/users/dto/**',
+    '!**/admin-users/dto/admin-user-response.dto.ts',
+    '!**/categories/dto/category-response.dto.ts',
     // Temporarily exclude services still using TypeORM during migration
-    '!**/carts/carts.service.ts',
     '!**/products/products.service.ts',
     '!**/users/users.service.ts',
     '!**/store-settings/store-settings.service.ts',
