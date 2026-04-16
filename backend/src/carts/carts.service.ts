@@ -36,10 +36,6 @@ export class CartsService {
         throw new NotFoundException("バリエーションが見つかりません");
       }
 
-      if (variation.stock < quantity) {
-        throw new BadRequestException("在庫が不足しています");
-      }
-
       // 同一セッション・同一バリエーションの既存カートを確認
       const existingCart = await tx.cart.findFirst({
         where: { sessionId, variationId, status: CartStatus.reserved },
@@ -66,11 +62,15 @@ export class CartsService {
         });
       }
 
-      // 在庫を減算
-      await tx.productVariation.update({
-        where: { id: variationId },
+      // 在庫を原子的に減算（競合防止）
+      const stockUpdateResult = await tx.productVariation.updateMany({
+        where: { id: variationId, stock: { gte: quantity } },
         data: { stock: { decrement: quantity } },
       });
+
+      if (stockUpdateResult.count === 0) {
+        throw new BadRequestException("在庫が不足しています");
+      }
 
       // 追加されたカートを返す
       return tx.cart.findFirst({

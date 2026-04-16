@@ -16,6 +16,7 @@ type MockPrisma = {
   productVariation: {
     findUnique: jest.Mock;
     update: jest.Mock;
+    updateMany: jest.Mock;
   };
   $transaction: jest.Mock;
 };
@@ -37,6 +38,7 @@ describe('CartsService', () => {
       productVariation: {
         findUnique: jest.fn(),
         update: jest.fn(),
+        updateMany: jest.fn(),
       },
       $transaction: jest.fn(),
     };
@@ -120,7 +122,7 @@ describe('CartsService', () => {
         .mockResolvedValueOnce(null) // 既存カートなし
         .mockResolvedValueOnce(createdCart); // 追加後の取得
       mockPrisma.cart.create.mockResolvedValue(createdCart);
-      mockPrisma.productVariation.update.mockResolvedValue({ ...variation, stock: 8 });
+      mockPrisma.productVariation.updateMany.mockResolvedValue({ count: 1 });
 
       const result = await service.addToCart(userId, { variationId, quantity });
 
@@ -128,8 +130,8 @@ describe('CartsService', () => {
         where: { id: variationId },
       });
       expect(mockPrisma.cart.create).toHaveBeenCalled();
-      expect(mockPrisma.productVariation.update).toHaveBeenCalledWith({
-        where: { id: variationId },
+      expect(mockPrisma.productVariation.updateMany).toHaveBeenCalledWith({
+        where: { id: variationId, stock: { gte: quantity } },
         data: { stock: { decrement: quantity } },
       });
       expect(result).toEqual(createdCart);
@@ -155,7 +157,7 @@ describe('CartsService', () => {
         .mockResolvedValueOnce(existingCart)
         .mockResolvedValueOnce({ ...existingCart, quantity: 3 });
       mockPrisma.cart.update.mockResolvedValue({ ...existingCart, quantity: 3 });
-      mockPrisma.productVariation.update.mockResolvedValue({ id: variationId, stock: 8 });
+      mockPrisma.productVariation.updateMany.mockResolvedValue({ count: 1 });
 
       await service.addToCart(userId, { variationId, quantity });
 
@@ -174,6 +176,7 @@ describe('CartsService', () => {
         cb(mockPrisma),
       );
       mockPrisma.productVariation.findUnique.mockResolvedValue({ id: variationId, stock: 5 });
+      mockPrisma.productVariation.updateMany.mockResolvedValue({ count: 0 });
 
       await expect(service.addToCart(userId, { variationId, quantity })).rejects.toThrow(
         BadRequestException,
