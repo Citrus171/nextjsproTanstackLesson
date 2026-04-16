@@ -27,20 +27,6 @@ import type {
   AdminCategoriesControllerRemoveResponses,
   AdminCategoriesControllerUpdateData,
   AdminCategoriesControllerUpdateResponses,
-  AdminMembersControllerDeleteData,
-  AdminMembersControllerDeleteResponses,
-  AdminMembersControllerFindAllData,
-  AdminMembersControllerFindAllResponses,
-  AdminMembersControllerFindByIdData,
-  AdminMembersControllerFindByIdResponses,
-  AdminOrdersControllerCancelOrderData,
-  AdminOrdersControllerCancelOrderResponses,
-  AdminOrdersControllerFindAllData,
-  AdminOrdersControllerFindAllResponses,
-  AdminOrdersControllerFindByIdData,
-  AdminOrdersControllerFindByIdResponses,
-  AdminOrdersControllerUpdateStatusData,
-  AdminOrdersControllerUpdateStatusResponses,
   AuthControllerLoginData,
   AuthControllerLoginResponses,
   AuthControllerRegisterData,
@@ -55,13 +41,6 @@ import type {
   CartsControllerUpdateItemResponses,
   CategoriesControllerFindAllData,
   CategoriesControllerFindAllResponses,
-  HealthControllerCheckData,
-  HealthControllerCheckErrors,
-  HealthControllerCheckResponses,
-  PaymentsControllerCreateCheckoutSessionData,
-  PaymentsControllerCreateCheckoutSessionResponses,
-  PaymentsControllerHandleWebhookData,
-  PaymentsControllerHandleWebhookResponses,
   ProductsControllerAddImageData,
   ProductsControllerAddImageResponses,
   ProductsControllerAddVariationData,
@@ -363,18 +342,6 @@ export const adminAccountsControllerUpdate = <
       ...options.headers,
     },
   });
-
-/**
- * ヘルスチェック（DB接続確認）
- */
-export const healthControllerCheck = <ThrowOnError extends boolean = false>(
-  options?: Options<HealthControllerCheckData, ThrowOnError>,
-) =>
-  (options?.client ?? client).get<
-    HealthControllerCheckResponses,
-    HealthControllerCheckErrors,
-    ThrowOnError
-  >({ url: "/health", ...options });
 
 export const adminCategoriesControllerFindAll = <
   ThrowOnError extends boolean = false,
@@ -777,149 +744,4 @@ export const cartsControllerUpdateItem = <ThrowOnError extends boolean = false>(
       "Content-Type": "application/json",
       ...options.headers,
     },
-  });
-
-/**
- * Stripe Checkout Sessionを作成してURLを返す
- */
-export const paymentsControllerCreateCheckoutSession = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<PaymentsControllerCreateCheckoutSessionData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    PaymentsControllerCreateCheckoutSessionResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/payments/checkout",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-
-/**
- * Stripe Webhookエンドポイント（署名検証済み）
- */
-export const paymentsControllerHandleWebhook = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<PaymentsControllerHandleWebhookData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    PaymentsControllerHandleWebhookResponses,
-    unknown,
-    ThrowOnError
-  >({ url: "/payments/webhook", ...options });
-
-export const adminMembersControllerFindAll = <
-  ThrowOnError extends boolean = false,
->(
-  options?: Options<AdminMembersControllerFindAllData, ThrowOnError>,
-) =>
-  (options?.client ?? client).get<
-    AdminMembersControllerFindAllResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/members",
-    ...options,
-  });
-
-export const adminMembersControllerDelete = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AdminMembersControllerDeleteData, ThrowOnError>,
-) =>
-  (options.client ?? client).delete<
-    AdminMembersControllerDeleteResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/members/{id}",
-    ...options,
-  });
-
-export const adminMembersControllerFindById = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AdminMembersControllerFindByIdData, ThrowOnError>,
-) =>
-  (options.client ?? client).get<
-    AdminMembersControllerFindByIdResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/members/{id}",
-    ...options,
-  });
-
-export const adminOrdersControllerFindAll = <
-  ThrowOnError extends boolean = false,
->(
-  options?: Options<AdminOrdersControllerFindAllData, ThrowOnError>,
-) =>
-  (options?.client ?? client).get<
-    AdminOrdersControllerFindAllResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/orders",
-    ...options,
-  });
-
-export const adminOrdersControllerFindById = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AdminOrdersControllerFindByIdData, ThrowOnError>,
-) =>
-  (options.client ?? client).get<
-    AdminOrdersControllerFindByIdResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/orders/{id}",
-    ...options,
-  });
-
-export const adminOrdersControllerUpdateStatus = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AdminOrdersControllerUpdateStatusData, ThrowOnError>,
-) =>
-  (options.client ?? client).patch<
-    AdminOrdersControllerUpdateStatusResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/orders/{id}/status",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-
-export const adminOrdersControllerCancelOrder = <
-  ThrowOnError extends boolean = false,
->(
-  options: Options<AdminOrdersControllerCancelOrderData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    AdminOrdersControllerCancelOrderResponses,
-    unknown,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/admin/orders/{id}/cancel",
-    ...options,
   });

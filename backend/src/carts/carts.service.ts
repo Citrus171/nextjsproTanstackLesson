@@ -1,198 +1,194 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { Repository, DataSource, LessThan } from 'typeorm';
-import { CartEntity } from './entities/cart.entity';
-import { ProductVariationEntity } from '../products/entities/product-variation.entity';
-import { AddToCartDto } from './dto/add-to-cart.dto';
-import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { PrismaService } from "../prisma/prisma.service";
+import { CartStatus } from "@prisma/client";
+import { AddToCartDto } from "./dto/add-to-cart.dto";
+import { UpdateCartItemDto } from "./dto/update-cart-item.dto";
 
 @Injectable()
 export class CartsService {
-  constructor(
-    @InjectRepository(CartEntity)
-    private readonly cartRepository: Repository<CartEntity>,
-    @InjectRepository(ProductVariationEntity)
-    private readonly variationRepository: Repository<ProductVariationEntity>,
-    private readonly dataSource: DataSource,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getCart(userId: number): Promise<CartEntity[]> {
+  async getCart(userId: number) {
     const sessionId = String(userId);
-    return this.cartRepository.find({
-      where: { sessionId, status: 'reserved' },
-      relations: { variation: { product: true } },
+    return this.prisma.cart.findMany({
+      where: { sessionId, status: CartStatus.reserved },
+      include: { variation: { include: { product: true } } },
     });
   }
 
-  async addToCart(userId: number, dto: AddToCartDto): Promise<CartEntity | null> {
+  async addToCart(userId: number, dto: AddToCartDto) {
     const sessionId = String(userId);
     const { variationId, quantity = 1 } = dto;
 
-    return this.dataSource.transaction(async (manager) => {
-      // FOR UPDATE でロック取得
-      const variation = await manager.findOne(ProductVariationEntity, {
+    return this.prisma.$transaction(async (tx) => {
+      // バリエーションを取得
+      const variation = await tx.productVariation.findUnique({
         where: { id: variationId },
-        lock: { mode: 'pessimistic_write' },
       });
 
       if (!variation) {
-        throw new NotFoundException('バリエーションが見つかりません');
-      }
-
-      if (variation.stock < quantity) {
-        throw new BadRequestException('在庫が不足しています');
+        throw new NotFoundException("バリエーションが見つかりません");
       }
 
       // 同一セッション・同一バリエーションの既存カートを確認
-      const existingCart = await manager.find(CartEntity, {
-        where: { sessionId, variationId, status: 'reserved' },
+      const existingCart = await tx.cart.findFirst({
+        where: { sessionId, variationId, status: CartStatus.reserved },
       });
 
-      if (existingCart.length > 0) {
+      if (existingCart) {
         // 既存カートの数量を加算
-        await manager.increment(
-          CartEntity,
-          { sessionId, variationId, status: 'reserved' },
-          'quantity',
-          quantity,
-        );
+        await tx.cart.update({
+          where: { id: existingCart.id },
+          data: { quantity: { increment: quantity } },
+        });
       } else {
         // 新規カートを作成
         const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-        await manager.insert(CartEntity, {
-          sessionId,
-          variationId,
-          quantity,
-          status: 'reserved',
-          reservedAt: new Date(),
-          expiresAt,
+        await tx.cart.create({
+          data: {
+            sessionId,
+            variationId,
+            quantity,
+            status: CartStatus.reserved,
+            reservedAt: new Date(),
+            expiresAt,
+          },
         });
       }
 
-      // 在庫を減算
-      await manager.decrement(
-        ProductVariationEntity,
-        { id: variationId },
-        'stock',
-        quantity,
-      );
+      // 在庫を原子的に減算（競合防止）
+      const stockUpdateResult = await tx.productVariation.updateMany({
+        where: { id: variationId, stock: { gte: quantity } },
+        data: { stock: { decrement: quantity } },
+      });
+
+      if (stockUpdateResult.count === 0) {
+        throw new BadRequestException("在庫が不足しています");
+      }
 
       // 追加されたカートを返す
-      return manager.findOne(CartEntity, {
-        where: { sessionId, variationId, status: 'reserved' },
+      return tx.cart.findFirst({
+        where: { sessionId, variationId, status: CartStatus.reserved },
       });
     });
   }
 
-  async updateItem(userId: number, cartId: number, dto: UpdateCartItemDto): Promise<void> {
+  async updateItem(
+    userId: number,
+    cartId: number,
+    dto: UpdateCartItemDto,
+  ): Promise<void> {
     const sessionId = String(userId);
     const { quantity: newQuantity } = dto;
 
-    return this.dataSource.transaction(async (manager) => {
-      const cart = await manager.findOne(CartEntity, {
-        where: { id: cartId, status: 'reserved' },
+    return this.prisma.$transaction(async (tx) => {
+      const cart = await tx.cart.findFirst({
+        where: { id: cartId, status: CartStatus.reserved },
       });
 
       if (!cart) {
-        throw new NotFoundException('カートアイテムが見つかりません');
+        throw new NotFoundException("カートアイテムが見つかりません");
       }
 
       if (cart.sessionId !== sessionId) {
-        throw new ForbiddenException('このカートアイテムを操作できません');
+        throw new ForbiddenException("このカートアイテムを操作できません");
       }
 
       const oldQuantity = cart.quantity;
       const quantityDiff = newQuantity - oldQuantity;
 
-      // variation を FOR UPDATE でロックし最新在庫を取得
-      const variation = await manager.findOne(ProductVariationEntity, {
+      // バリエーションを取得
+      const variation = await tx.productVariation.findUnique({
         where: { id: cart.variationId },
-        lock: { mode: 'pessimistic_write' },
       });
 
       if (!variation) {
-        throw new NotFoundException('商品バリエーションが見つかりません');
+        throw new NotFoundException("商品バリエーションが見つかりません");
       }
 
       if (quantityDiff > 0 && variation.stock < quantityDiff) {
-        throw new BadRequestException('在庫が不足しています');
+        throw new BadRequestException("在庫が不足しています");
       }
 
       // 在庫を調整
       if (quantityDiff > 0) {
-        await manager.decrement(
-          ProductVariationEntity,
-          { id: cart.variationId },
-          'stock',
-          quantityDiff,
-        );
+        await tx.productVariation.update({
+          where: { id: cart.variationId },
+          data: { stock: { decrement: quantityDiff } },
+        });
       } else if (quantityDiff < 0) {
-        await manager.increment(
-          ProductVariationEntity,
-          { id: cart.variationId },
-          'stock',
-          Math.abs(quantityDiff),
-        );
+        await tx.productVariation.update({
+          where: { id: cart.variationId },
+          data: { stock: { increment: Math.abs(quantityDiff) } },
+        });
       }
 
       // カートの数量を更新
-      await manager.update(CartEntity, cartId, { quantity: newQuantity });
+      await tx.cart.update({
+        where: { id: cartId },
+        data: { quantity: newQuantity },
+      });
     });
   }
 
   async removeItem(userId: number, cartId: number): Promise<void> {
     const sessionId = String(userId);
 
-    return this.dataSource.transaction(async (manager) => {
-      const cart = await manager.findOne(CartEntity, {
-        where: { id: cartId, status: 'reserved' },
+    return this.prisma.$transaction(async (tx) => {
+      const cart = await tx.cart.findFirst({
+        where: { id: cartId, status: CartStatus.reserved },
       });
 
       if (!cart) {
-        throw new NotFoundException('カートアイテムが見つかりません');
+        throw new NotFoundException("カートアイテムが見つかりません");
       }
 
       if (cart.sessionId !== sessionId) {
-        throw new ForbiddenException('このカートアイテムを操作できません');
+        throw new ForbiddenException("このカートアイテムを操作できません");
       }
 
       // 在庫を返却
-      await manager.increment(
-        ProductVariationEntity,
-        { id: cart.variationId },
-        'stock',
-        cart.quantity,
-      );
+      await tx.productVariation.update({
+        where: { id: cart.variationId },
+        data: { stock: { increment: cart.quantity } },
+      });
 
       // カートアイテムを削除
-      await manager.delete(CartEntity, cartId);
+      await tx.cart.delete({
+        where: { id: cartId },
+      });
     });
   }
 
   @Cron(CronExpression.EVERY_30_MINUTES)
   async releaseExpiredCarts(): Promise<void> {
-    return this.dataSource.transaction(async (manager) => {
+    return this.prisma.$transaction(async (tx) => {
       const now = new Date();
-      const expiredCarts = await manager.find(CartEntity, {
+      const expiredCarts = await tx.cart.findMany({
         where: {
-          status: 'reserved',
-          expiresAt: LessThan(now),
+          status: CartStatus.reserved,
+          expiresAt: { lt: now },
         },
-        lock: { mode: 'pessimistic_write' },
       });
 
       for (const cart of expiredCarts) {
         // 在庫を返却
-        await manager.increment(
-          ProductVariationEntity,
-          { id: cart.variationId },
-          'stock',
-          cart.quantity,
-        );
+        await tx.productVariation.update({
+          where: { id: cart.variationId },
+          data: { stock: { increment: cart.quantity } },
+        });
 
         // ステータスを expired に更新
-        await manager.update(CartEntity, { id: cart.id }, { status: 'expired' });
+        await tx.cart.update({
+          where: { id: cart.id },
+          data: { status: CartStatus.expired },
+        });
       }
     });
   }

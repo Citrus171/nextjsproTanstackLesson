@@ -1,18 +1,14 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { StoreSettingsEntity } from './entities/store-settings.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { StoreSettings } from '@prisma/client';
 import { UpdateStoreSettingsDto } from './dto/update-store-settings.dto';
 
 @Injectable()
 export class StoreSettingsService {
-  constructor(
-    @InjectRepository(StoreSettingsEntity)
-    private readonly repository: Repository<StoreSettingsEntity>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getSettings(): Promise<StoreSettingsEntity> {
-    const settings = await this.repository.findOneBy({ id: 1 });
+  async getSettings(): Promise<StoreSettings> {
+    const settings = await this.prisma.storeSettings.findUnique({ where: { id: 1 } });
     if (!settings) {
       throw new Error('Store settings not found');
     }
@@ -21,7 +17,7 @@ export class StoreSettingsService {
 
   async updateSettings(
     dto: UpdateStoreSettingsDto,
-  ): Promise<StoreSettingsEntity> {
+  ): Promise<StoreSettings> {
     // バリデーション
     if (
       dto.shippingFixedFee !== undefined &&
@@ -39,12 +35,21 @@ export class StoreSettingsService {
       );
     }
 
-    // 既存の設定を取得
-    const existing = await this.repository.findOneBy({ id: 1 });
-
-    // 更新対象を作成
-    const toUpdate = Object.assign(existing || new StoreSettingsEntity(), dto);
-
-    return this.repository.save(toUpdate);
+    try {
+      return await this.prisma.storeSettings.update({
+        where: { id: 1 },
+        data: dto,
+      });
+    } catch {
+      // If update fails (record doesn't exist), create it
+      return this.prisma.storeSettings.create({
+        data: {
+          id: 1,
+          invoiceNumber: dto.invoiceNumber ?? null,
+          shippingFixedFee: dto.shippingFixedFee ?? 0, // Provide defaults for required fields
+          shippingFreeThreshold: dto.shippingFreeThreshold ?? 0,
+        },
+      });
+    }
   }
 }

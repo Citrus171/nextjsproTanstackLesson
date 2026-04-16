@@ -3,12 +3,8 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ProductEntity } from './entities/product.entity';
-import { ProductVariationEntity } from './entities/product-variation.entity';
-import { ProductImageEntity } from './entities/product-image.entity';
-import { CategoryEntity } from '../categories/entities/category.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { Product, ProductVariation, ProductImage } from '@prisma/client';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AddVariationDto } from './dto/add-variation.dto';
@@ -17,18 +13,9 @@ import { AddImageDto } from './dto/add-image.dto';
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    @InjectRepository(ProductEntity)
-    private productRepository: Repository<ProductEntity>,
-    @InjectRepository(ProductVariationEntity)
-    private variationRepository: Repository<ProductVariationEntity>,
-    @InjectRepository(ProductImageEntity)
-    private imageRepository: Repository<ProductImageEntity>,
-    @InjectRepository(CategoryEntity)
-    private categoryRepository: Repository<CategoryEntity>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(createProductDto: CreateProductDto): Promise<ProductEntity> {
+  async create(createProductDto: CreateProductDto): Promise<Product> {
     // Validate name
     if (!createProductDto.name || createProductDto.name.trim() === '') {
       throw new BadRequestException('name is required');
@@ -49,8 +36,8 @@ export class ProductsService {
 
     // Validate categoryId if provided
     if (createProductDto.categoryId) {
-      const category = await this.categoryRepository.findOneBy({
-        id: createProductDto.categoryId,
+      const category = await this.prisma.category.findUnique({
+        where: { id: createProductDto.categoryId },
       });
       if (!category) {
         throw new NotFoundException(
@@ -59,21 +46,25 @@ export class ProductsService {
       }
     }
 
-    const product = this.productRepository.create({
-      name: createProductDto.name,
-      description: createProductDto.description || null,
-      price: createProductDto.price,
-      categoryId: createProductDto.categoryId || null,
-      isPublished: createProductDto.isPublished ?? false,
+    return this.prisma.product.create({
+      data: {
+        name: createProductDto.name,
+        description: createProductDto.description || null,
+        price: createProductDto.price,
+        categoryId: createProductDto.categoryId || null,
+        isPublished: createProductDto.isPublished ?? false,
+      },
     });
-
-    return this.productRepository.save(product);
   }
 
-  async findById(id: number): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne({
+  async findById(id: number): Promise<Product> {
+    const product = await this.prisma.product.findUnique({
       where: { id },
-      relations: ['images', 'variations', 'category'],
+      include: {
+        images: true,
+        variations: true,
+        category: true,
+      },
     });
 
     if (!product) {
@@ -86,19 +77,23 @@ export class ProductsService {
   async findAll(options: {
     page?: number;
     limit?: number;
-  }): Promise<{ data: ProductEntity[]; total: number }> {
+  }): Promise<{ data: Product[]; total: number }> {
     const page = options.page || 1;
     const limit = options.limit || 10;
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([
-      this.productRepository.find({
-        relations: ['images', 'variations', 'category'],
+      this.prisma.product.findMany({
+        include: {
+          images: true,
+          variations: true,
+          category: true,
+        },
         skip,
         take: limit,
-        order: { createdAt: 'DESC' },
+        orderBy: { createdAt: 'desc' },
       }),
-      this.productRepository.count(),
+      this.prisma.product.count(),
     ]);
 
     return {
@@ -110,9 +105,7 @@ export class ProductsService {
   async update(
     id: number,
     updateProductDto: UpdateProductDto,
-  ): Promise<ProductEntity> {
-    const product = await this.findById(id);
-
+  ): Promise<Product> {
     // Validate name if provided
     if (updateProductDto.name !== undefined) {
       if (!updateProductDto.name || updateProductDto.name.trim() === '') {
@@ -138,8 +131,8 @@ export class ProductsService {
       updateProductDto.categoryId !== undefined &&
       updateProductDto.categoryId !== null
     ) {
-      const category = await this.categoryRepository.findOneBy({
-        id: updateProductDto.categoryId,
+      const category = await this.prisma.category.findUnique({
+        where: { id: updateProductDto.categoryId },
       });
       if (!category) {
         throw new NotFoundException(
@@ -148,32 +141,29 @@ export class ProductsService {
       }
     }
 
-    // Update product fields
-    if (updateProductDto.name !== undefined) {
-      product.name = updateProductDto.name;
-    }
-    if (updateProductDto.description !== undefined) {
-      product.description = updateProductDto.description || null;
-    }
-    if (updateProductDto.price !== undefined) {
-      product.price = updateProductDto.price;
-    }
-    if (updateProductDto.categoryId !== undefined) {
-      product.categoryId = updateProductDto.categoryId;
-    }
-
-    return this.productRepository.save(product);
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        name: updateProductDto.name,
+        description: updateProductDto.description,
+        price: updateProductDto.price,
+        categoryId: updateProductDto.categoryId,
+      },
+    });
   }
 
   async delete(id: number): Promise<void> {
     await this.findById(id);
-    await this.productRepository.softDelete(id);
+    await this.prisma.product.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
   }
 
   async addVariation(
     productId: number,
     addVariationDto: AddVariationDto,
-  ): Promise<ProductVariationEntity> {
+  ): Promise<ProductVariation> {
     // Validate product exists
     await this.findById(productId);
 
@@ -209,30 +199,22 @@ export class ProductsService {
       throw new BadRequestException('stock must be 0 or more');
     }
 
-    const variation = this.variationRepository.create({
-      productId,
-      size: addVariationDto.size,
-      color: addVariationDto.color,
-      price: addVariationDto.price,
-      stock: addVariationDto.stock,
-      imageUrl: addVariationDto.imageUrl || null,
+    return this.prisma.productVariation.create({
+      data: {
+        productId,
+        size: addVariationDto.size,
+        color: addVariationDto.color,
+        price: addVariationDto.price,
+        stock: addVariationDto.stock,
+        imageUrl: addVariationDto.imageUrl || null,
+      },
     });
-
-    return this.variationRepository.save(variation);
   }
 
   async updateVariation(
     id: number,
     updateVariationDto: UpdateVariationDto,
-  ): Promise<ProductVariationEntity> {
-    const variation = await this.variationRepository.findOne({
-      where: { id },
-    });
-
-    if (!variation) {
-      throw new NotFoundException(`Variation with id ${id} not found`);
-    }
-
+  ): Promise<ProductVariation> {
     // Validate size if provided
     if (updateVariationDto.size !== undefined) {
       if (!updateVariationDto.size || updateVariationDto.size.trim() === '') {
@@ -270,28 +252,20 @@ export class ProductsService {
       }
     }
 
-    // Update variation fields
-    if (updateVariationDto.size !== undefined) {
-      variation.size = updateVariationDto.size;
-    }
-    if (updateVariationDto.color !== undefined) {
-      variation.color = updateVariationDto.color;
-    }
-    if (updateVariationDto.price !== undefined) {
-      variation.price = updateVariationDto.price;
-    }
-    if (updateVariationDto.stock !== undefined) {
-      variation.stock = updateVariationDto.stock;
-    }
-    if (updateVariationDto.imageUrl !== undefined) {
-      variation.imageUrl = updateVariationDto.imageUrl || null;
-    }
-
-    return this.variationRepository.save(variation);
+    return this.prisma.productVariation.update({
+      where: { id },
+      data: {
+        size: updateVariationDto.size,
+        color: updateVariationDto.color,
+        price: updateVariationDto.price,
+        stock: updateVariationDto.stock,
+        imageUrl: updateVariationDto.imageUrl,
+      },
+    });
   }
 
   async deleteVariation(id: number): Promise<void> {
-    const variation = await this.variationRepository.findOne({
+    const variation = await this.prisma.productVariation.findUnique({
       where: { id },
     });
 
@@ -299,25 +273,30 @@ export class ProductsService {
       throw new NotFoundException(`Variation with id ${id} not found`);
     }
 
-    await this.variationRepository.softDelete(id);
+    await this.prisma.productVariation.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
   }
 
-  async publish(id: number): Promise<ProductEntity> {
-    const product = await this.findById(id);
-    product.isPublished = true;
-    return this.productRepository.save(product);
+  async publish(id: number): Promise<Product> {
+    return this.prisma.product.update({
+      where: { id },
+      data: { isPublished: true },
+    });
   }
 
-  async unpublish(id: number): Promise<ProductEntity> {
-    const product = await this.findById(id);
-    product.isPublished = false;
-    return this.productRepository.save(product);
+  async unpublish(id: number): Promise<Product> {
+    return this.prisma.product.update({
+      where: { id },
+      data: { isPublished: false },
+    });
   }
 
   async addImage(
     productId: number,
     addImageDto: AddImageDto,
-  ): Promise<ProductImageEntity> {
+  ): Promise<ProductImage> {
     // Validate product exists
     await this.findById(productId);
 
@@ -326,17 +305,17 @@ export class ProductsService {
       throw new BadRequestException('url is required');
     }
 
-    const image = this.imageRepository.create({
-      productId,
-      url: addImageDto.url,
-      sortOrder: addImageDto.sortOrder || 0,
+    return this.prisma.productImage.create({
+      data: {
+        productId,
+        url: addImageDto.url,
+        sortOrder: addImageDto.sortOrder || 0,
+      },
     });
-
-    return this.imageRepository.save(image);
   }
 
   async deleteImage(id: number): Promise<void> {
-    const image = await this.imageRepository.findOne({
+    const image = await this.prisma.productImage.findUnique({
       where: { id },
     });
 
@@ -344,13 +323,19 @@ export class ProductsService {
       throw new NotFoundException(`Image with id ${id} not found`);
     }
 
-    await this.imageRepository.delete(id);
+    await this.prisma.productImage.delete({
+      where: { id },
+    });
   }
 
-  async findByIdPublished(id: number): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne({
+  async findByIdPublished(id: number): Promise<Product> {
+    const product = await this.prisma.product.findFirst({
       where: { id, isPublished: true },
-      relations: ['images', 'variations', 'category'],
+      include: {
+        images: true,
+        variations: true,
+        category: true,
+      },
     });
 
     if (!product) {
@@ -366,49 +351,56 @@ export class ProductsService {
     categoryId?: number;
     keyword?: string;
     sort?: string;
-  }): Promise<{ data: ProductEntity[]; total: number }> {
+  }): Promise<{ data: Product[]; total: number }> {
     const page = Math.max(1, options.page || 1);
     const limit = Math.max(1, Math.min(options.limit || 10, 100));
     const skip = (page - 1) * limit;
 
-    const query = this.productRepository
-      .createQueryBuilder('product')
-      .leftJoinAndSelect('product.images', 'images')
-      .leftJoinAndSelect('product.variations', 'variations')
-      .leftJoinAndSelect('product.category', 'category')
-      .where('product.isPublished = :isPublished', { isPublished: true });
+    const where: any = {
+      isPublished: true,
+    };
 
     // フィルター: カテゴリ
     if (options.categoryId) {
-      query.andWhere('product.categoryId = :categoryId', { categoryId: options.categoryId });
+      where.categoryId = options.categoryId;
     }
 
     // フィルター: キーワード
     if (options.keyword) {
-      const keyword = `%${options.keyword}%`;
-      query.andWhere(
-        '(product.name LIKE :keyword OR product.description LIKE :keyword)',
-        { keyword },
-      );
+      where.OR = [
+        { name: { contains: options.keyword } },
+        { description: { contains: options.keyword } },
+      ];
     }
 
     // ソート
     const sortBy = options.sort || 'newest';
+    let orderBy: any;
     switch (sortBy) {
       case 'price_asc':
-        query.orderBy('product.price', 'ASC');
+        orderBy = { price: 'asc' };
         break;
       case 'price_desc':
-        query.orderBy('product.price', 'DESC');
+        orderBy = { price: 'desc' };
         break;
       case 'newest':
       default:
-        query.orderBy('product.createdAt', 'DESC');
+        orderBy = { createdAt: 'desc' };
     }
 
     const [products, total] = await Promise.all([
-      query.skip(skip).take(limit).getMany(),
-      query.getCount(),
+      this.prisma.product.findMany({
+        where,
+        include: {
+          images: true,
+          variations: true,
+          category: true,
+        },
+        skip,
+        take: limit,
+        orderBy,
+      }),
+      this.prisma.product.count({ where }),
     ]);
 
     return {

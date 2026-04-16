@@ -582,6 +582,11 @@ nestjspro/
         │       │   └── テスト環境以外で$connectが呼ばれること ✓
         │       └── onModuleInit should not call $connect in test env
         │           └── テスト環境では$connectが呼ばれないこと ✓
+        ├── typeorm-removal.spec.ts
+        │   ├── TypeORM パッケージが削除されていること ✓
+        │   ├── @nestjs/typeorm パッケージが削除されていること ✓
+        │   ├── data-source.ts が削除されていること ✓
+        │   └── マイグレーションファイルが削除されていること ✓
 └── frontend/
     └── src/
         ├── lib/

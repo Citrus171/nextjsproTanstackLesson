@@ -21,9 +21,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { AddVariationDto } from './dto/add-variation.dto';
 import { UpdateVariationDto } from './dto/update-variation.dto';
 import { AddImageDto } from './dto/add-image.dto';
-import { ProductEntity } from './entities/product.entity';
-import { ProductVariationEntity } from './entities/product-variation.entity';
-import { ProductImageEntity } from './entities/product-image.entity';
+import { Product, ProductVariation, ProductImage } from '@prisma/client';
 
 @ApiTags('Admin - Products')
 @ApiBearerAuth()
@@ -34,7 +32,7 @@ export class ProductsController {
 
   @Post()
   @Roles('general', 'super')
-  async create(@Body() createProductDto: CreateProductDto): Promise<ProductEntity> {
+  async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.productsService.create(createProductDto);
   }
 
@@ -43,7 +41,7 @@ export class ProductsController {
   async findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
-  ): Promise<{ data: ProductEntity[]; total: number }> {
+  ): Promise<{ data: Product[]; total: number }> {
     return this.productsService.findAll({ page, limit });
   }
 
@@ -52,7 +50,7 @@ export class ProductsController {
   async findById(
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     id: number,
-  ): Promise<ProductEntity> {
+  ): Promise<Product> {
     return this.productsService.findById(id);
   }
 
@@ -62,7 +60,7 @@ export class ProductsController {
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     id: number,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<ProductEntity> {
+  ): Promise<Product> {
     return this.productsService.update(id, updateProductDto);
   }
 
@@ -81,7 +79,7 @@ export class ProductsController {
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     id: number,
     @Body() addVariationDto: AddVariationDto,
-  ): Promise<ProductVariationEntity> {
+  ): Promise<ProductVariation> {
     return this.productsService.addVariation(id, addVariationDto);
   }
 
@@ -91,7 +89,7 @@ export class ProductsController {
     @Param('variationId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     variationId: number,
     @Body() updateVariationDto: UpdateVariationDto,
-  ): Promise<ProductVariationEntity> {
+  ): Promise<ProductVariation> {
     return this.productsService.updateVariation(variationId, updateVariationDto);
   }
 
@@ -109,7 +107,7 @@ export class ProductsController {
   async publish(
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     id: number,
-  ): Promise<ProductEntity> {
+  ): Promise<Product> {
     return this.productsService.publish(id);
   }
 
@@ -118,7 +116,7 @@ export class ProductsController {
   async unpublish(
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     id: number,
-  ): Promise<ProductEntity> {
+  ): Promise<Product> {
     return this.productsService.unpublish(id);
   }
 
@@ -128,7 +126,7 @@ export class ProductsController {
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }))
     id: number,
     @Body() addImageDto: AddImageDto,
-  ): Promise<ProductImageEntity> {
+  ): Promise<ProductImage> {
     return this.productsService.addImage(id, addImageDto);
   }
 

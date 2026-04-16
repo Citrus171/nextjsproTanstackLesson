@@ -12,12 +12,8 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config jest.e2e.config.ts",
-    "migration:run": "ts-node -r tsconfig-paths/register -e \"(async () => { const ds = require('./src/data-source').AppDataSource; let code = 0; try { await ds.initialize(); await ds.runMigrations(); console.log('Migrations complete'); } catch (e) { code = 1; console.error(e); } finally { if (ds.isInitialized) await ds.destroy(); process.exit(code); } })()\"",
-    "migration:revert": "ts-node -r tsconfig-paths/register -e \"(async () => { const ds = require('./src/data-source').AppDataSource; let code = 0; try { await ds.initialize(); await ds.undoLastMigration(); console.log('Migration reverted'); } catch (e) { code = 1; console.error(e); } finally { if (ds.isInitialized) await ds.destroy(); process.exit(code); } })()\"",
-    "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/data-source.ts",
-    "migration:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create",
-    "seed": "ts-node -r tsconfig-paths/register src/seeds/initial-seed.ts",
-    "type-coverage": "npx type-coverage --at-least 95 --strict --ignore-files \"dist/**\" --ignore-files \"src/**/*.spec.ts\" --ignore-files \"src/**/*.e2e-spec.ts\" --ignore-files \"src/main.ts\" --ignore-files \"src/export-openapi.ts\" --ignore-files \"src/data-source.ts\" --ignore-files \"src/seeds/**\""
+
+    "type-coverage": "npx type-coverage --at-least 95 --strict --ignore-files \"dist/**\" --ignore-files \"src/**/*.spec.ts\" --ignore-files \"src/**/*.e2e-spec.ts\" --ignore-files \"src/main.ts\" --ignore-files \"src/export-openapi.ts\" --ignore-files \"src/seeds/**\""
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.3.4",
@@ -29,7 +25,6 @@
     "@nestjs/schedule": "^6.1.1",
     "@nestjs/swagger": "^7.0.0",
     "@nestjs/terminus": "^11.1.1",
-    "@nestjs/typeorm": "^11.0.1",
     "@prisma/adapter-planetscale": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@sentry/nestjs": "^10.48.0",
@@ -46,8 +41,7 @@
     "prisma": "^7.7.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "stripe": "^22.0.1",
-    "typeorm": "^0.3.28"
+    "stripe": "^22.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

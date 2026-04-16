@@ -1,34 +1,28 @@
 import { Injectable, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from './entities/user.entity';
-import { OrderEntity } from '../orders/entities/order.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(OrderEntity)
-    private readonly orderRepository: Repository<OrderEntity>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(name: string, email: string, password: string): Promise<UserEntity> {
-    const exists = await this.userRepository.findOneBy({ email });
+  async create(name: string, email: string, password: string): Promise<User> {
+    const exists = await this.prisma.user.findUnique({ where: { email } });
     if (exists) throw new ConflictException('このメールアドレスは既に登録されています');
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = this.userRepository.create({ name, email, password: hashed });
-    return this.userRepository.save(user);
+    return this.prisma.user.create({
+      data: { name, email, password: hashed },
+    });
   }
 
-  findByEmail(email: string): Promise<UserEntity | null> {
-    return this.userRepository.findOneBy({ email });
+  findByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { email } });
   }
 
-  async findById(id: number): Promise<UserEntity> {
-    const user = await this.userRepository.findOneBy({ id });
+  async findById(id: number): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('ユーザーが見つかりません');
     return user;
   }
@@ -39,27 +33,36 @@ export class UsersService {
     if (!isMatch) throw new UnauthorizedException('現在のパスワードが正しくありません');
 
     const hashed = await bcrypt.hash(newPassword, 10);
-    await this.userRepository.update(userId, { password: hashed });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    });
   }
 
-  async updateProfile(userId: number, name: string, address?: string | null): Promise<UserEntity> {
-    const updateData: Partial<UserEntity> = { name };
+  async updateProfile(userId: number, name: string, address?: string | null): Promise<User> {
+    const updateData: Partial<User> = { name };
     if (address !== undefined) {
       updateData.address = address;
     }
-    await this.userRepository.update(userId, updateData);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
     return this.findById(userId);
   }
 
-  async findOrdersByUserId(userId: number): Promise<OrderEntity[]> {
-    return this.orderRepository.find({
+  async findOrdersByUserId(userId: number) {
+    return this.prisma.order.findMany({
       select: { id: true, status: true, totalAmount: true, createdAt: true },
       where: { userId },
-      order: { createdAt: 'DESC' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async withdraw(userId: number): Promise<void> {
-    await this.userRepository.softDelete(userId);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { deletedAt: new Date() },
+    });
   }
 }
