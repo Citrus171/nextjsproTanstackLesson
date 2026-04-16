@@ -22,13 +22,6 @@ import {
   adminCategoriesControllerFindAll,
   adminCategoriesControllerRemove,
   adminCategoriesControllerUpdate,
-  adminMembersControllerDelete,
-  adminMembersControllerFindAll,
-  adminMembersControllerFindById,
-  adminOrdersControllerCancelOrder,
-  adminOrdersControllerFindAll,
-  adminOrdersControllerFindById,
-  adminOrdersControllerUpdateStatus,
   authControllerLogin,
   authControllerRegister,
   cartsControllerAddToCart,
@@ -36,10 +29,7 @@ import {
   cartsControllerRemoveItem,
   cartsControllerUpdateItem,
   categoriesControllerFindAll,
-  healthControllerCheck,
   type Options,
-  paymentsControllerCreateCheckoutSession,
-  paymentsControllerHandleWebhook,
   productsControllerAddImage,
   productsControllerAddVariation,
   productsControllerCreate,
@@ -77,20 +67,6 @@ import type {
   AdminCategoriesControllerRemoveData,
   AdminCategoriesControllerRemoveResponse,
   AdminCategoriesControllerUpdateData,
-  AdminMembersControllerDeleteData,
-  AdminMembersControllerDeleteResponse,
-  AdminMembersControllerFindAllData,
-  AdminMembersControllerFindAllResponse,
-  AdminMembersControllerFindByIdData,
-  AdminMembersControllerFindByIdResponse,
-  AdminOrdersControllerCancelOrderData,
-  AdminOrdersControllerCancelOrderResponse,
-  AdminOrdersControllerFindAllData,
-  AdminOrdersControllerFindAllResponse,
-  AdminOrdersControllerFindByIdData,
-  AdminOrdersControllerFindByIdResponse,
-  AdminOrdersControllerUpdateStatusData,
-  AdminOrdersControllerUpdateStatusResponse,
   AuthControllerLoginData,
   AuthControllerRegisterData,
   CartsControllerAddToCartData,
@@ -100,12 +76,6 @@ import type {
   CartsControllerRemoveItemData,
   CartsControllerUpdateItemData,
   CategoriesControllerFindAllData,
-  HealthControllerCheckData,
-  HealthControllerCheckError,
-  HealthControllerCheckResponse,
-  PaymentsControllerCreateCheckoutSessionData,
-  PaymentsControllerCreateCheckoutSessionResponse,
-  PaymentsControllerHandleWebhookData,
   ProductsControllerAddImageData,
   ProductsControllerAddVariationData,
   ProductsControllerCreateData,
@@ -541,34 +511,6 @@ export const adminAccountsControllerUpdateMutation = (
   };
   return mutationOptions;
 };
-
-export const healthControllerCheckQueryKey = (
-  options?: Options<HealthControllerCheckData>,
-) => createQueryKey("healthControllerCheck", options);
-
-/**
- * ヘルスチェック（DB接続確認）
- */
-export const healthControllerCheckOptions = (
-  options?: Options<HealthControllerCheckData>,
-) =>
-  queryOptions<
-    HealthControllerCheckResponse,
-    HealthControllerCheckError,
-    HealthControllerCheckResponse,
-    ReturnType<typeof healthControllerCheckQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await healthControllerCheck({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: healthControllerCheckQueryKey(options),
-  });
 
 export const adminCategoriesControllerFindAllQueryKey = (
   options?: Options<AdminCategoriesControllerFindAllData>,
@@ -1314,326 +1256,6 @@ export const cartsControllerUpdateItemMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await cartsControllerUpdateItem({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Stripe Checkout Sessionを作成してURLを返す
- */
-export const paymentsControllerCreateCheckoutSessionMutation = (
-  options?: Partial<Options<PaymentsControllerCreateCheckoutSessionData>>,
-): UseMutationOptions<
-  PaymentsControllerCreateCheckoutSessionResponse,
-  DefaultError,
-  Options<PaymentsControllerCreateCheckoutSessionData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    PaymentsControllerCreateCheckoutSessionResponse,
-    DefaultError,
-    Options<PaymentsControllerCreateCheckoutSessionData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await paymentsControllerCreateCheckoutSession({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-/**
- * Stripe Webhookエンドポイント（署名検証済み）
- */
-export const paymentsControllerHandleWebhookMutation = (
-  options?: Partial<Options<PaymentsControllerHandleWebhookData>>,
-): UseMutationOptions<
-  unknown,
-  DefaultError,
-  Options<PaymentsControllerHandleWebhookData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    unknown,
-    DefaultError,
-    Options<PaymentsControllerHandleWebhookData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await paymentsControllerHandleWebhook({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const adminMembersControllerFindAllQueryKey = (
-  options?: Options<AdminMembersControllerFindAllData>,
-) => createQueryKey("adminMembersControllerFindAll", options);
-
-export const adminMembersControllerFindAllOptions = (
-  options?: Options<AdminMembersControllerFindAllData>,
-) =>
-  queryOptions<
-    AdminMembersControllerFindAllResponse,
-    DefaultError,
-    AdminMembersControllerFindAllResponse,
-    ReturnType<typeof adminMembersControllerFindAllQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminMembersControllerFindAll({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminMembersControllerFindAllQueryKey(options),
-  });
-
-export const adminMembersControllerFindAllInfiniteQueryKey = (
-  options?: Options<AdminMembersControllerFindAllData>,
-): QueryKey<Options<AdminMembersControllerFindAllData>> =>
-  createQueryKey("adminMembersControllerFindAll", options, true);
-
-export const adminMembersControllerFindAllInfiniteOptions = (
-  options?: Options<AdminMembersControllerFindAllData>,
-) =>
-  infiniteQueryOptions<
-    AdminMembersControllerFindAllResponse,
-    DefaultError,
-    InfiniteData<AdminMembersControllerFindAllResponse>,
-    QueryKey<Options<AdminMembersControllerFindAllData>>,
-    | number
-    | Pick<
-        QueryKey<Options<AdminMembersControllerFindAllData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<AdminMembersControllerFindAllData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await adminMembersControllerFindAll({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: adminMembersControllerFindAllInfiniteQueryKey(options),
-    },
-  );
-
-export const adminMembersControllerDeleteMutation = (
-  options?: Partial<Options<AdminMembersControllerDeleteData>>,
-): UseMutationOptions<
-  AdminMembersControllerDeleteResponse,
-  DefaultError,
-  Options<AdminMembersControllerDeleteData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AdminMembersControllerDeleteResponse,
-    DefaultError,
-    Options<AdminMembersControllerDeleteData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await adminMembersControllerDelete({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const adminMembersControllerFindByIdQueryKey = (
-  options: Options<AdminMembersControllerFindByIdData>,
-) => createQueryKey("adminMembersControllerFindById", options);
-
-export const adminMembersControllerFindByIdOptions = (
-  options: Options<AdminMembersControllerFindByIdData>,
-) =>
-  queryOptions<
-    AdminMembersControllerFindByIdResponse,
-    DefaultError,
-    AdminMembersControllerFindByIdResponse,
-    ReturnType<typeof adminMembersControllerFindByIdQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminMembersControllerFindById({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminMembersControllerFindByIdQueryKey(options),
-  });
-
-export const adminOrdersControllerFindAllQueryKey = (
-  options?: Options<AdminOrdersControllerFindAllData>,
-) => createQueryKey("adminOrdersControllerFindAll", options);
-
-export const adminOrdersControllerFindAllOptions = (
-  options?: Options<AdminOrdersControllerFindAllData>,
-) =>
-  queryOptions<
-    AdminOrdersControllerFindAllResponse,
-    DefaultError,
-    AdminOrdersControllerFindAllResponse,
-    ReturnType<typeof adminOrdersControllerFindAllQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminOrdersControllerFindAll({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminOrdersControllerFindAllQueryKey(options),
-  });
-
-export const adminOrdersControllerFindAllInfiniteQueryKey = (
-  options?: Options<AdminOrdersControllerFindAllData>,
-): QueryKey<Options<AdminOrdersControllerFindAllData>> =>
-  createQueryKey("adminOrdersControllerFindAll", options, true);
-
-export const adminOrdersControllerFindAllInfiniteOptions = (
-  options?: Options<AdminOrdersControllerFindAllData>,
-) =>
-  infiniteQueryOptions<
-    AdminOrdersControllerFindAllResponse,
-    DefaultError,
-    InfiniteData<AdminOrdersControllerFindAllResponse>,
-    QueryKey<Options<AdminOrdersControllerFindAllData>>,
-    | number
-    | Pick<
-        QueryKey<Options<AdminOrdersControllerFindAllData>>[0],
-        "body" | "headers" | "path" | "query"
-      >
-  >(
-    // @ts-ignore
-    {
-      queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<
-          QueryKey<Options<AdminOrdersControllerFindAllData>>[0],
-          "body" | "headers" | "path" | "query"
-        > =
-          typeof pageParam === "object"
-            ? pageParam
-            : {
-                query: {
-                  page: pageParam,
-                },
-              };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await adminOrdersControllerFindAll({
-          ...options,
-          ...params,
-          signal,
-          throwOnError: true,
-        });
-        return data;
-      },
-      queryKey: adminOrdersControllerFindAllInfiniteQueryKey(options),
-    },
-  );
-
-export const adminOrdersControllerFindByIdQueryKey = (
-  options: Options<AdminOrdersControllerFindByIdData>,
-) => createQueryKey("adminOrdersControllerFindById", options);
-
-export const adminOrdersControllerFindByIdOptions = (
-  options: Options<AdminOrdersControllerFindByIdData>,
-) =>
-  queryOptions<
-    AdminOrdersControllerFindByIdResponse,
-    DefaultError,
-    AdminOrdersControllerFindByIdResponse,
-    ReturnType<typeof adminOrdersControllerFindByIdQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await adminOrdersControllerFindById({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: adminOrdersControllerFindByIdQueryKey(options),
-  });
-
-export const adminOrdersControllerUpdateStatusMutation = (
-  options?: Partial<Options<AdminOrdersControllerUpdateStatusData>>,
-): UseMutationOptions<
-  AdminOrdersControllerUpdateStatusResponse,
-  DefaultError,
-  Options<AdminOrdersControllerUpdateStatusData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AdminOrdersControllerUpdateStatusResponse,
-    DefaultError,
-    Options<AdminOrdersControllerUpdateStatusData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await adminOrdersControllerUpdateStatus({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
-export const adminOrdersControllerCancelOrderMutation = (
-  options?: Partial<Options<AdminOrdersControllerCancelOrderData>>,
-): UseMutationOptions<
-  AdminOrdersControllerCancelOrderResponse,
-  DefaultError,
-  Options<AdminOrdersControllerCancelOrderData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    AdminOrdersControllerCancelOrderResponse,
-    DefaultError,
-    Options<AdminOrdersControllerCancelOrderData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await adminOrdersControllerCancelOrder({
         ...options,
         ...fnOptions,
         throwOnError: true,

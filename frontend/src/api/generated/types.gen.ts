@@ -188,143 +188,12 @@ export type UpdateStoreSettingsDto = {
   shippingFreeThreshold?: number;
 };
 
-export type ProductEntity = {
-  id: number;
-  name: string;
-  description?: string | null;
-  price: number;
-  categoryId?: number | null;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type ProductVariationEntity = {
-  id: number;
-  productId: number;
-  product?: ProductEntity;
-  size: string;
-  color: string;
-  price: number;
-  stock: number;
-  imageUrl?: string | null;
-};
-
-export type CartEntity = {
-  id: number;
-  sessionId: string;
-  variationId: number;
-  variation: ProductVariationEntity;
-  quantity: number;
-  reservedAt: string;
-  expiresAt: string;
-  status: "reserved" | "purchased" | "expired";
-};
-
 export type AddToCartDto = {
   [key: string]: unknown;
 };
 
 export type UpdateCartItemDto = {
   [key: string]: unknown;
-};
-
-export type CreateCheckoutSessionDto = {
-  zip: string;
-  prefecture: string;
-  city: string;
-  address1: string;
-  address2?: string;
-};
-
-export type AdminMemberListItemDto = {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: string;
-  deletedAt: string | null;
-};
-
-export type AdminMemberListDto = {
-  items: Array<AdminMemberListItemDto>;
-  page: number;
-  limit: number;
-  total: number;
-};
-
-export type AdminMemberDetailDto = {
-  id: number;
-  name: string;
-  email: string;
-  address: string | null;
-  createdAt: string;
-  deletedAt: string | null;
-  orders: Array<OrderSummaryDto>;
-};
-
-export type AdminOrderUserDto = {
-  id: number;
-  name: string;
-  email: string;
-};
-
-export type AdminOrderListItemDto = {
-  id: number;
-  status:
-    | "pending"
-    | "paid"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  totalAmount: number;
-  createdAt: string;
-  user: AdminOrderUserDto;
-};
-
-export type AdminOrderListDto = {
-  items: Array<AdminOrderListItemDto>;
-  page: number;
-  limit: number;
-  total: number;
-};
-
-export type ShippingAddressDto = {
-  zip: string;
-  prefecture: string;
-  city: string;
-  address1: string;
-  address2?: string;
-};
-
-export type AdminOrderItemDto = {
-  id: number;
-  productName: string;
-  size: string;
-  color: string;
-  quantity: number;
-  price: number;
-};
-
-export type AdminOrderDetailDto = {
-  id: number;
-  status:
-    | "pending"
-    | "paid"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  shippingAddress: ShippingAddressDto;
-  shippingFee: number;
-  totalAmount: number;
-  createdAt: string;
-  user: AdminOrderUserDto;
-  items: Array<AdminOrderItemDto>;
-};
-
-export type UpdateOrderStatusDto = {
-  status: "shipped" | "delivered";
 };
 
 export type UsersControllerWithdrawData = {
@@ -521,73 +390,6 @@ export type AdminAccountsControllerUpdateData = {
 export type AdminAccountsControllerUpdateResponses = {
   200: unknown;
 };
-
-export type HealthControllerCheckData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: "/health";
-};
-
-export type HealthControllerCheckErrors = {
-  /**
-   * The Health Check is not successful
-   */
-  503: {
-    status?: string;
-    info?: {
-      [key: string]: {
-        status: string;
-        [key: string]: unknown;
-      };
-    } | null;
-    error?: {
-      [key: string]: {
-        status: string;
-        [key: string]: unknown;
-      };
-    } | null;
-    details?: {
-      [key: string]: {
-        status: string;
-        [key: string]: unknown;
-      };
-    };
-  };
-};
-
-export type HealthControllerCheckError =
-  HealthControllerCheckErrors[keyof HealthControllerCheckErrors];
-
-export type HealthControllerCheckResponses = {
-  /**
-   * The Health Check is successful
-   */
-  200: {
-    status?: string;
-    info?: {
-      [key: string]: {
-        status: string;
-        [key: string]: unknown;
-      };
-    } | null;
-    error?: {
-      [key: string]: {
-        status: string;
-        [key: string]: unknown;
-      };
-    } | null;
-    details?: {
-      [key: string]: {
-        status: string;
-        [key: string]: unknown;
-      };
-    };
-  };
-};
-
-export type HealthControllerCheckResponse =
-  HealthControllerCheckResponses[keyof HealthControllerCheckResponses];
 
 export type AdminCategoriesControllerFindAllData = {
   body?: never;
@@ -872,7 +674,9 @@ export type CartsControllerGetCartData = {
 };
 
 export type CartsControllerGetCartResponses = {
-  200: Array<CartEntity>;
+  200: {
+    [key: string]: unknown;
+  };
 };
 
 export type CartsControllerGetCartResponse =
@@ -886,7 +690,9 @@ export type CartsControllerAddToCartData = {
 };
 
 export type CartsControllerAddToCartResponses = {
-  200: CartEntity;
+  200: {
+    [key: string]: unknown;
+  };
 };
 
 export type CartsControllerAddToCartResponse =
@@ -917,160 +723,3 @@ export type CartsControllerUpdateItemData = {
 export type CartsControllerUpdateItemResponses = {
   200: unknown;
 };
-
-export type PaymentsControllerCreateCheckoutSessionData = {
-  body: CreateCheckoutSessionDto;
-  path?: never;
-  query?: never;
-  url: "/payments/checkout";
-};
-
-export type PaymentsControllerCreateCheckoutSessionResponses = {
-  200: {
-    url?: string;
-  };
-};
-
-export type PaymentsControllerCreateCheckoutSessionResponse =
-  PaymentsControllerCreateCheckoutSessionResponses[keyof PaymentsControllerCreateCheckoutSessionResponses];
-
-export type PaymentsControllerHandleWebhookData = {
-  body?: never;
-  headers: {
-    "stripe-signature": string;
-  };
-  path?: never;
-  query?: never;
-  url: "/payments/webhook";
-};
-
-export type PaymentsControllerHandleWebhookResponses = {
-  200: unknown;
-};
-
-export type AdminMembersControllerFindAllData = {
-  body?: never;
-  path?: never;
-  query?: {
-    limit?: number;
-    page?: number;
-  };
-  url: "/admin/members";
-};
-
-export type AdminMembersControllerFindAllResponses = {
-  200: AdminMemberListDto;
-};
-
-export type AdminMembersControllerFindAllResponse =
-  AdminMembersControllerFindAllResponses[keyof AdminMembersControllerFindAllResponses];
-
-export type AdminMembersControllerDeleteData = {
-  body?: never;
-  path: {
-    id: number;
-  };
-  query?: never;
-  url: "/admin/members/{id}";
-};
-
-export type AdminMembersControllerDeleteResponses = {
-  204: void;
-};
-
-export type AdminMembersControllerDeleteResponse =
-  AdminMembersControllerDeleteResponses[keyof AdminMembersControllerDeleteResponses];
-
-export type AdminMembersControllerFindByIdData = {
-  body?: never;
-  path: {
-    id: number;
-  };
-  query?: never;
-  url: "/admin/members/{id}";
-};
-
-export type AdminMembersControllerFindByIdResponses = {
-  200: AdminMemberDetailDto;
-};
-
-export type AdminMembersControllerFindByIdResponse =
-  AdminMembersControllerFindByIdResponses[keyof AdminMembersControllerFindByIdResponses];
-
-export type AdminOrdersControllerFindAllData = {
-  body?: never;
-  path?: never;
-  query?: {
-    status?:
-      | "pending"
-      | "paid"
-      | "shipped"
-      | "delivered"
-      | "cancelled"
-      | "refunded";
-    limit?: number;
-    page?: number;
-  };
-  url: "/admin/orders";
-};
-
-export type AdminOrdersControllerFindAllResponses = {
-  200: AdminOrderListDto;
-};
-
-export type AdminOrdersControllerFindAllResponse =
-  AdminOrdersControllerFindAllResponses[keyof AdminOrdersControllerFindAllResponses];
-
-export type AdminOrdersControllerFindByIdData = {
-  body?: never;
-  path: {
-    id: number;
-  };
-  query?: never;
-  url: "/admin/orders/{id}";
-};
-
-export type AdminOrdersControllerFindByIdResponses = {
-  200: AdminOrderDetailDto;
-};
-
-export type AdminOrdersControllerFindByIdResponse =
-  AdminOrdersControllerFindByIdResponses[keyof AdminOrdersControllerFindByIdResponses];
-
-export type AdminOrdersControllerUpdateStatusData = {
-  body: UpdateOrderStatusDto;
-  path: {
-    id: number;
-  };
-  query?: never;
-  url: "/admin/orders/{id}/status";
-};
-
-export type AdminOrdersControllerUpdateStatusResponses = {
-  /**
-   * ステータス更新成功
-   */
-  204: void;
-};
-
-export type AdminOrdersControllerUpdateStatusResponse =
-  AdminOrdersControllerUpdateStatusResponses[keyof AdminOrdersControllerUpdateStatusResponses];
-
-export type AdminOrdersControllerCancelOrderData = {
-  body?: never;
-  path: {
-    id: number;
-  };
-  query?: never;
-  url: "/admin/orders/{id}/cancel";
-};
-
-export type AdminOrdersControllerCancelOrderResponses = {
-  /**
-   * キャンセル・返金成功
-   */
-  204: void;
-};
-
-export type AdminOrdersControllerCancelOrderResponse =
-  AdminOrdersControllerCancelOrderResponses[keyof AdminOrdersControllerCancelOrderResponses];

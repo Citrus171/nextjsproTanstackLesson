@@ -6,7 +6,7 @@ import { SentryModule, SentryGlobalFilter } from "@sentry/nestjs/setup";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
-import { HealthModule } from "./health/health.module";
+// import { HealthModule } from "./health/health.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { ProductsModule } from "./products/products.module";
 import { StoreSettingsModule } from "./store-settings/store-settings.module";
@@ -34,7 +34,7 @@ import { CartsModule } from "./carts/carts.module";
     ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
-    HealthModule,
+    // HealthModule,
     CategoriesModule,
     ProductsModule,
     StoreSettingsModule,
