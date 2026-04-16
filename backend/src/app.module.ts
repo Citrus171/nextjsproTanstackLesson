@@ -11,9 +11,9 @@ import { CategoriesModule } from "./categories/categories.module";
 import { ProductsModule } from "./products/products.module";
 import { StoreSettingsModule } from "./store-settings/store-settings.module";
 import { CartsModule } from "./carts/carts.module";
-import { PaymentsModule } from "./payments/payments.module";
-import { AdminMembersModule } from "./admin-members/admin-members.module";
-import { AdminOrdersModule } from "./admin-orders/admin-orders.module";
+// import { PaymentsModule } from "./payments/payments.module";
+// import { AdminMembersModule } from "./admin-members/admin-members.module";
+// import { AdminOrdersModule } from "./admin-orders/admin-orders.module";
 
 @Module({
   imports: [
@@ -39,9 +39,9 @@ import { AdminOrdersModule } from "./admin-orders/admin-orders.module";
     ProductsModule,
     StoreSettingsModule,
     CartsModule,
-    PaymentsModule,
-    AdminMembersModule,
-    AdminOrdersModule,
+    // PaymentsModule,
+    // AdminMembersModule,
+    // AdminOrdersModule,
   ],
   providers: [
     {
